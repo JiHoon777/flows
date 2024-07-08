@@ -1,12 +1,13 @@
 import { PropsWithChildren, useCallback } from 'react'
 
+import { debounce } from 'lodash-es'
+import { Map, NotebookPen, Type } from 'lucide-react'
+import { Handle, NodeProps, NodeResizer, Position } from 'reactflow'
+
 import { Textarea } from '@/components/ui/textarea'
 import { useStore } from '@/store/store'
 import { NodeType } from '@/store/types'
 import { cn } from '@/utils/cn'
-import { debounce } from 'lodash-es'
-import { Map, NotebookPen, Type } from 'lucide-react'
-import { Handle, NodeProps, NodeResizer, Position } from 'reactflow'
 
 type Props = PropsWithChildren & NodeProps
 

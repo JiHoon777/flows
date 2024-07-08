@@ -1,3 +1,6 @@
+import { Edge, Node, OnEdgesChange, OnNodesChange, XYPosition } from 'reactflow'
+import { StateCreator } from 'zustand'
+
 import {
   Flow,
   FlowNodeData,
@@ -5,8 +8,6 @@ import {
   NodeType,
   NodeTypes,
 } from '@/store/types'
-import { Edge, Node, OnEdgesChange, OnNodesChange, XYPosition } from 'reactflow'
-import { StateCreator } from 'zustand'
 
 export type CommonStateCreator<STORE_TYPE, SLICE_TYPE> = StateCreator<
   STORE_TYPE,

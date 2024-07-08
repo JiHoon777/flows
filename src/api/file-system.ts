@@ -1,5 +1,4 @@
 // Save Flow
-import { Flow, NodeTypes } from '@/store/types'
 import {
   BaseDirectory,
   createDir,
@@ -8,6 +7,8 @@ import {
   removeFile,
   writeTextFile,
 } from '@tauri-apps/api/fs'
+
+import { Flow, NodeTypes } from '@/store/types'
 
 const FLOW_DIR = `flows/flow`
 const NODE_DIR = `flows/node`

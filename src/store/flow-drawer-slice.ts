@@ -1,11 +1,3 @@
-import { fileSystemAPI } from '@/api/file-system'
-import {
-  CommonStateCreator,
-  FlowDrawerSlice,
-  StoreType,
-} from '@/store/slice.type'
-import { FlowNodeData, NodeType } from '@/store/types'
-import { reactFlowUtils } from '@/utils/react-flow'
 import { nanoid } from 'nanoid'
 import {
   applyEdgeChanges,
@@ -16,6 +8,15 @@ import {
   NodeChange,
   XYPosition,
 } from 'reactflow'
+
+import { fileSystemAPI } from '@/api/file-system'
+import {
+  CommonStateCreator,
+  FlowDrawerSlice,
+  StoreType,
+} from '@/store/slice.type'
+import { FlowNodeData, NodeType } from '@/store/types'
+import { reactFlowUtils } from '@/utils/react-flow'
 
 export const createFlowDrawerSlice: CommonStateCreator<
   StoreType,

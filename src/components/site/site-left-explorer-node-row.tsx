@@ -1,10 +1,11 @@
 import { memo } from 'react'
 
+import { motion } from 'framer-motion'
+import { useNavigate, useParams } from 'react-router-dom'
+
 import { Badge } from '@/components/ui/badge'
 import { NodeTypes } from '@/store/types'
 import { cn } from '@/utils/cn'
-import { motion } from 'framer-motion'
-import { useNavigate, useParams } from 'react-router-dom'
 
 export const SiteLeftExplorerNodeRow = memo(({ node }: { node: NodeTypes }) => {
   const navigate = useNavigate()

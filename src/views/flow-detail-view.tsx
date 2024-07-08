@@ -7,18 +7,8 @@ import {
   useState,
 } from 'react'
 
-import {
-  FlowContextMenuContent,
-  MenuItem,
-} from '@/components/flow-context-menu-content'
-import { StraightEdge } from '@/components/flow-edge/straight-edge'
-import { FlowNode } from '@/components/flow-node/flow-node'
-import { NoteNode } from '@/components/flow-node/note-node'
-import { TextNode } from '@/components/flow-node/text-node'
-import { BookLoading } from '@/components/loading/book-loading'
-import { StoreType } from '@/store/slice.type'
-import { useStore } from '@/store/store'
 import { Map, NotebookPen, Type } from 'lucide-react'
+import { useParams } from 'react-router-dom'
 import {
   Background,
   ConnectionLineType,
@@ -34,8 +24,19 @@ import {
 } from 'reactflow'
 import { shallow } from 'zustand/shallow'
 
+import {
+  FlowContextMenuContent,
+  MenuItem,
+} from '@/components/flow-context-menu-content'
+import { StraightEdge } from '@/components/flow-edge/straight-edge'
+import { FlowNode } from '@/components/flow-node/flow-node'
+import { NoteNode } from '@/components/flow-node/note-node'
+import { TextNode } from '@/components/flow-node/text-node'
+import { BookLoading } from '@/components/loading/book-loading'
+import { StoreType } from '@/store/slice.type'
+import { useStore } from '@/store/store'
+
 import 'reactflow/dist/style.css'
-import { useParams } from 'react-router-dom'
 
 // eslint-disable-next-line react-refresh/only-export-components
 const FlowDetailView = () => {

@@ -1,12 +1,13 @@
+import { Outlet } from 'react-router-dom'
+
 import { Providers } from '@/components/providers.tsx'
 import { SiteDataLoader } from '@/components/site/site-data-loader.tsx'
+import { SiteLeftExplorer } from '@/components/site/site-left-explorer.tsx'
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from '@/components/ui/resizable.tsx'
-import { SiteLeftExplorer } from '@/components/site/site-left-explorer.tsx'
-import { Outlet } from 'react-router-dom'
 
 export const SiteLayout = () => {
   return (

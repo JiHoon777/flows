@@ -1,11 +1,12 @@
+import { enableMapSet } from 'immer'
+import { immer } from 'zustand/middleware/immer'
+import { createWithEqualityFn } from 'zustand/traditional'
+
 import { fileSystemAPI } from '@/api/file-system'
 import { createFlowDrawerSlice } from '@/store/flow-drawer-slice'
 import { createFlowSlice } from '@/store/flow-slice'
 import { createNodeSlice } from '@/store/node-slice'
 import { StoreType } from '@/store/slice.type'
-import { enableMapSet } from 'immer'
-import { immer } from 'zustand/middleware/immer'
-import { createWithEqualityFn } from 'zustand/traditional'
 
 enableMapSet()
 
