@@ -1,6 +1,7 @@
 import { observer } from 'mobx-react'
 import { useParams } from 'react-router-dom'
 
+import { LexicalEditor } from '@/components/lexical/lexical-editor.tsx'
 import { useStore } from '@/store/useStore.ts'
 
 export const NodeDetailViewParamsWrap = observer(() => {
@@ -33,15 +34,23 @@ export const NodeDetailView = observer(({ nodeId }: { nodeId: string }) => {
   }
 
   return (
-    <main
-      className={
-        'flex flex-col w-full h-full max-w-[1024px] mx-auto overflow-y-auto pt-10 gap-6 px-10'
-      }
-    >
-      {/* Meta Data; Title, Tag, ...*/}
-      <header className={'flex flex-col gap-1'}>
-        <h1 className={'font-bold text-2xl'}>{node.title}</h1>
-      </header>
+    <main className={'w-full h-screen overflow-y-auto'}>
+      <div
+        className={
+          'max-w-[1024px] w-full min-h-full flex flex-col mx-auto gap-6 mb-6'
+        }
+      >
+        {/* Meta Data; Title, Tag, ...*/}
+        <header className={'flex flex-col gap-1 shrink-0'}>
+          <h1 className={'font-bold text-2xl'}>{node.title}</h1>
+        </header>
+        <LexicalEditor
+          initialEditorState={null}
+          onChange={(v) => {
+            return v
+          }}
+        />
+      </div>
     </main>
   )
 })
