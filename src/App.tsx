@@ -9,10 +9,14 @@ const SiteLayout = lazy(() =>
     default: module.SiteLayout,
   })),
 )
-const FlowDetailView = lazy(() => import('@/views/flow-detail-view.tsx'))
+const FlowDetailView = lazy(() =>
+  import('@/views/flow-detail-view.tsx').then((module) => ({
+    default: module.FlowDetailViewParamsWrap,
+  })),
+)
 const NodeDetailView = lazy(() =>
   import('@/views/node-detail-view.tsx').then((module) => ({
-    default: module.NodeDetailView,
+    default: module.NodeDetailViewParamsWrap,
   })),
 )
 

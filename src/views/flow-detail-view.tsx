@@ -1,5 +1,4 @@
 import {
-  memo,
   MouseEvent as ReactMouseEvent,
   useCallback,
   useEffect,
@@ -8,11 +7,14 @@ import {
 } from 'react'
 
 import { Map, NotebookPen, Type } from 'lucide-react'
+import { observer } from 'mobx-react'
 import { useParams } from 'react-router-dom'
 import {
   Background,
   ConnectionLineType,
   Controls,
+  EdgeChange,
+  NodeChange,
   NodeDragHandler,
   NodeOrigin,
   OnConnectEnd,
@@ -22,7 +24,6 @@ import {
   useReactFlow,
   useStoreApi,
 } from 'reactflow'
-import { shallow } from 'zustand/shallow'
 
 import {
   FlowContextMenuContent,
@@ -33,30 +34,36 @@ import { FlowNode } from '@/components/flow-node/flow-node'
 import { NoteNode } from '@/components/flow-node/note-node'
 import { TextNode } from '@/components/flow-node/text-node'
 import { BookLoading } from '@/components/loading/book-loading'
-import { StoreType } from '@/store/slice.type'
-import { useStore } from '@/store/store'
+import { DoFlow } from '@/store/flow/do-flow.ts'
+import { useStore } from '@/store/useStore.ts'
 
 import 'reactflow/dist/style.css'
 
-// eslint-disable-next-line react-refresh/only-export-components
-const FlowDetailView = () => {
-  const {
-    appLoaded,
-    initializeFlowDrawer,
-    loaded,
-    nodes,
-    edges,
-    onNodesChange,
-    onEdgesChange,
-    addNode,
-    addFlowNode,
-    connectNodes,
-    updateNodePosition,
-  } = useStore(selector, shallow)
+export const FlowDetailViewParamsWrap = observer(() => {
+  const { flowId } = useParams<{ flowId: string }>()
+
+  if (!flowId) {
+    throw new Error(`flowId 가 존재하지 않습니다.`)
+  }
+
+  return <FlowDetailView flowId={flowId} />
+})
+
+export const FlowDetailView = observer(({ flowId }: { flowId: string }) => {
+  return (
+    <ReactFlowProvider>
+      <FlowDetailView_ flowId={flowId} />
+    </ReactFlowProvider>
+  )
+})
+
+const FlowDetailView_ = observer(({ flowId }: { flowId: string }) => {
+  const appStore = useStore()
   const store = useStoreApi()
   const { screenToFlowPosition } = useReactFlow()
-  const { flowId } = useParams<{ flowId: string }>()
   const connectingNodeId = useRef<string | null>(null)
+  const flow = appStore.flowStore.getFlowById(flowId) as DoFlow | undefined
+  const drawer = flow?.drawer
 
   //
   // context menu
@@ -110,7 +117,7 @@ const FlowDetailView = () => {
         const targetNode = targetNodeId ? nodeInternals.get(targetNodeId) : null
 
         if (targetNode) {
-          connectNodes(sourceNode, targetNode)
+          drawer?.connectNodes(sourceNode, targetNode)
         }
       }
 
@@ -130,14 +137,20 @@ const FlowDetailView = () => {
       //   }
       // }
     },
-    [connectNodes, store],
+    [drawer, store],
   )
 
   const onNodeDragStop: NodeDragHandler = useCallback(
     (_, node) => {
-      updateNodePosition(node)
+      if (node.type) {
+        drawer?.updateNodePosition({
+          id: node.id,
+          type: node.type,
+          position: node.position,
+        })
+      }
     },
-    [updateNodePosition],
+    [drawer],
   )
 
   const onPaneContextMenu = useCallback((e: ReactMouseEvent | TouchEvent) => {
@@ -151,17 +164,32 @@ const FlowDetailView = () => {
     })
   }, [])
 
+  const onNodesChange = useCallback(
+    (changes: NodeChange[]) => {
+      drawer?.onNodesChange(changes)
+    },
+    [drawer],
+  )
+
+  const onEdgesChange = useCallback(
+    (changes: EdgeChange[]) => {
+      drawer?.onEdgesChange(changes)
+    },
+    [drawer],
+  )
+
   /**
    * 컴포넌트가 마운트될 때 초기화 함수 호출
    *
    * id가 변경될 때마다 initialize 함수를 호출합니다.
    */
   useEffect(() => {
-    if (!appLoaded) {
+    if (!appStore.appLoaded) {
       return
     }
-    initializeFlowDrawer(flowId!)
-  }, [flowId, initializeFlowDrawer, appLoaded])
+
+    drawer?.initialize()
+  }, [appStore.appLoaded, drawer])
 
   const paneContextMenuItems: MenuItem[] = (() => {
     if (!paneContextMenuPosition) {
@@ -178,27 +206,27 @@ const FlowDetailView = () => {
       {
         leftIcon: <NotebookPen className={'w-4 h-4'} />,
         text: 'Create Note',
-        onClick: () =>
-          addNode({ parentFlowId: flowId!, nodeType: 'note', position }),
+        onClick: () => drawer?.addNode({ nodeType: 'note', position }),
       },
       {
         leftIcon: <Map className={'w-4 h-4'} />,
         text: 'Create Flow',
-        onClick: () => addFlowNode({ parentFlowId: flowId!, position }),
+        onClick: () => drawer?.addFlowNode(position),
       },
       {
         leftIcon: <Type className={'w-4 h-4'} />,
         text: 'Create Text',
-        onClick: () =>
-          addNode({ parentFlowId: flowId!, nodeType: 'text', position }),
+        onClick: () => drawer?.addNode({ nodeType: 'text', position }),
       },
     ]
   })()
 
-  if (!loaded) {
+  if (!drawer?.loaded) {
     return <BookLoading />
   }
 
+  const nodes = drawer.nodes
+  const edges = drawer.edges
   return (
     <main className={'w-full h-screen'}>
       <ReactFlow
@@ -291,21 +319,6 @@ const FlowDetailView = () => {
       </ReactFlow>
     </main>
   )
-}
-
-const selector = (state: StoreType) => ({
-  loaded: state.loaded,
-  initializeFlowDrawer: state.initializeFlowDrawer,
-  nodes: state.nodes,
-  edges: state.edges,
-  onNodesChange: state.onNodesChange,
-  onEdgesChange: state.onEdgesChange,
-  addChildNode: state.addChildNode,
-  addNode: state.addNode,
-  addFlowNode: state.addFlowNode,
-  connectNodes: state.connectNodes,
-  appLoaded: state.appLoaded,
-  updateNodePosition: state.updateNodePosition,
 })
 
 const nodeOrigin: NodeOrigin = [0.5, 0.5]
@@ -323,10 +336,3 @@ const edgeTypes = {
   text: StraightEdge,
   note: StraightEdge,
 }
-
-// eslint-disable-next-line react-refresh/only-export-components
-export default memo(() => (
-  <ReactFlowProvider>
-    <FlowDetailView />
-  </ReactFlowProvider>
-))

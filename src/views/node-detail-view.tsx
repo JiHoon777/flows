@@ -1,13 +1,21 @@
+import { observer } from 'mobx-react'
 import { useParams } from 'react-router-dom'
 
-import { useStore } from '@/store/store'
+import { useStore } from '@/store/useStore.ts'
 
-export const NodeDetailView = () => {
+export const NodeDetailViewParamsWrap = observer(() => {
   const { nodeId } = useParams<{ nodeId: string }>()
-  const { node } = useStore((state) => ({
-    node: state.getNodeById(nodeId!),
-    updateNode: state.updateNode,
-  }))
+
+  if (!nodeId) {
+    throw new Error(`노드가 존재하지 않습니다.`)
+  }
+
+  return <NodeDetailView nodeId={nodeId} />
+})
+
+export const NodeDetailView = observer(({ nodeId }: { nodeId: string }) => {
+  const store = useStore()
+  const node = store.nodeStore.getNodeById(nodeId)
 
   // const handleChange = useCallback(
   //   (content: string) => {
@@ -32,8 +40,8 @@ export const NodeDetailView = () => {
     >
       {/* Meta Data; Title, Tag, ...*/}
       <header className={'flex flex-col gap-1'}>
-        <h1 className={'font-bold text-2xl'}>{node.data.title}</h1>
+        <h1 className={'font-bold text-2xl'}>{node.title}</h1>
       </header>
     </main>
   )
-}
+})

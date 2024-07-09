@@ -1,13 +1,13 @@
 import { useEffect } from 'react'
 
-import { useStore } from '@/store/store'
+import { useStore } from '@/store/useStore.ts'
 
 export const SiteDataLoader = () => {
-  const initialize = useStore((state) => state.initialize)
+  const store = useStore()
 
   useEffect(() => {
-    initialize()
-  }, [initialize])
+    store.initializeApp()
+  }, [store])
 
   return null
 }
