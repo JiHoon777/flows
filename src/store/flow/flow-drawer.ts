@@ -47,14 +47,14 @@ export class FlowDrawer {
     const creatingEdges: Edge[] = []
 
     reactFlowUtils.initializeChildNodes(
-      this.flow.data.childFlowIds ?? [],
-      (id) => this.flow.store.getFlowById(id)?.data,
+      this.flow.snapshot.childFlowIds ?? [],
+      (id) => this.flow.store.getFlowById(id)?.snapshot,
       creatingNodes,
       creatingEdges,
     )
     reactFlowUtils.initializeChildNodes(
-      this.flow.data.childNodeIds ?? [],
-      (id) => this.flow.store.rootStore.nodeStore.getNodeById(id)?.data,
+      this.flow.snapshot.childNodeIds ?? [],
+      (id) => this.flow.store.rootStore.nodeStore.getNodeById(id)?.snapshot,
       creatingNodes,
       creatingEdges,
     )
@@ -121,7 +121,10 @@ export class FlowDrawer {
       ? this.rootStore.flowStore.getFlowById(sourceNode.id)
       : this.rootStore.nodeStore.getNodeById(sourceNode.id)
 
-    const targets = [...(flowOrNode.data.targets ?? []), { id: targetNode.id }]
+    const targets = [
+      ...(flowOrNode.snapshot.targets ?? []),
+      { id: targetNode.id },
+    ]
     try {
       if (isSourceNodeFlow) {
         await this.rootStore.flowStore.updateFlow({

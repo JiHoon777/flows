@@ -12,6 +12,7 @@
     "build:app": "tauri build"
   },
   "dependencies": {
+    "@lexical/list": "^0.16.1",
     "@lexical/react": "^0.16.1",
     "@radix-ui/react-context-menu": "^2.2.1",
     "@radix-ui/react-dropdown-menu": "^2.1.1",

@@ -77,11 +77,11 @@ export class DoFlowStore {
     }
 
     // todo: cloneDeep 말고
-    const dataBeforeMerge = cloneDeep(existing.data)
+    const dataBeforeMerge = cloneDeep(existing.snapshot)
     existing.merge({ ...changedFlow, updated_at: new Date() })
 
     try {
-      await fileSystemAPI.saveFlowToFile(existing.data)
+      await fileSystemAPI.saveFlowToFile(existing.snapshot)
 
       return existing
     } catch (ex) {

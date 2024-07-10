@@ -74,11 +74,11 @@ export class DoNodeStore {
       throw new Error('could not find node')
     }
 
-    const dataBeforeMerge = cloneDeep(existing.data)
+    const dataBeforeMerge = cloneDeep(existing.snapshot)
     existing.merge(changedNode)
 
     try {
-      await fileSystemAPI.saveNodeToFile(existing.data)
+      await fileSystemAPI.saveNodeToFile(existing.snapshot)
 
       return existing
     } catch (ex) {

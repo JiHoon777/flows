@@ -37,7 +37,7 @@ export const NodeDetailView = observer(({ nodeId }: { nodeId: string }) => {
     <main className={'w-full h-screen overflow-y-auto'}>
       <div
         className={
-          'max-w-[1024px] w-full min-h-full flex flex-col mx-auto gap-6 mb-6'
+          'max-w-[1024px] w-full flex flex-col mx-auto gap-6 mt-10 mb-6'
         }
       >
         {/* Meta Data; Title, Tag, ...*/}
@@ -45,6 +45,7 @@ export const NodeDetailView = observer(({ nodeId }: { nodeId: string }) => {
           <h1 className={'font-bold text-2xl'}>{node.title}</h1>
         </header>
         <LexicalEditor
+          showTreeView
           initialEditorState={null}
           onChange={(v) => {
             return v

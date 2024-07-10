@@ -1,15 +1,21 @@
 import { merge } from 'lodash-es'
-import { action, computed, makeObservable, observable } from 'mobx'
+import { action, makeObservable, observable } from 'mobx'
 
 import { DoFlowStore } from '@/store/flow/do-flow-store.ts'
 import { FlowDrawer } from '@/store/flow/flow-drawer.ts'
 import { Flow, FlowNodeData, NodeTypes } from '@/store/types.ts'
+import { assignIf } from '@/store/utils/store.utils.ts'
 
 export class DoFlow {
   store: DoFlowStore
   drawer: FlowDrawer
 
-  data!: Flow
+  title!: string
+  parentFlowId: string | null = null
+  childFlowIds: string[] | null = null
+  childNodeIds: string[] | null = null
+
+  snapshot!: Flow
 
   constructor(store: DoFlowStore, data: Flow) {
     this.store = store
@@ -17,43 +23,40 @@ export class DoFlow {
 
     this.merge(data)
     makeObservable(this, {
-      data: observable,
-
-      title: computed,
-      parentFlowId: computed,
-      childFlowIds: computed,
-      childNodeIds: computed,
+      title: observable,
+      parentFlowId: observable,
+      childFlowIds: observable,
+      childNodeIds: observable,
 
       merge: action,
     })
   }
 
   get id() {
-    return this.data.flowId
-  }
-
-  get title() {
-    return this.data.data?.title
-  }
-
-  get parentFlowId() {
-    return this.data.parentFlowId
-  }
-
-  get childFlowIds() {
-    return this.data.childFlowIds ?? []
-  }
-
-  get childNodeIds() {
-    return this.data.childNodeIds ?? []
+    return this.snapshot.flowId
   }
 
   merge(
-    data: Partial<Omit<Flow, 'data'>> & {
+    changedData: Partial<Omit<Flow, 'data'>> & {
       data?: Partial<FlowNodeData>
     },
   ) {
-    this.data = merge({}, this.data, data)
+    this.snapshot = merge({}, this.snapshot, changedData)
+
+    assignIf(changedData, 'parentFlowId', (parentFlowId) => {
+      this.parentFlowId = parentFlowId
+    })
+    assignIf(changedData, 'childFlowIds', (childFlowIds) => {
+      this.childFlowIds = childFlowIds
+    })
+    assignIf(changedData, 'childNodeIds', (childNodeIds) => {
+      this.childNodeIds = childNodeIds
+    })
+    assignIf(changedData, 'data', (data) => {
+      assignIf(data, 'title', (title) => {
+        this.title = title
+      })
+    })
 
     return this
   }
@@ -68,7 +71,7 @@ export class DoFlow {
     await this.store.updateFlow({
       flowId: this.id,
       changedFlow: {
-        childFlowIds: [...(this.data.childFlowIds ?? []), createdFlow.id],
+        childFlowIds: [...(this.snapshot.childFlowIds ?? []), createdFlow.id],
       },
     })
   }
@@ -77,7 +80,7 @@ export class DoFlow {
     await this.store.updateFlow({
       flowId: this.id,
       changedFlow: {
-        childNodeIds: [...(this.data.childNodeIds ?? []), createdNode.id],
+        childNodeIds: [...(this.snapshot.childNodeIds ?? []), createdNode.id],
       },
     })
   }
