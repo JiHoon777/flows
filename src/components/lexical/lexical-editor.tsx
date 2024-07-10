@@ -6,19 +6,22 @@ import {
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
+import { ListPlugin } from '@lexical/react/LexicalListPlugin'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
+import { observer } from 'mobx-react'
 
 import { lexicalEditorTheme } from '@/components/lexical/lexical-editor-theme.ts'
 import { LexicalNodes } from '@/components/lexical/nodes'
 import { OnChangePlugin } from '@/components/lexical/plugins/on-change-plugin.tsx'
+import { TreeViewPlugin } from '@/components/lexical/plugins/tree-view-plugin.tsx'
 
-export const LexicalEditor = ({
-  initialEditorState,
-  onChange,
-}: {
+type Props = {
   initialEditorState: InitialEditorStateType
   onChange: (editorState: string) => void
-}) => {
+  showTreeView?: boolean
+}
+
+export const LexicalEditor = observer((props: Props) => {
   const initialConfig = {
     namespace: 'NodeEditor,',
     theme: lexicalEditorTheme,
@@ -28,30 +31,48 @@ export const LexicalEditor = ({
 
   return (
     <LexicalComposer initialConfig={initialConfig}>
-      <div className={'relative flex flex-col w-full min-h-full p-5 mb-10'}>
-        <AutoFocusPlugin />
-        <RichTextPlugin
-          contentEditable={
-            <ContentEditable
-              className={'w-full min-h-full border-none outline-none mb-10'}
-            />
-          }
-          placeholder={
-            <div className={'absolute top-5 left-5'}>Enter some text...</div>
-          }
-          ErrorBoundary={LexicalErrorBoundary}
-        />
-        <HistoryPlugin />
-        <AutoFocusPlugin />
-        <OnChangePlugin
-          initialEditorState={initialEditorState}
-          onChange={onChange}
-        />
-      </div>
-      {/*<TreeViewPlugin />*/}
+      <LexicalEditor_ {...props} />
     </LexicalComposer>
   )
-}
+})
+
+const LexicalEditor_ = observer(
+  ({
+    initialEditorState,
+    onChange,
+    showTreeView = false,
+  }: {
+    initialEditorState: InitialEditorStateType
+    onChange: (editorState: string) => void
+    showTreeView?: boolean
+  }) => {
+    return (
+      <>
+        <div className={'relative w-full'}>
+          <RichTextPlugin
+            contentEditable={
+              <ContentEditable
+                className={'w-full min-h-[85vh] border-none outline-none'}
+              />
+            }
+            placeholder={
+              <div className={'absolute top-0 left-0'}>Enter some text...</div>
+            }
+            ErrorBoundary={LexicalErrorBoundary}
+          />
+          <OnChangePlugin
+            initialEditorState={initialEditorState}
+            onChange={onChange}
+          />
+          <HistoryPlugin />
+          <AutoFocusPlugin />
+          <ListPlugin />
+        </div>
+        {showTreeView && <TreeViewPlugin />}
+      </>
+    )
+  },
+)
 
 const onError = (error: Error) => {
   console.error(error)
