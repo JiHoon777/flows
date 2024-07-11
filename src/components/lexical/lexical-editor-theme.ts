@@ -1,10 +1,16 @@
 import { EditorThemeClasses } from 'lexical'
 
+import { cn } from '@/utils/cn.ts'
+
 export const lexicalEditorTheme: EditorThemeClasses = {
   autocomplete: 'PlaygroundEditorTheme__autocomplete',
   blockCursor: 'PlaygroundEditorTheme__blockCursor',
   characterLimit: 'PlaygroundEditorTheme__characterLimit',
-  code: 'PlaygroundEditorTheme__code',
+  code: cn(
+    'bg-[rgb(240,242,245)] block py-2 pr-2 pl-[52px] text-sm mx-0 my-2 overflow-x-auto relative ',
+    'before:content-[attr(data-gutter)] before:absolute before:bg-[#eee] before:left-0 before:top-0 ',
+    'before:border-r before:border-[#ccc] before:p-2 before:text-[#777] before:whitespace-pre-wrap before:text-right before:min-w[25px]',
+  ),
   codeHighlight: {
     atrule: 'PlaygroundEditorTheme__tokenAttr',
     attr: 'PlaygroundEditorTheme__tokenAttr',
