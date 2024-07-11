@@ -44,12 +44,12 @@ export const lexicalEditorTheme: EditorThemeClasses = {
   hashtag:
     'bg-[rgba(88,144,255,0.15)] border-b border-[rgba(88, 144, 255, 0.3)]',
   heading: {
-    h1: 'text-2xl text-[rgb(5,5,5)] font-normal m-0',
-    h2: 'PlaygroundEditorTheme__h2',
-    h3: 'PlaygroundEditorTheme__h3',
-    h4: 'PlaygroundEditorTheme__h4',
-    h5: 'PlaygroundEditorTheme__h5',
-    h6: 'PlaygroundEditorTheme__h6',
+    h1: 'text-6xl text-foreground font-bold my-6',
+    h2: 'text-5xl text-foreground font-bold my-5',
+    h3: 'text-4xl text-foreground font-bold my-4',
+    h4: 'text-3xl text-foreground font-bold my-3',
+    h5: 'text-2xl text-foreground font-bold my-2',
+    h6: 'text-1xl text-foreground font-bold my-1',
   },
   hr: 'PlaygroundEditorTheme__hr',
   image: 'editor-image',

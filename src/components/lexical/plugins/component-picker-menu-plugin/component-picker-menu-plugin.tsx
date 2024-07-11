@@ -201,7 +201,7 @@ function getBaseOptions(editor: LexicalEditor) {
         }),
     }),
     new ComponentPickerOption('Divider', {
-      icon: <DividerHorizontalIcon />,
+      icon: <DividerHorizontalIcon className={'w-6 h-6'} />,
       keywords: ['horizontal rule', 'divider', 'hr'],
       onSelect: () =>
         editor.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, undefined),
