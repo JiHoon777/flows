@@ -18,6 +18,7 @@ import { observer } from 'mobx-react'
 
 import { lexicalEditorTheme } from '@/components/lexical/lexical-editor-theme.ts'
 import { LexicalNodes } from '@/components/lexical/nodes'
+import { LexicalAutoLinkPlugin } from '@/components/lexical/plugins/auto-link-plugin.tsx'
 import { CodeHighlightPlugin } from '@/components/lexical/plugins/code-highlight-plugin.tsx'
 import { ComponentPickerMenuPlugin } from '@/components/lexical/plugins/component-picker-menu-plugin/component-picker-menu-plugin.tsx'
 import { ListMaxIndentLevelPlugin } from '@/components/lexical/plugins/list-max-indent-level-plugin.tsx'
@@ -81,6 +82,7 @@ const LexicalEditor_ = observer(
           <TabIndentationPlugin />
           <MarkdownShortcutPlugin transformers={DEFAULT_TRANSFORMERS} />
           <CodeHighlightPlugin />
+          <LexicalAutoLinkPlugin />
           <ComponentPickerMenuPlugin />
         </div>
         {showTreeView && <TreeViewPlugin />}

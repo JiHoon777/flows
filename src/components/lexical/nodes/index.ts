@@ -16,6 +16,8 @@ export const LexicalNodes: Klass<LexicalNode>[] = [
   AutoLinkNode,
   LinkNode,
   HorizontalRuleNode,
+  LinkNode,
+  AutoLinkNode,
   // ExcalidrawNode
   // StickyNode
   // CollapsibleNode

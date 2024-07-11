@@ -63,7 +63,7 @@ export const lexicalEditorTheme: EditorThemeClasses = {
   inlineImage: 'inline-editor-image',
   layoutContainer: 'PlaygroundEditorTheme__layoutContainer',
   layoutItem: 'PlaygroundEditorTheme__layoutItem',
-  link: 'PlaygroundEditorTheme__link',
+  link: 'text-[rgb(33,111,219)] no-underline hover:underline cursor-pointer',
   list: {
     checklist: '',
     listitem: 'my-0 mx-8',
