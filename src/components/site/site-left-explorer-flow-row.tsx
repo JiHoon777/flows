@@ -45,7 +45,7 @@ export const SiteLeftExplorerFlowRow = observer(
             />
           </motion.div>
           <span className={'text-sm'}>{flow.title ?? '-'}</span>
-          <Badge variant={'outline'} className={'py-0.5 px-2'}>
+          <Badge variant={'outline'} className={'py-0.5 px-2 ml-auto'}>
             flow
           </Badge>
         </div>
@@ -58,13 +58,13 @@ export const SiteLeftExplorerFlowRow = observer(
               exit={{ height: 0 }}
               transition={{ duration: 0.2 }}
             >
-              {flow.childFlowIds.map((cf) => {
+              {flow.childFlowIds?.map((cf) => {
                 const found = store.flowStore.getFlowById(cf)
                 return found ? (
                   <SiteLeftExplorerFlowRow key={found.id} flow={found} />
                 ) : null
               })}
-              {flow.childNodeIds.map((cn) => {
+              {flow.childNodeIds?.map((cn) => {
                 const found = store.nodeStore.getNodeById(cn)
                 return found?.type === 'note' ? (
                   <SiteLeftExplorerNodeRow key={found.id} node={found} />

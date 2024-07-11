@@ -7,11 +7,19 @@ import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
 import { ListPlugin } from '@lexical/react/LexicalListPlugin'
+import {
+  DEFAULT_TRANSFORMERS,
+  MarkdownShortcutPlugin,
+} from '@lexical/react/LexicalMarkdownShortcutPlugin'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
+import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin'
 import { observer } from 'mobx-react'
 
 import { lexicalEditorTheme } from '@/components/lexical/lexical-editor-theme.ts'
 import { LexicalNodes } from '@/components/lexical/nodes'
+import { CodeHighlightPlugin } from '@/components/lexical/plugins/code-highlight-plugin.tsx'
+import { ComponentPickerMenuPlugin } from '@/components/lexical/plugins/component-picker-menu-plugin/component-picker-menu-plugin.tsx'
+import { ListMaxIndentLevelPlugin } from '@/components/lexical/plugins/list-max-indent-level-plugin.tsx'
 import { OnChangePlugin } from '@/components/lexical/plugins/on-change-plugin.tsx'
 import { TreeViewPlugin } from '@/components/lexical/plugins/tree-view-plugin.tsx'
 
@@ -67,6 +75,11 @@ const LexicalEditor_ = observer(
           <HistoryPlugin />
           <AutoFocusPlugin />
           <ListPlugin />
+          <ListMaxIndentLevelPlugin maxDepth={7} />
+          <TabIndentationPlugin />
+          <MarkdownShortcutPlugin transformers={DEFAULT_TRANSFORMERS} />
+          <CodeHighlightPlugin />
+          <ComponentPickerMenuPlugin />
         </div>
         {showTreeView && <TreeViewPlugin />}
       </>

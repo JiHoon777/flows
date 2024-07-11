@@ -25,8 +25,8 @@ export const SiteLeftExplorerNodeRow = observer(
         onClick={() => navigate(`/nodes/${node.id}`)}
       >
         <span className={'text-sm'}>{node.title}</span>
-        <Badge variant={'outline'} className={'py-0.5 px-2'}>
-          node
+        <Badge variant={'outline'} className={'py-0.5 px-2 ml-auto'}>
+          {node.type}
         </Badge>
       </motion.div>
     )
