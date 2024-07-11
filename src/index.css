@@ -1,3 +1,5 @@
+@import url('lexical.css');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

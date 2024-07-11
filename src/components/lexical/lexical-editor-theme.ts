@@ -65,10 +65,10 @@ export const lexicalEditorTheme: EditorThemeClasses = {
   layoutItem: 'PlaygroundEditorTheme__layoutItem',
   link: 'PlaygroundEditorTheme__link',
   list: {
-    checklist: 'PlaygroundEditorTheme__checklist',
+    checklist: '',
     listitem: 'my-0 mx-8',
-    listitemChecked: 'PlaygroundEditorTheme__listItemChecked',
-    listitemUnchecked: 'PlaygroundEditorTheme__listItemUnchecked',
+    listitemChecked: 'EditorTheme__listItemChecked',
+    listitemUnchecked: 'EditorTheme__listItemUnChecked',
     nested: {
       listitem: 'list-none before:hidden after:hidden',
     },

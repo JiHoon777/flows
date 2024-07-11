@@ -1,4 +1,5 @@
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin'
+import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin'
 import {
   InitialEditorStateType,
   LexicalComposer,
@@ -75,6 +76,7 @@ const LexicalEditor_ = observer(
           <HistoryPlugin />
           <AutoFocusPlugin />
           <ListPlugin />
+          <CheckListPlugin />
           <ListMaxIndentLevelPlugin maxDepth={7} />
           <TabIndentationPlugin />
           <MarkdownShortcutPlugin transformers={DEFAULT_TRANSFORMERS} />
