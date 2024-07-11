@@ -26,6 +26,9 @@ importers:
       '@lexical/selection':
         specifier: ^0.16.1
         version: 0.16.1
+      '@lexical/utils':
+        specifier: ^0.16.1
+        version: 0.16.1
       '@radix-ui/react-context-menu':
         specifier: ^2.2.1
         version: 2.2.1(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
