@@ -151,6 +151,9 @@ const LexicalEditor_ = observer(
                1. Excalidraw Plugin
                2. Collapsible Plugin
                3. Image Plugin
+               4. Columns Layout
+               5. Table
+               6. Block Drag and Drop
                이후에는 편의성 위주로 추가하고, 플러긴은 필요할 떄마다 구현
                나머지는 앱 전체적으로 기능을 추가하는게 더 좋을거같다.
                999. Sticky Plugin
