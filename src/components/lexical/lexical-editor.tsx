@@ -23,7 +23,9 @@ import { LexicalNodes } from '@/components/lexical/nodes'
 import { LexicalAutoLinkPlugin } from '@/components/lexical/plugins/auto-link-plugin.tsx'
 import { CodeHighlightPlugin } from '@/components/lexical/plugins/code-highlight-plugin.tsx'
 import { ComponentPickerMenuPlugin } from '@/components/lexical/plugins/component-picker-menu-plugin'
+import { FloatingLinkEditorPlugin } from '@/components/lexical/plugins/floating-link-editor-plugin'
 import { FloatingTextFormatToolbarPlugin } from '@/components/lexical/plugins/floating-text-format-toolbar-plugin'
+import { LinkPlugin } from '@/components/lexical/plugins/link-plugin.tsx'
 import { ListMaxIndentLevelPlugin } from '@/components/lexical/plugins/list-max-indent-level-plugin.tsx'
 import { OnChangePlugin } from '@/components/lexical/plugins/on-change-plugin.tsx'
 import { TreeViewPlugin } from '@/components/lexical/plugins/tree-view-plugin.tsx'
@@ -69,7 +71,7 @@ const LexicalEditor_ = observer(
     const [isSmallWidthViewport, setIsSmallWidthViewport] =
       useState<boolean>(false)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [_, setIsLinkEditMode] = useState<boolean>(false)
+    const [isLinkEditMode, setIsLinkEditMode] = useState<boolean>(false)
 
     const onRef = (_floatingAnchorElem: HTMLDivElement) => {
       if (_floatingAnchorElem !== null) {
@@ -117,6 +119,11 @@ const LexicalEditor_ = observer(
                 setIsLinkEditMode={setIsLinkEditMode}
                 anchorElem={floatingAnchorElem}
               />
+              <FloatingLinkEditorPlugin
+                anchorElem={floatingAnchorElem}
+                isLinkEditMode={isLinkEditMode}
+                setIsLinkEditMode={setIsLinkEditMode}
+              />
             </>
           )}
           {/* */}
@@ -136,6 +143,8 @@ const LexicalEditor_ = observer(
           <ListPlugin />
           <CheckListPlugin />
           <CodeHighlightPlugin />
+          <LinkPlugin />
+          <LexicalAutoLinkPlugin />
         </div>
         {showTreeView && <TreeViewPlugin />}
       </>
