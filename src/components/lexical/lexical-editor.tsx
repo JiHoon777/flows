@@ -147,6 +147,15 @@ const LexicalEditor_ = observer(
           <LinkPlugin />
           <LexicalAutoLinkPlugin />
           <HorizontalRulePlugin />
+          {/* Todo
+               1. Excalidraw Plugin
+               2. Collapsible Plugin
+               3. Image Plugin
+               이후에는 편의성 위주로 추가하고, 플러긴은 필요할 떄마다 구현
+               나머지는 앱 전체적으로 기능을 추가하는게 더 좋을거같다.
+               999. Sticky Plugin
+               - 우선순위 낮지만 애정, 꼭 필요하진 않지만 애정이 간다.
+          */}
         </div>
         {showTreeView && <TreeViewPlugin />}
       </>
