@@ -142,7 +142,7 @@ export const TextFormatFloatingToolbar = ({
     <div
       ref={popupCharStylesEditorRef}
       className={
-        'flex bg-[#fff] absolute top-0 left-0 z-10 drop-shadow-md rounded-lg h-6 rounded-lg'
+        'flex bg-[#fff] absolute top-0 left-0 z-10 drop-shadow-md h-6 rounded-lg'
       }
     >
       {editor.isEditable() && (

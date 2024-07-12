@@ -107,10 +107,11 @@ export const lexicalEditorTheme: EditorThemeClasses = {
     bold: 'font-bold',
     code: 'bg-[rgb(240,242,245)] py-px px-1 text-[0.94rem]',
     italic: 'italic',
-    strikethrough: 'line-through',
+    strikethrough: 'line-through decoration-wavy',
     subscript: 'text-sm align-sub',
     superscript: 'text-sm align-super',
-    underline: 'underline',
-    underlineStrikethrough: 'underline line-through',
+    underline: 'underline decoration-wavy',
+    underlineStrikethrough:
+      '[text-decoration:underline_line-through] decoration-wavy',
   },
 }

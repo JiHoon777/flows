@@ -1,8 +1,8 @@
 .EditorTheme__listItemChecked,
 .EditorTheme__listItemUnChecked {
   position: relative;
-  margin-left: 8px;
-  margin-right: 8px;
+  margin-left: 0.6rem !important;
+  margin-right: 0.6rem !important;
   padding-left: 24px;
   padding-right: 24px;
   list-style-type: none;
