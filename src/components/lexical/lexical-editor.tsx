@@ -9,6 +9,7 @@ import {
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
+import { HorizontalRulePlugin } from '@lexical/react/LexicalHorizontalRulePlugin'
 import { ListPlugin } from '@lexical/react/LexicalListPlugin'
 import {
   DEFAULT_TRANSFORMERS,
@@ -145,6 +146,7 @@ const LexicalEditor_ = observer(
           <CodeHighlightPlugin />
           <LinkPlugin />
           <LexicalAutoLinkPlugin />
+          <HorizontalRulePlugin />
         </div>
         {showTreeView && <TreeViewPlugin />}
       </>

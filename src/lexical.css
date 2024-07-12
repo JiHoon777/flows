@@ -61,3 +61,20 @@
   transform: rotate(45deg);
   border-width: 0 2px 2px 0;
 }
+.PlaygroundEditorTheme__hr {
+  padding: 2px 2px;
+  border: none;
+  margin: 1rem 0;
+  pointer-events: none;
+}
+.PlaygroundEditorTheme__hr:after {
+  content: '';
+  display: block;
+  height: 2px;
+  background-color: #ccc;
+  line-height: 2px;
+}
+.PlaygroundEditorTheme__hr.selected {
+  outline: 2px solid rgb(60, 132, 244);
+  user-select: none;
+}
