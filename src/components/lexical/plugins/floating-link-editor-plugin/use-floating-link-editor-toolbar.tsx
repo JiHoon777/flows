@@ -98,6 +98,10 @@ export const useFloatingLinkEditorToolbar = (
     )
   }, [editor])
 
+  if (!isLink) {
+    return null
+  }
+
   return (
     <Portal containerEl={anchorElem}>
       <FloatingLinkEditor

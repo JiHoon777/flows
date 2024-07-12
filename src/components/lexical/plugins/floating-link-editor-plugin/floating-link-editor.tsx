@@ -210,24 +210,26 @@ export const FloatingLinkEditor = ({
     }
   }
 
-  console.log(isLink)
-
   return (
     <div
       ref={editorRef}
       className={
-        'flex bg-[#fff] absolute top-0 left-0 z-10 drop-shadow-md rounded-lg h-6 rounded-lg'
+        'flex bg-[#fff] absolute top-0 left-0 z-10 drop-shadow-md rounded-lg p-4 w-full max-w-[320px]'
       }
     >
-      {!isLink ? null : isLinkEditMode ? (
-        <>
+      {isLink && isLinkEditMode && (
+        <div className={'w-full flex flex-col gap-1'}>
           <Input
             ref={inputRef}
             value={editedLinkUrl}
             onChange={(e) => setEditedLinkUrl(e.target.value)}
             onKeyDown={(e) => monitorInputInteraction(e)}
           />
-          <div>
+          <div
+            className={
+              'w-full flex justify-end gap-2 border-t border-accent pt-2'
+            }
+          >
             <Button
               variant={'destructive'}
               tabIndex={0}
@@ -244,36 +246,46 @@ export const FloatingLinkEditor = ({
               확인
             </Button>
           </div>
-        </>
-      ) : (
-        <>
+        </div>
+      )}
+      {isLink && !isLinkEditMode && (
+        <div className={'w-full flex flex-col gap-1'}>
           <a
             href={lexicalUtils.sanitizeUrl(linkUrl)}
             target="_blank"
             rel="noopener noreferrer"
+            className={
+              'text-[rgb(33,111,219)] no-underline hover:underline cursor-pointer'
+            }
           >
             {linkUrl}
           </a>
-          <Button
-            variant={'ghost'}
-            tabIndex={0}
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={() => {
-              setEditedLinkUrl(linkUrl)
-              setIsLinkEditMode(true)
-            }}
+          <div
+            className={
+              'w-full flex justify-end gap-2 border-t border-accent pt-2'
+            }
           >
-            링크 수정
-          </Button>
-          <Button
-            variant={'destructive'}
-            tabIndex={0}
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={() => editor.dispatchCommand(TOGGLE_LINK_COMMAND, null)}
-          >
-            링크 삭제
-          </Button>
-        </>
+            <Button
+              variant={'outline'}
+              tabIndex={0}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => {
+                setEditedLinkUrl(linkUrl)
+                setIsLinkEditMode(true)
+              }}
+            >
+              링크 수정
+            </Button>
+            <Button
+              variant={'destructive'}
+              tabIndex={0}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => editor.dispatchCommand(TOGGLE_LINK_COMMAND, null)}
+            >
+              링크 삭제
+            </Button>
+          </div>
+        </div>
       )}
     </div>
   )
