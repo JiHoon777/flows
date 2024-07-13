@@ -25,6 +25,7 @@ import {
 import {
   CaseSensitive,
   Code,
+  FilePieChartIcon,
   Heading1,
   Heading2,
   Heading3,
@@ -38,6 +39,7 @@ import { createPortal } from 'react-dom'
 
 import { ComponentPickerMenuItem } from '@/components/lexical/plugins/component-picker-menu-plugin/component-picker-menu-item.tsx'
 import { ComponentPickerOption } from '@/components/lexical/plugins/component-picker-menu-plugin/component-picker-option.ts'
+import { INSERT_EXCALIDRAW_COMMAND } from '@/components/lexical/plugins/excalidraw-plugin.tsx'
 
 export const ComponentPickerMenuPlugin = () => {
   const [editor] = useLexicalComposerContext()
@@ -210,6 +212,12 @@ function getBaseOptions(editor: LexicalEditor) {
       icon: <Ruler />,
       keywords: ['page break', 'divider'],
       onSelect: () => {},
+    }),
+    new ComponentPickerOption('Excalidraw', {
+      icon: <FilePieChartIcon className={'w-6 h-6'} />,
+      keywords: ['excalidraw', 'diagram', 'drawing'],
+      onSelect: () =>
+        editor.dispatchCommand(INSERT_EXCALIDRAW_COMMAND, undefined),
     }),
   ]
 }

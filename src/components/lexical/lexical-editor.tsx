@@ -24,6 +24,7 @@ import { LexicalNodes } from '@/components/lexical/nodes'
 import { LexicalAutoLinkPlugin } from '@/components/lexical/plugins/auto-link-plugin.tsx'
 import { CodeHighlightPlugin } from '@/components/lexical/plugins/code-highlight-plugin.tsx'
 import { ComponentPickerMenuPlugin } from '@/components/lexical/plugins/component-picker-menu-plugin'
+import { ExcalidrawPlugin } from '@/components/lexical/plugins/excalidraw-plugin.tsx'
 import { FloatingLinkEditorPlugin } from '@/components/lexical/plugins/floating-link-editor-plugin'
 import { FloatingTextFormatToolbarPlugin } from '@/components/lexical/plugins/floating-text-format-toolbar-plugin'
 import { LinkPlugin } from '@/components/lexical/plugins/link-plugin.tsx'
@@ -147,18 +148,7 @@ const LexicalEditor_ = observer(
           <LinkPlugin />
           <LexicalAutoLinkPlugin />
           <HorizontalRulePlugin />
-          {/* Todo
-               1. Excalidraw Plugin
-               2. Collapsible Plugin
-               3. Image Plugin
-               4. Columns Layout
-               5. Table
-               6. Block Drag and Drop
-               이후에는 편의성 위주로 추가하고, 플러긴은 필요할 떄마다 구현
-               나머지는 앱 전체적으로 기능을 추가하는게 더 좋을거같다.
-               999. Sticky Plugin
-               - 우선순위 낮지만 애정, 꼭 필요하진 않지만 애정이 간다.
-          */}
+          <ExcalidrawPlugin />
         </div>
         {showTreeView && <TreeViewPlugin />}
       </>

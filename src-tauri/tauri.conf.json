@@ -15,10 +15,7 @@
       "all": false,
       "fs": {
         "all": false,
-        "scope": [
-          "$DOCUMENT/flows/*",
-          "$DOCUMENT/flows/**"
-        ],
+        "scope": ["$DOCUMENT/flows/*", "$DOCUMENT/flows/**"],
         "readFile": true,
         "writeFile": true,
         "readDir": true,
@@ -27,6 +24,9 @@
         "removeDir": true,
         "removeFile": true,
         "renameFile": true
+      },
+      "shell": {
+        "all": true
       }
     },
     "bundle": {

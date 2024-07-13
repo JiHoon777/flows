@@ -12,6 +12,7 @@
     "build:app": "tauri build"
   },
   "dependencies": {
+    "@excalidraw/excalidraw": "^0.17.6",
     "@lexical/code": "^0.16.1",
     "@lexical/link": "^0.16.1",
     "@lexical/list": "^0.16.1",
