@@ -5,6 +5,9 @@ import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode'
 import { HeadingNode, QuoteNode } from '@lexical/rich-text'
 import { Klass, LexicalNode } from 'lexical'
 
+import { CollapsibleContainerNode } from '@/components/lexical/nodes/collapsible/collapsible-container.node.ts'
+import { CollapsibleContentNode } from '@/components/lexical/nodes/collapsible/collapsible-content-node.ts'
+import { CollapsibleTitleNode } from '@/components/lexical/nodes/collapsible/collapsible-title-node.ts'
 import { ExcalidrawNode } from '@/components/lexical/nodes/excalidraw'
 
 export const LexicalNodes: Klass<LexicalNode>[] = [
@@ -21,8 +24,10 @@ export const LexicalNodes: Klass<LexicalNode>[] = [
   LinkNode,
   AutoLinkNode,
   ExcalidrawNode,
+  CollapsibleContainerNode,
+  CollapsibleContentNode,
+  CollapsibleTitleNode,
   // ExcalidrawNode
   // StickyNode
-  // CollapsibleNode
   // ImageNode
 ]

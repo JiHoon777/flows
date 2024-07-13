@@ -1,4 +1,7 @@
 .editor-shell {
+  //
+  // List
+  //
   .EditorTheme__listItemChecked,
   .EditorTheme__listItemUnChecked {
     position: relative;
@@ -32,21 +35,25 @@
     left: auto;
     right: 0;
   }
+
   .EditorTheme__listItemChecked:focus:before,
   .EditorTheme__listItemUnChecked:focus:before {
     box-shadow: 0 0 0 2px #a6cdfe;
     border-radius: 2px;
   }
+
   .EditorTheme__listItemUnChecked:before {
     border: 1px solid #999;
     border-radius: 2px;
   }
+
   .EditorTheme__listItemChecked:before {
     border: 1px solid rgb(61, 135, 245);
     border-radius: 2px;
     background-color: #3d87f5;
     background-repeat: no-repeat;
   }
+
   .EditorTheme__listItemChecked:after {
     content: '';
     cursor: pointer !important;
@@ -62,12 +69,17 @@
     transform: rotate(45deg);
     border-width: 0 2px 2px 0;
   }
+
+  //
+  // hr
+  //
   .PlaygroundEditorTheme__hr {
     padding: 2px 2px;
     border: none;
     margin: 1rem 0;
     pointer-events: none;
   }
+
   .PlaygroundEditorTheme__hr:after {
     content: '';
     display: block;
@@ -75,6 +87,7 @@
     background-color: #ccc;
     line-height: 2px;
   }
+
   .PlaygroundEditorTheme__hr.selected {
     outline: 2px solid rgb(60, 132, 244);
     user-select: none;
@@ -83,7 +96,6 @@
   //
   // image resizer
   //
-
   .editor-image .image-resizer {
     display: block;
     width: 7px;
@@ -140,4 +152,60 @@
     left: -6px;
     cursor: nw-resize;
   }
+
+  //
+  // Collapsible
+  //
+  .Collapsible__container {
+    background: #fcfcfc;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    margin-bottom: 8px;
+  }
+
+  .Collapsible__title {
+    cursor: pointer;
+    padding: 5px 5px 5px 20px;
+    position: relative;
+    font-weight: bold;
+    list-style: none;
+    outline: none;
+  }
+
+  .Collapsible__title::marker,
+  .Collapsible__title::-webkit-details-marker {
+    display: none;
+  }
+
+  .Collapsible__title:before {
+    border-style: solid;
+    border-color: transparent;
+    border-width: 4px 6px 4px 6px;
+    border-left-color: #000;
+    display: block;
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .Collapsible__container[open] > .Collapsible__title:before {
+    border-color: transparent;
+    border-width: 6px 4px 0 4px;
+    border-top-color: #000;
+  }
+
+  .Collapsible__content {
+    padding: 0 5px 5px 20px;
+  }
+
+  .Collapsible__collapsed .Collapsible__content {
+    display: none;
+    user-select: none;
+  }
+
+  //
+  // end
+  //
 }

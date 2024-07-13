@@ -23,6 +23,7 @@ import { lexicalEditorTheme } from '@/components/lexical/lexical-editor-theme.ts
 import { LexicalNodes } from '@/components/lexical/nodes'
 import { LexicalAutoLinkPlugin } from '@/components/lexical/plugins/auto-link-plugin.tsx'
 import { CodeHighlightPlugin } from '@/components/lexical/plugins/code-highlight-plugin.tsx'
+import CollapsiblePlugin from '@/components/lexical/plugins/collapsible-plugin.tsx'
 import { ComponentPickerMenuPlugin } from '@/components/lexical/plugins/component-picker-menu-plugin'
 import { ExcalidrawPlugin } from '@/components/lexical/plugins/excalidraw-plugin.tsx'
 import { FloatingLinkEditorPlugin } from '@/components/lexical/plugins/floating-link-editor-plugin'
@@ -31,11 +32,7 @@ import { LinkPlugin } from '@/components/lexical/plugins/link-plugin.tsx'
 import { ListMaxIndentLevelPlugin } from '@/components/lexical/plugins/list-max-indent-level-plugin.tsx'
 import { OnChangePlugin } from '@/components/lexical/plugins/on-change-plugin.tsx'
 import { TreeViewPlugin } from '@/components/lexical/plugins/tree-view-plugin.tsx'
-
-const CAN_USE_DOM: boolean =
-  typeof window !== 'undefined' &&
-  typeof window.document !== 'undefined' &&
-  typeof window.document.createElement !== 'undefined'
+import { CAN_USE_DOM } from '@/components/lexical/utils/environment.ts'
 
 type Props = {
   initialEditorState: InitialEditorStateType
@@ -149,6 +146,7 @@ const LexicalEditor_ = observer(
           <LexicalAutoLinkPlugin />
           <HorizontalRulePlugin />
           <ExcalidrawPlugin />
+          <CollapsiblePlugin />
         </div>
         {showTreeView && <TreeViewPlugin />}
       </>

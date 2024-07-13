@@ -145,6 +145,9 @@ export const ExcalidrawModal = ({
     return null
   }
 
+  /**
+   * ModalOverlay 컴포넌트를 쓰면 Excalidraw 의 width, height 가 잡히지 않는다.
+   **/
   return (
     <Portal>
       <div

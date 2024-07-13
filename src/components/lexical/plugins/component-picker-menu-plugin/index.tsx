@@ -37,6 +37,7 @@ import {
 } from 'lucide-react'
 import { createPortal } from 'react-dom'
 
+import { INSERT_COLLAPSIBLE_COMMAND } from '@/components/lexical/plugins/collapsible-plugin.tsx'
 import { ComponentPickerMenuItem } from '@/components/lexical/plugins/component-picker-menu-plugin/component-picker-menu-item.tsx'
 import { ComponentPickerOption } from '@/components/lexical/plugins/component-picker-menu-plugin/component-picker-option.ts'
 import { INSERT_EXCALIDRAW_COMMAND } from '@/components/lexical/plugins/excalidraw-plugin.tsx'
@@ -218,6 +219,12 @@ function getBaseOptions(editor: LexicalEditor) {
       keywords: ['excalidraw', 'diagram', 'drawing'],
       onSelect: () =>
         editor.dispatchCommand(INSERT_EXCALIDRAW_COMMAND, undefined),
+    }),
+    new ComponentPickerOption('Collapsible', {
+      icon: <i className="icon caret-right" />,
+      keywords: ['collapse', 'collapsible', 'toggle'],
+      onSelect: () =>
+        editor.dispatchCommand(INSERT_COLLAPSIBLE_COMMAND, undefined),
     }),
   ]
 }

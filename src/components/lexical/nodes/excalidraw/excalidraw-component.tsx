@@ -16,12 +16,12 @@ import {
 } from 'lexical'
 import { PencilIcon } from 'lucide-react'
 
-import { ImageResizer } from '@/components/lexical/components/image-resizer.tsx'
 import { ExcalidrawImage } from '@/components/lexical/nodes/excalidraw/excalidraw-image.tsx'
 import {
   ExcalidrawInitialElements,
   ExcalidrawModal,
 } from '@/components/lexical/nodes/excalidraw/excalidraw-modal.tsx'
+import { ImageResizer } from '@/components/lexical/nodes/excalidraw/image-resizer.tsx'
 import { $isExcalidrawNode } from '@/components/lexical/nodes/excalidraw/index.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import { useOverlay } from '@/contexts/overlay/use-overlay.tsx'
