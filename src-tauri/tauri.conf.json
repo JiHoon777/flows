@@ -14,7 +14,7 @@
     "allowlist": {
       "all": false,
       "fs": {
-        "all": false,
+        "all": true,
         "scope": ["$DOCUMENT/flows/*", "$DOCUMENT/flows/**"],
         "readFile": true,
         "writeFile": true,
@@ -74,7 +74,8 @@
         "height": 600,
         "resizable": true,
         "title": "flows",
-        "width": 800
+        "width": 800,
+        "fileDropEnabled": false
       }
     ]
   }
