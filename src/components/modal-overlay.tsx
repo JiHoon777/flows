@@ -7,7 +7,7 @@ import { Portal } from '@/components/portal.tsx'
 import { useOutsideClick } from '@/hooks/use-outside-click.ts'
 import { cn } from '@/utils/cn.ts'
 
-const modalVariants = cva('w-full rounded-xl p-10 bg-background shadow-lg', {
+const modalVariants = cva('w-full rounded-xl bg-background shadow-lg', {
   variants: {
     size: {
       sm: 'max-w-sm',
@@ -30,6 +30,7 @@ interface ModalOverlayProps
   isOpen: boolean
   onClose: () => void
   closeOnClickOutside?: boolean
+  className?: string
 }
 
 export function ModalOverlay({
@@ -38,6 +39,7 @@ export function ModalOverlay({
   closeOnClickOutside = false,
   size,
   children,
+  className,
 }: ModalOverlayProps): JSX.Element {
   const modalRef = useRef<HTMLDivElement | null>(null)
 
@@ -56,7 +58,7 @@ export function ModalOverlay({
           >
             <m.div
               animate={{ opacity: 1, scale: 1 }}
-              className={cn(modalVariants({ size }))}
+              className={cn(modalVariants({ size }), className)}
               exit={{ opacity: 0, scale: 0.1 }}
               initial={{ opacity: 0, scale: 0.1 }}
               transition={{ duration: 0.2 }}

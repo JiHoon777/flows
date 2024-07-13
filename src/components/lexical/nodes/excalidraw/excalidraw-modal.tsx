@@ -9,11 +9,12 @@ import {
 } from '@excalidraw/excalidraw/types/types'
 
 import { ExcalidrawDiscardModal } from '@/components/lexical/nodes/excalidraw/excalidraw-discard-modal.tsx'
-import { ModalOverlay } from '@/components/modal-overlay.tsx'
+import { Portal } from '@/components/portal.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import { useOverlay } from '@/contexts/overlay/use-overlay.tsx'
 import { useCallbackRefState } from '@/hooks/use-callback-ref-state.ts'
 import { useFocusOnMount } from '@/hooks/use-focus-on-mount.ts'
+import { cn } from '@/utils/cn.ts'
 
 export type ExcalidrawInitialElements = ExcalidrawInitialDataState['elements']
 
@@ -126,6 +127,7 @@ export const ExcalidrawModal = ({
           onClose={exit}
           discard={() => {
             exit()
+            onClose()
           }}
         />
       ))
@@ -141,38 +143,44 @@ export const ExcalidrawModal = ({
     setFiles(fls)
   }
 
+  if (!isOpen) {
+    return null
+  }
+
   return (
-    <ModalOverlay
-      size={'7xl'}
-      isOpen={isOpen}
-      onClose={onClose}
-      closeOnClickOutside={closeOnClickOutside}
-    >
+    <Portal>
       <div
-        ref={excalidrawModalRef}
-        tabIndex={-1}
-        className={'w-full flex flex-col gap-2'}
+        className={
+          'z-50 fixed inset-0 flex justify-center items-center bg-black/80'
+        }
       >
-        <div className={'relative w-full h-[80vh]'}>
-          <Excalidraw
-            onChange={onChange}
-            excalidrawAPI={excalidrawAPIRefCallback}
-            initialData={{
-              appState: initialAppState || { isLoading: false },
-              elements: initialElements,
-              files: initialFiles,
-            }}
-          />
-        </div>
-        <div className={'flex items-center justify-end p-4 gap-4'}>
-          <Button variant={'destructive'} onClick={discard}>
-            Discard
-          </Button>
-          <Button variant={'default'} onClick={save}>
-            Save
-          </Button>
+        <div
+          ref={excalidrawModalRef}
+          className={
+            'relative z-10 w-auto bg-background rounded-lg shadow-accent pt-4'
+          }
+        >
+          <div className={cn('relative w-[70vw] h-[70vh]')}>
+            <Excalidraw
+              onChange={onChange}
+              excalidrawAPI={excalidrawAPIRefCallback}
+              initialData={{
+                appState: initialAppState || { isLoading: false },
+                elements: initialElements,
+                files: initialFiles,
+              }}
+            />
+          </div>
+          <div className={'flex items-center justify-end p-4 gap-4'}>
+            <Button variant={'destructive'} onClick={discard}>
+              Discard
+            </Button>
+            <Button variant={'default'} onClick={save}>
+              Save
+            </Button>
+          </div>
         </div>
       </div>
-    </ModalOverlay>
+    </Portal>
   )
 }
