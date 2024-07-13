@@ -37,9 +37,10 @@ export const OnChangePlugin = ({
       return
     }
 
-    const editorState = editor.parseEditorState(initialEditorState as string)
-    editor.setEditorState(editorState)
-    console.log(editorState)
+    queueMicrotask(() => {
+      const editorState = editor.parseEditorState(initialEditorState as string)
+      editor.setEditorState(editorState)
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editor])
 
