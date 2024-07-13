@@ -1,9 +1,10 @@
-import { JSX, PropsWithChildren } from 'react'
+import { JSX, PropsWithChildren, useRef } from 'react'
 
 import { cva, VariantProps } from 'class-variance-authority'
 import { AnimatePresence, motion as m } from 'framer-motion'
 
 import { Portal } from '@/components/portal.tsx'
+import { useOutsideClick } from '@/hooks/use-outside-click.ts'
 import { cn } from '@/utils/cn.ts'
 
 const modalVariants = cva('w-full rounded-xl p-10 bg-background shadow-lg', {
@@ -25,32 +26,46 @@ const modalVariants = cva('w-full rounded-xl p-10 bg-background shadow-lg', {
 
 interface ModalOverlayProps
   extends VariantProps<typeof modalVariants>,
-    PropsWithChildren {}
+    PropsWithChildren {
+  isOpen: boolean
+  onClose: () => void
+  closeOnClickOutside?: boolean
+}
 
 export function ModalOverlay({
+  isOpen,
+  onClose,
+  closeOnClickOutside = false,
   size,
   children,
 }: ModalOverlayProps): JSX.Element {
+  const modalRef = useRef<HTMLDivElement | null>(null)
+
+  useOutsideClick(modalRef, () => onClose(), closeOnClickOutside)
+
   return (
     <Portal>
       <AnimatePresence mode="wait">
-        <m.div
-          animate={{ opacity: 1 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80"
-          exit={{ opacity: 0 }}
-          initial={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+        {isOpen ? (
           <m.div
-            animate={{ opacity: 1, scale: 1 }}
-            className={cn(modalVariants({ size }))}
-            exit={{ opacity: 0, scale: 0.1 }}
-            initial={{ opacity: 0, scale: 0.1 }}
+            animate={{ opacity: 1 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80"
+            exit={{ opacity: 0 }}
+            initial={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
           >
-            {children}
+            <m.div
+              animate={{ opacity: 1, scale: 1 }}
+              className={cn(modalVariants({ size }))}
+              exit={{ opacity: 0, scale: 0.1 }}
+              initial={{ opacity: 0, scale: 0.1 }}
+              transition={{ duration: 0.2 }}
+              ref={modalRef}
+            >
+              {children}
+            </m.div>
           </m.div>
-        </m.div>
+        ) : null}
       </AnimatePresence>
     </Portal>
   )

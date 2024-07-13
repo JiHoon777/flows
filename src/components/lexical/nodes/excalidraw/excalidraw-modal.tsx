@@ -14,11 +14,11 @@ import { Button } from '@/components/ui/button.tsx'
 import { useOverlay } from '@/contexts/overlay/use-overlay.tsx'
 import { useCallbackRefState } from '@/hooks/use-callback-ref-state.ts'
 import { useFocusOnMount } from '@/hooks/use-focus-on-mount.ts'
-import { useOutsideClick } from '@/hooks/use-outside-click.ts'
 
 export type ExcalidrawInitialElements = ExcalidrawInitialDataState['elements']
 
 type Props = {
+  isOpen: boolean
   closeOnClickOutside?: boolean
   /**
    * The initial set of elements to draw into the scene
@@ -51,6 +51,7 @@ type Props = {
 }
 
 export const ExcalidrawModal = ({
+  isOpen,
   closeOnClickOutside = false,
   onSave,
   initialFiles,
@@ -67,7 +68,6 @@ export const ExcalidrawModal = ({
     useState<ExcalidrawInitialElements>(initialElements)
   const [files, setFiles] = useState<BinaryFiles>(initialFiles)
 
-  useOutsideClick(excalidrawModalRef, () => onDelete(), closeOnClickOutside)
   useFocusOnMount(excalidrawModalRef)
 
   useLayoutEffect(() => {
@@ -120,11 +120,11 @@ export const ExcalidrawModal = ({
       onDelete()
     } else {
       //Otherwise, show confirmation dialog before closing
-      openDiscardModal(({ exit }) => (
+      openDiscardModal(({ isOpen, exit }) => (
         <ExcalidrawDiscardModal
+          isOpen={isOpen}
           onClose={exit}
           discard={() => {
-            onClose()
             exit()
           }}
         />
@@ -142,7 +142,12 @@ export const ExcalidrawModal = ({
   }
 
   return (
-    <ModalOverlay size={'7xl'}>
+    <ModalOverlay
+      size={'7xl'}
+      isOpen={isOpen}
+      onClose={onClose}
+      closeOnClickOutside={closeOnClickOutside}
+    >
       <div
         ref={excalidrawModalRef}
         tabIndex={-1}

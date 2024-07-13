@@ -14,6 +14,7 @@ import {
   KEY_DELETE_COMMAND,
   NodeKey,
 } from 'lexical'
+import { PencilIcon } from 'lucide-react'
 
 import { ImageResizer } from '@/components/lexical/components/image-resizer.tsx'
 import { ExcalidrawImage } from '@/components/lexical/nodes/excalidraw/excalidraw-image.tsx'
@@ -22,7 +23,9 @@ import {
   ExcalidrawModal,
 } from '@/components/lexical/nodes/excalidraw/excalidraw-modal.tsx'
 import { $isExcalidrawNode } from '@/components/lexical/nodes/excalidraw/index.tsx'
+import { Button } from '@/components/ui/button.tsx'
 import { useOverlay } from '@/contexts/overlay/use-overlay.tsx'
+import { cn } from '@/utils/cn.ts'
 
 const ExcalidrawComponent = ({
   data,
@@ -91,9 +94,10 @@ const ExcalidrawComponent = ({
       exit()
     }
     editor.setEditable(false)
-    open(() => {
+    open(({ isOpen }) => {
       return (
         <ExcalidrawModal
+          isOpen={isOpen}
           initialElements={elements}
           initialFiles={files}
           initialAppState={appState}
@@ -215,12 +219,17 @@ const ExcalidrawComponent = ({
     })
   }
 
+  console.log(218, isSelected)
   return (
     <>
       {elements.length > 0 && (
         <button
           ref={buttonRef}
-          className={`excalidraw-button ${isSelected ? 'selected' : ''}`}
+          className={cn(
+            'relative p-0 bg-transparent',
+            isSelected && 'select-none outline outline-2 outline-[#3c84f4]',
+            !isSelected && 'border-0',
+          )}
         >
           <ExcalidrawImage
             imageContainerRef={imageContainerRef}
@@ -230,13 +239,18 @@ const ExcalidrawComponent = ({
             appState={appState}
           />
           {isSelected && (
-            <div
-              className="image-edit-button"
-              role="button"
-              tabIndex={0}
-              onMouseDown={(event) => event.preventDefault()}
+            <Button
+              asChild
+              variant={'outline'}
+              size={'icon'}
+              onMouseDown={(e) => e.preventDefault()}
               onClick={openModal}
-            />
+              className={'absolute top-4 right-4'}
+            >
+              <div className={'p-4'}>
+                <PencilIcon className={'!w-6 !h-6 shrink-0'} />
+              </div>
+            </Button>
           )}
           {(isSelected || isResizing) && (
             <ImageResizer

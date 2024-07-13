@@ -21,6 +21,7 @@ export function useOverlay({ exitOnUnmount = true }: Options = {}) {
   const [id] = useState(() => String(elementId++))
 
   const overlayRef = useRef<OverlayControlRef | null>(null)
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     return () => {
@@ -29,6 +30,14 @@ export function useOverlay({ exitOnUnmount = true }: Options = {}) {
       }
     }
   }, [exitOnUnmount, id, unmount])
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+    }
+  }, [])
 
   return useMemo(
     () => ({
@@ -41,7 +50,11 @@ export function useOverlay({ exitOnUnmount = true }: Options = {}) {
             ref={overlayRef}
             overlayElement={overlayElement}
             onExit={() => {
-              unmount(id)
+              overlayRef.current?.close()
+
+              timeoutRef.current = setTimeout(() => {
+                unmount(id)
+              }, 500)
             }}
           />,
         )
@@ -50,7 +63,11 @@ export function useOverlay({ exitOnUnmount = true }: Options = {}) {
         overlayRef.current?.close()
       },
       exit: () => {
-        unmount(id)
+        overlayRef.current?.close()
+
+        timeoutRef.current = setTimeout(() => {
+          unmount(id)
+        }, 500)
       },
     }),
     [id, mount, unmount],
