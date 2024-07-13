@@ -26,6 +26,7 @@ import { CodeHighlightPlugin } from '@/components/lexical/plugins/code-highlight
 import CollapsiblePlugin from '@/components/lexical/plugins/collapsible-plugin.tsx'
 import { ComponentPickerMenuPlugin } from '@/components/lexical/plugins/component-picker-menu-plugin'
 import DragDropPaste from '@/components/lexical/plugins/drag-drop-paste-plugin.tsx'
+import { DraggableBlockPlugin } from '@/components/lexical/plugins/draggable-block-plugin'
 import { ExcalidrawPlugin } from '@/components/lexical/plugins/excalidraw-plugin.tsx'
 import { FloatingLinkEditorPlugin } from '@/components/lexical/plugins/floating-link-editor-plugin'
 import { FloatingTextFormatToolbarPlugin } from '@/components/lexical/plugins/floating-text-format-toolbar-plugin'
@@ -127,6 +128,7 @@ const LexicalEditor_ = observer(
                 isLinkEditMode={isLinkEditMode}
                 setIsLinkEditMode={setIsLinkEditMode}
               />
+              <DraggableBlockPlugin anchorElem={floatingAnchorElem} />
             </>
           )}
           {/* */}
