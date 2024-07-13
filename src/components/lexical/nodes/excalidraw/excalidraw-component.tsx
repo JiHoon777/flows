@@ -31,7 +31,6 @@ const ExcalidrawComponent = ({
   data: string
   nodeKey: NodeKey
 }) => {
-  console.log(34444)
   const [editor] = useLexicalComposerContext()
   const { open, exit } = useOverlay()
   const imageContainerRef = useRef<HTMLImageElement | null>(null)
@@ -87,22 +86,29 @@ const ExcalidrawComponent = ({
   )
 
   const openModal = useCallback(() => {
-    open(({ exit }) => (
-      <ExcalidrawModal
-        initialElements={elements}
-        initialFiles={files}
-        initialAppState={appState}
-        onDelete={deleteNode}
-        onClose={() => exit()}
-        onSave={(els, aps, fls) => {
-          editor.setEditable(true)
-          setData(els, aps, fls)
-          exit()
-        }}
-        closeOnClickOutside={false}
-      />
-    ))
-  }, [appState, deleteNode, editor, elements, files, open, setData])
+    const handleExit = () => {
+      editor.setEditable(true)
+      exit()
+    }
+    editor.setEditable(false)
+    open(() => {
+      return (
+        <ExcalidrawModal
+          initialElements={elements}
+          initialFiles={files}
+          initialAppState={appState}
+          onDelete={deleteNode}
+          onClose={handleExit}
+          onSave={(els, aps, fls) => {
+            editor.setEditable(true)
+            setData(els, aps, fls)
+            handleExit()
+          }}
+          closeOnClickOutside={false}
+        />
+      )
+    })
+  }, [appState, deleteNode, editor, elements, exit, files, open, setData])
 
   const onDelete = useCallback(
     (event: KeyboardEvent) => {
@@ -178,9 +184,8 @@ const ExcalidrawComponent = ({
     setSelected,
   ])
 
-  // console.log('hi')
   useEffect(() => {
-    if (data === '[]' && editor.isEditable()) {
+    if (data === '[]') {
       openModal()
     }
 
