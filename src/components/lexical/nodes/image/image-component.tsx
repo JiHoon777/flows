@@ -27,6 +27,7 @@ import {
   BrokenImage,
   LazyImage,
 } from '@/components/lexical/nodes/image/lazy-image.tsx'
+import { cn } from '@/utils/cn.ts'
 
 export const RIGHT_CLICK_IMAGE_COMMAND: LexicalCommand<MouseEvent> =
   createCommand('RIGHT_CLICK_IMAGE_COMMAND')
@@ -210,7 +211,13 @@ export const ImageComponent = ({
   return (
     <Suspense fallback={null}>
       <>
-        <div draggable={draggable}>
+        <div
+          draggable={draggable}
+          className={cn(
+            isFocused &&
+              'select-none outline-none border border-gray-200 border-dashed',
+          )}
+        >
           {isLoadError ? (
             <BrokenImage />
           ) : (

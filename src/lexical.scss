@@ -94,6 +94,32 @@
   }
 
   //
+  // image
+  //
+   span.editor-image {
+    cursor: default;
+    display: inline-block;
+    position: relative;
+    user-select: none;
+  }
+
+  .editor-image img {
+    max-width: 100%;
+    cursor: default;
+  }
+
+  .editor-image img.focused {
+  }
+
+  .editor-image img.focused.draggable {
+    cursor: grab;
+  }
+
+  .editor-image img.focused.draggable:active {
+    cursor: grabbing;
+  }
+
+  //
   // image resizer
   //
   .editor-image .image-resizer {
