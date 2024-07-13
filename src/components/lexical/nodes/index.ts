@@ -9,6 +9,7 @@ import { CollapsibleContainerNode } from '@/components/lexical/nodes/collapsible
 import { CollapsibleContentNode } from '@/components/lexical/nodes/collapsible/collapsible-content-node.ts'
 import { CollapsibleTitleNode } from '@/components/lexical/nodes/collapsible/collapsible-title-node.ts'
 import { ExcalidrawNode } from '@/components/lexical/nodes/excalidraw'
+import { ImageNode } from '@/components/lexical/nodes/image'
 
 export const LexicalNodes: Klass<LexicalNode>[] = [
   //
@@ -27,6 +28,7 @@ export const LexicalNodes: Klass<LexicalNode>[] = [
   CollapsibleContainerNode,
   CollapsibleContentNode,
   CollapsibleTitleNode,
+  ImageNode,
   // ExcalidrawNode
   // StickyNode
   // ImageNode

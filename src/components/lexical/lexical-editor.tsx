@@ -25,9 +25,11 @@ import { LexicalAutoLinkPlugin } from '@/components/lexical/plugins/auto-link-pl
 import { CodeHighlightPlugin } from '@/components/lexical/plugins/code-highlight-plugin.tsx'
 import CollapsiblePlugin from '@/components/lexical/plugins/collapsible-plugin.tsx'
 import { ComponentPickerMenuPlugin } from '@/components/lexical/plugins/component-picker-menu-plugin'
+import DragDropPaste from '@/components/lexical/plugins/drag-drop-paste-plugin.tsx'
 import { ExcalidrawPlugin } from '@/components/lexical/plugins/excalidraw-plugin.tsx'
 import { FloatingLinkEditorPlugin } from '@/components/lexical/plugins/floating-link-editor-plugin'
 import { FloatingTextFormatToolbarPlugin } from '@/components/lexical/plugins/floating-text-format-toolbar-plugin'
+import { ImagesPlugin } from '@/components/lexical/plugins/images-plugin.tsx'
 import { LinkPlugin } from '@/components/lexical/plugins/link-plugin.tsx'
 import { ListMaxIndentLevelPlugin } from '@/components/lexical/plugins/list-max-indent-level-plugin.tsx'
 import { OnChangePlugin } from '@/components/lexical/plugins/on-change-plugin.tsx'
@@ -98,6 +100,8 @@ const LexicalEditor_ = observer(
     return (
       <>
         <div className={'relative w-full editor-shell'}>
+          <DragDropPaste />
+
           <RichTextPlugin
             contentEditable={
               <div ref={onRef}>
@@ -147,6 +151,7 @@ const LexicalEditor_ = observer(
           <HorizontalRulePlugin />
           <ExcalidrawPlugin />
           <CollapsiblePlugin />
+          <ImagesPlugin />
         </div>
         {showTreeView && <TreeViewPlugin />}
       </>
