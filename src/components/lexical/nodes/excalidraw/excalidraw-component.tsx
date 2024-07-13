@@ -38,7 +38,6 @@ const ExcalidrawComponent = ({
   const { open, exit } = useOverlay()
   const imageContainerRef = useRef<HTMLImageElement | null>(null)
   const buttonRef = useRef<HTMLButtonElement | null>(null)
-  const captionButtonRef = useRef<HTMLButtonElement | null>(null)
   const [isSelected, setSelected, clearSelection] =
     useLexicalNodeSelection(nodeKey)
   const [isResizing, setIsResizing] = useState<boolean>(false)
@@ -108,7 +107,6 @@ const ExcalidrawComponent = ({
             setData(els, aps, fls)
             handleExit()
           }}
-          closeOnClickOutside={false}
         />
       )
     })
@@ -227,7 +225,8 @@ const ExcalidrawComponent = ({
           ref={buttonRef}
           className={cn(
             'relative p-0 bg-transparent',
-            isSelected && 'select-none outline outline-2 outline-[#3c84f4]',
+            isSelected &&
+              'select-none outline-none border border-gray-200 border-dashed',
             !isSelected && 'border-0',
           )}
         >
@@ -254,14 +253,10 @@ const ExcalidrawComponent = ({
           )}
           {(isSelected || isResizing) && (
             <ImageResizer
-              buttonRef={captionButtonRef}
-              showCaption={true}
-              setShowCaption={() => null}
               imageRef={imageContainerRef}
               editor={editor}
               onResizeStart={onResizeStart}
               onResizeEnd={onResizeEnd}
-              captionsEnabled={true}
             />
           )}
         </button>

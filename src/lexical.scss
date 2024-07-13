@@ -1,0 +1,143 @@
+.editor-shell {
+  .EditorTheme__listItemChecked,
+  .EditorTheme__listItemUnChecked {
+    position: relative;
+    margin-left: 0.6rem !important;
+    margin-right: 0.6rem !important;
+    padding-left: 24px;
+    padding-right: 24px;
+    list-style-type: none;
+    outline: none;
+  }
+
+  .EditorTheme__listItemChecked {
+    text-decoration: line-through;
+  }
+
+  .EditorTheme__listItemChecked:before,
+  .EditorTheme__listItemUnChecked:before {
+    content: '';
+    width: 16px;
+    height: 16px;
+    top: 3px;
+    left: 0;
+    cursor: pointer !important;
+    display: block;
+    background-size: cover;
+    position: absolute;
+  }
+
+  .EditorTheme__listItemChecked[dir='rtl']:before,
+  .EditorTheme__listItemUnChecked[dir='rtl']:before {
+    left: auto;
+    right: 0;
+  }
+  .EditorTheme__listItemChecked:focus:before,
+  .EditorTheme__listItemUnChecked:focus:before {
+    box-shadow: 0 0 0 2px #a6cdfe;
+    border-radius: 2px;
+  }
+  .EditorTheme__listItemUnChecked:before {
+    border: 1px solid #999;
+    border-radius: 2px;
+  }
+  .EditorTheme__listItemChecked:before {
+    border: 1px solid rgb(61, 135, 245);
+    border-radius: 2px;
+    background-color: #3d87f5;
+    background-repeat: no-repeat;
+  }
+  .EditorTheme__listItemChecked:after {
+    content: '';
+    cursor: pointer !important;
+    border-color: #fff;
+    border-style: solid;
+    position: absolute;
+    display: block;
+    top: 7px;
+    width: 3px;
+    left: 7px;
+    right: 7px;
+    height: 6px;
+    transform: rotate(45deg);
+    border-width: 0 2px 2px 0;
+  }
+  .PlaygroundEditorTheme__hr {
+    padding: 2px 2px;
+    border: none;
+    margin: 1rem 0;
+    pointer-events: none;
+  }
+  .PlaygroundEditorTheme__hr:after {
+    content: '';
+    display: block;
+    height: 2px;
+    background-color: #ccc;
+    line-height: 2px;
+  }
+  .PlaygroundEditorTheme__hr.selected {
+    outline: 2px solid rgb(60, 132, 244);
+    user-select: none;
+  }
+
+  //
+  // image resizer
+  //
+
+  .editor-image .image-resizer {
+    display: block;
+    width: 7px;
+    height: 7px;
+    position: absolute;
+    background-color: var(--foreground);
+    border: 1px solid var(--border);
+  }
+
+  .editor-image .image-resizer.image-resizer-n {
+    top: -6px;
+    left: 48%;
+    cursor: n-resize;
+  }
+
+  .editor-image .image-resizer.image-resizer-ne {
+    top: -6px;
+    right: -6px;
+    cursor: ne-resize;
+  }
+
+  .editor-image .image-resizer.image-resizer-e {
+    bottom: 48%;
+    right: -6px;
+    cursor: e-resize;
+  }
+
+  .editor-image .image-resizer.image-resizer-se {
+    bottom: -2px;
+    right: -6px;
+    cursor: nwse-resize;
+  }
+
+  .editor-image .image-resizer.image-resizer-s {
+    bottom: -2px;
+    left: 48%;
+    cursor: s-resize;
+  }
+
+  .editor-image .image-resizer.image-resizer-sw {
+    bottom: -2px;
+    left: -6px;
+    cursor: sw-resize;
+  }
+
+  .editor-image .image-resizer.image-resizer-w {
+    bottom: 48%;
+    left: -6px;
+    cursor: w-resize;
+  }
+
+  .editor-image .image-resizer.image-resizer-nw {
+    top: -6px;
+    left: -6px;
+    cursor: nw-resize;
+  }
+}

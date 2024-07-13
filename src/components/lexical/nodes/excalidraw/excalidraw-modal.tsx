@@ -20,7 +20,6 @@ export type ExcalidrawInitialElements = ExcalidrawInitialDataState['elements']
 
 type Props = {
   isOpen: boolean
-  closeOnClickOutside?: boolean
   /**
    * The initial set of elements to draw into the scene
    */
@@ -53,7 +52,6 @@ type Props = {
 
 export const ExcalidrawModal = ({
   isOpen,
-  closeOnClickOutside = false,
   onSave,
   initialFiles,
   initialElements,

@@ -100,7 +100,7 @@ const LexicalEditor_ = observer(
 
     return (
       <>
-        <div className={'relative w-full'}>
+        <div className={'relative w-full editor-shell'}>
           <RichTextPlugin
             contentEditable={
               <div ref={onRef}>
