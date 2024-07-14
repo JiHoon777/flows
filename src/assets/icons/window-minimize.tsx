@@ -1,0 +1,10 @@
+import { SVGWrap } from '@/assets/icons/svg-wrap.tsx'
+import { CustomSVGProps } from '@/assets/icons/types.ts'
+
+export function WindowMinimize(props: CustomSVGProps) {
+  return (
+    <SVGWrap {...props} viewBox="0 0 24 24">
+      <path fill="currentColor" d="M20 14H4v-4h16" />
+    </SVGWrap>
+  )
+}
