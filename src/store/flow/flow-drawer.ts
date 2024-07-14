@@ -108,6 +108,20 @@ export class FlowDrawer {
   async connectNodes(sourceNode: Node, targetNode: Node) {
     const isSourceNodeFlow = sourceNode.type === 'flow'
 
+    // 자기 자신으로 연결시, 중복 연결시 데이터가 계속 추가되는 이슈 수정
+    const isSelf = sourceNode.id === targetNode.id
+    const isDuplicated =
+      this.edges.findIndex((edge) => {
+        return (
+          (edge.source === sourceNode.id && edge.target === targetNode.id) ||
+          (edge.source === targetNode.id && edge.target === sourceNode.id)
+        )
+      }) > -1
+
+    if (isSelf || isDuplicated) {
+      return
+    }
+
     const edgeToCreate = reactFlowUtils.createEdge({
       sourceId: sourceNode.id,
       targetId: targetNode.id,
