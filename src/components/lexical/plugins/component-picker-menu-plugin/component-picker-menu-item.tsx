@@ -19,8 +19,8 @@ export const ComponentPickerMenuItem = ({
       key={option.key}
       tabIndex={-1}
       className={cn(
-        'w-full flex gap-2 px-2 py-0.5 items-center hover:bg-gray-300',
-        isSelected && 'bg-gray-500',
+        'cursor-pointer w-full flex gap-2 px-2 py-0.5 items-center hover:bg-primary-foreground',
+        isSelected && 'bg-primary-foreground',
       )}
       ref={option.setRefElement}
       aria-selected={isSelected}
@@ -29,7 +29,7 @@ export const ComponentPickerMenuItem = ({
       onClick={onClick}
     >
       {option.icon}
-      <span>{option.title}</span>
+      <span className={'text-sm font-medium'}>{option.title}</span>
     </li>
   )
 }

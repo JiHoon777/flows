@@ -24,8 +24,9 @@ import {
 } from 'lexical'
 import {
   CaseSensitive,
+  ChevronRight,
   Code,
-  FilePieChartIcon,
+  FilePieChart,
   Heading1,
   Heading2,
   Heading3,
@@ -41,6 +42,7 @@ import { INSERT_COLLAPSIBLE_COMMAND } from '@/components/lexical/plugins/collaps
 import { ComponentPickerMenuItem } from '@/components/lexical/plugins/component-picker-menu-plugin/component-picker-menu-item.tsx'
 import { ComponentPickerOption } from '@/components/lexical/plugins/component-picker-menu-plugin/component-picker-option.ts'
 import { INSERT_EXCALIDRAW_COMMAND } from '@/components/lexical/plugins/excalidraw-plugin.tsx'
+import { cn } from '@/utils/cn.ts'
 
 export const ComponentPickerMenuPlugin = () => {
   const [editor] = useLexicalComposerContext()
@@ -99,7 +101,7 @@ export const ComponentPickerMenuPlugin = () => {
                 <div>
                   <ul
                     className={
-                      'flex flex-col gap-2 w-[300px] bg-gray-100 rounded-lg p-4 h-[200px] overflow-y-auto'
+                      'flex flex-col gap-2 w-[17.5rem] bg-background shadow-lg rounded-xl p-4 h-[300px] overflow-y-auto'
                     }
                   >
                     {options.map((option, i: number) => (
@@ -128,10 +130,12 @@ export const ComponentPickerMenuPlugin = () => {
   )
 }
 
+const baseClassName = 'text-foreground'
+
 function getBaseOptions(editor: LexicalEditor) {
   return [
     new ComponentPickerOption('Paragraph', {
-      icon: <CaseSensitive />,
+      icon: <CaseSensitive className={baseClassName} />,
       keywords: ['normal', 'paragraph', 'p', 'text'],
       onSelect: () =>
         editor.update(() => {
@@ -144,7 +148,14 @@ function getBaseOptions(editor: LexicalEditor) {
     ...([1, 2, 3] as const).map(
       (n) =>
         new ComponentPickerOption(`Heading ${n}`, {
-          icon: n === 1 ? <Heading1 /> : n === 2 ? <Heading2 /> : <Heading3 />,
+          icon:
+            n === 1 ? (
+              <Heading1 className={baseClassName} />
+            ) : n === 2 ? (
+              <Heading2 className={baseClassName} />
+            ) : (
+              <Heading3 className={baseClassName} />
+            ),
           keywords: ['heading', 'header', `h${n}`],
           onSelect: () =>
             editor.update(() => {
@@ -156,25 +167,25 @@ function getBaseOptions(editor: LexicalEditor) {
         }),
     ),
     new ComponentPickerOption('Numbered List', {
-      icon: <ListOrdered />,
+      icon: <ListOrdered className={baseClassName} />,
       keywords: ['numbered list', 'ordered list', 'ol'],
       onSelect: () =>
         editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined),
     }),
     new ComponentPickerOption('Bulleted List', {
-      icon: <List />,
+      icon: <List className={baseClassName} />,
       keywords: ['bulleted list', 'unordered list', 'ul'],
       onSelect: () =>
         editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined),
     }),
     new ComponentPickerOption('Check List', {
-      icon: <ListChecks />,
+      icon: <ListChecks className={baseClassName} />,
       keywords: ['check list', 'todo list'],
       onSelect: () =>
         editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, undefined),
     }),
     new ComponentPickerOption('Quote', {
-      icon: <Quote />,
+      icon: <Quote className={baseClassName} />,
       keywords: ['block quote'],
       onSelect: () =>
         editor.update(() => {
@@ -185,7 +196,7 @@ function getBaseOptions(editor: LexicalEditor) {
         }),
     }),
     new ComponentPickerOption('Code', {
-      icon: <Code />,
+      icon: <Code className={baseClassName} />,
       keywords: ['javascript', 'python', 'js', 'codebook'],
       onSelect: () =>
         editor.update(() => {
@@ -204,24 +215,24 @@ function getBaseOptions(editor: LexicalEditor) {
         }),
     }),
     new ComponentPickerOption('Divider', {
-      icon: <DividerHorizontalIcon className={'w-6 h-6'} />,
+      icon: <DividerHorizontalIcon className={cn(baseClassName, 'w-6 h-6')} />,
       keywords: ['horizontal rule', 'divider', 'hr'],
       onSelect: () =>
         editor.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, undefined),
     }),
     new ComponentPickerOption('Page Break', {
-      icon: <Ruler />,
+      icon: <Ruler className={baseClassName} />,
       keywords: ['page break', 'divider'],
       onSelect: () => {},
     }),
     new ComponentPickerOption('Excalidraw', {
-      icon: <FilePieChartIcon className={'w-6 h-6'} />,
+      icon: <FilePieChart className={baseClassName} />,
       keywords: ['excalidraw', 'diagram', 'drawing'],
       onSelect: () =>
         editor.dispatchCommand(INSERT_EXCALIDRAW_COMMAND, undefined),
     }),
     new ComponentPickerOption('Collapsible', {
-      icon: <i className="icon caret-right" />,
+      icon: <ChevronRight className={baseClassName} />,
       keywords: ['collapse', 'collapsible', 'toggle'],
       onSelect: () =>
         editor.dispatchCommand(INSERT_COLLAPSIBLE_COMMAND, undefined),
