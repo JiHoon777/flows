@@ -109,7 +109,7 @@ const LexicalEditor_ = observer(
               <div ref={onRef}>
                 <ContentEditable
                   className={
-                    'w-full min-h-[85vh] border-none outline-none px-7 py-3'
+                    'w-full min-h-[90vh] border-none outline-none px-7 py-3'
                   }
                 />
               </div>

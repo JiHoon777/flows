@@ -62,7 +62,7 @@ export const NodeDetailView = observer(({ nodeId }: { nodeId: string }) => {
           <h1 className={'font-bold text-2xl'}>{node.title}</h1>
         </header>
         <LexicalEditor
-          showTreeView
+          showTreeView={false}
           initialEditorState={
             (node.snapshot.data as NoteNodeData)?.content ?? null
           }

@@ -27,6 +27,9 @@
       },
       "shell": {
         "all": true
+      },
+      "os": {
+        "all": true
       }
     },
     "bundle": {
@@ -63,7 +66,7 @@
       }
     },
     "security": {
-      "csp": null
+      "csp": "default-src blob: data: filesystem: ws: wss: http: https: tauri: 'unsafe-eval' 'unsafe-inline' 'self' img-src: 'self'"
     },
     "updater": {
       "active": false

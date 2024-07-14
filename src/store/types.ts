@@ -18,7 +18,7 @@ interface ReactFlowNodeBase<DATA_TYPE> {
     x: number
     y: number
   }
-  style: {
+  style?: {
     width: number
     height: number
   }
