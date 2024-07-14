@@ -4,6 +4,8 @@ import {
   ChevronsDownUp,
   ChevronsUpDown,
   FolderPlus,
+  MoonStar,
+  Sun,
 } from 'lucide-react'
 import { observer } from 'mobx-react'
 
@@ -19,6 +21,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip.tsx'
+import { useTheme } from '@/contexts/theme-provider.tsx'
 import { useStore } from '@/store/useStore.ts'
 import { ExplorerSortOption } from '@/store/views/explorer-view.ts'
 
@@ -26,6 +29,7 @@ const IconCn = 'w-[1.1rem] h-[1.1rem] text-gray-500'
 
 export const ExplorerToolbar = observer(() => {
   const store = useStore()
+  const { theme, setTheme } = useTheme()
   const explorerView = store.explorerView
 
   return (
@@ -84,6 +88,24 @@ export const ExplorerToolbar = observer(() => {
         <TooltipContent side={'bottom'}>
           {explorerView.isExpandAll && 'Collapse All'}
           {!explorerView.isExpandAll && 'Expand All'}
+        </TooltipContent>
+      </Tooltip>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant={'ghost'}
+            size={'icon'}
+            onClick={() =>
+              theme === 'light' ? setTheme('dark') : setTheme('light')
+            }
+          >
+            {theme === 'light' && <Sun className={IconCn} />}
+            {theme === 'dark' && <MoonStar className={IconCn} />}
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side={'bottom'}>
+          {theme === 'light' && 'Light theme'}
+          {theme === 'dark' && 'Dark theme'}
         </TooltipContent>
       </Tooltip>
     </div>
