@@ -1,5 +1,6 @@
 import {
   ArrowUpNarrowWide,
+  Check,
   ChevronsDownUp,
   ChevronsUpDown,
   FolderPlus,
@@ -56,8 +57,11 @@ export const ExplorerToolbar = observer(() => {
                 <DropdownMenuItem
                   key={item}
                   onClick={() => explorerView.setSortOption(item)}
-                  className={'text-gray-500 text-sm'}
+                  className={'relative text-gray-500 text-sm pl-7'}
                 >
+                  {explorerView.sortOption === item && (
+                    <Check className={'w-4 h-4 absolute top-2 left-2'} />
+                  )}
                   {item}
                 </DropdownMenuItem>
               ))}

@@ -16,7 +16,6 @@ export const SiteLeftExplorerFlowRow = observer(
     const navigate = useNavigate()
     const { flowId } = useParams<{ flowId?: string }>()
     const store = useStore()
-
     const explorerView = store.explorerView
 
     const [isOpen, setIsOpen] = useState(false)
@@ -36,14 +35,15 @@ export const SiteLeftExplorerFlowRow = observer(
       setIsOpen(false)
     }, [explorerView.isExpandAll])
 
-    const FlowIdsToFlows =
-      flow?.childFlowIds
-        ?.map((id) => store.flowStore.getFlowById(id))
-        .filter((cf) => !!cf) ?? []
-    const NodeIdsToNodes =
-      flow.childNodeIds
-        ?.map((id) => store.nodeStore.getNodeById(id))
-        .filter((cn) => !!cn && cn.type === 'note') ?? []
+    const FlowIdsToFlows = ExplorerView.convertChildFlowIdsToDoFlows(
+      flow.id,
+      (id) => store.flowStore.getFlowById(id),
+    )
+    const NodeIdsToNodes = ExplorerView.convertChildNodeIdsToDoNodes(
+      flow.id,
+      (id) => store.flowStore.getFlowById(id),
+      (id) => store.nodeStore.getNodeById(id),
+    )
     const sortedFlowAndNodes = ExplorerView.sortFlowsOrNodesBySortOption(
       [...FlowIdsToFlows, ...NodeIdsToNodes],
       store.explorerView.sortOption,

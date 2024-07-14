@@ -43,7 +43,7 @@ export class ExplorerView {
         (flow) => !flow.parentFlowId,
       ),
       this.sortOption,
-    )
+    ) as DoFlow[]
   }
 
   //
@@ -112,5 +112,34 @@ export class ExplorerView {
         return items
       }
     }
+  }
+  static convertChildFlowIdsToDoFlows(
+    flowId: string,
+    getFlowById: (id: string) => DoFlow | undefined,
+  ): DoFlow[] {
+    const flow = getFlowById(flowId)
+
+    if (!flow) {
+      return []
+    }
+
+    return (
+      flow.childFlowIds?.map((id) => getFlowById(id)).filter((cf) => !!cf) ?? []
+    )
+  }
+  static convertChildNodeIdsToDoNodes(
+    flowId: string,
+    getFlowById: (id: string) => DoFlow | undefined,
+    getNodeById: (id: string) => DoNode | undefined,
+  ): DoNode[] {
+    const flow = getFlowById(flowId)
+
+    if (!flow) {
+      return []
+    }
+
+    return (flow.childNodeIds
+      ?.map((id) => getNodeById(id))
+      .filter((cn) => !!cn && cn.type === 'note') ?? []) as DoNode[]
   }
 }
