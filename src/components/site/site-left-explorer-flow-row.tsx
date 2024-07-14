@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
@@ -13,11 +13,28 @@ import { cn } from '@/utils/cn'
 
 export const SiteLeftExplorerFlowRow = observer(
   ({ flow }: { flow: DoFlow }) => {
-    const store = useStore()
     const navigate = useNavigate()
     const { flowId } = useParams<{ flowId?: string }>()
+    const store = useStore()
+
+    const explorerView = store.explorerView
 
     const [isOpen, setIsOpen] = useState(false)
+
+    const isMountedRef = useRef(false)
+    useEffect(() => {
+      if (!isMountedRef.current) {
+        isMountedRef.current = true
+        return
+      }
+
+      if (explorerView.isExpandAll) {
+        setIsOpen(true)
+        return
+      }
+
+      setIsOpen(false)
+    }, [explorerView.isExpandAll])
 
     const isViewing = flow.id === flowId
     return (

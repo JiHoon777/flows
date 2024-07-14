@@ -3,18 +3,19 @@ import { nanoid } from 'nanoid'
 
 import { RootStore } from '@/store/root-store.ts'
 
-export type ExplorerSortOption =
-  | 'Created time asc'
-  | 'Created time desc'
-  | 'Updated time asc'
-  | 'Updated time desc'
-  | 'Title a to z'
-  | 'Title z to a'
+export enum ExplorerSortOption {
+  CreatedTimeAsc = 'CreatedTimeAsc',
+  CreatedTimeDesc = 'CreatedTimeDesc',
+  UpdatedTimeAsc = 'UpdatedTimeAsc',
+  UpdatedTimeDesc = 'UpdatedTimeDesc',
+  TitleAtoZ = 'TitleAtoZ',
+  TitleZtoA = 'TitleZtoA',
+}
 
 export class ExplorerView {
   rootStore: RootStore
 
-  sortOption: ExplorerSortOption = 'Created time asc'
+  sortOption: ExplorerSortOption = ExplorerSortOption.CreatedTimeAsc
   isExpandAll: boolean = false
   constructor(rootStore: RootStore) {
     this.rootStore = rootStore
