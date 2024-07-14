@@ -14,6 +14,30 @@ const FLOW_DIR = `flows/flow`
 const NODE_DIR = `flows/node`
 
 export const fileSystemAPI = {
+  checkFlowDirectoryAndCreate: async () => {
+    try {
+      // FLOW_DIR 존재 여부 확인 및 생성
+      await readDir(FLOW_DIR, { dir: BaseDirectory.Document })
+    } catch (error) {
+      // 디렉토리가 존재하지 않으면 생성
+      await createDir(FLOW_DIR, {
+        recursive: true,
+        dir: BaseDirectory.Document,
+      })
+    }
+  },
+  checkNodeDirectoryAndCreaet: async () => {
+    try {
+      // NODE_DIR 존재 여부 확인 및 생성
+      await readDir(NODE_DIR, { dir: BaseDirectory.Document })
+    } catch (error) {
+      // 디렉토리가 존재하지 않으면 생성
+      await createDir(NODE_DIR, {
+        recursive: true,
+        dir: BaseDirectory.Document,
+      })
+    }
+  },
   saveFlowToFile: async (data: Flow) => {
     const filePath = `${FLOW_DIR}/${data.flowId}.json`
 

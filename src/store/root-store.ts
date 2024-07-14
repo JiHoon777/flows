@@ -46,6 +46,9 @@ export class RootStore {
       this.platform = res
     })
 
+    await fileSystemAPI.checkFlowDirectoryAndCreate()
+    await fileSystemAPI.checkNodeDirectoryAndCreaet()
+
     Promise.all([fileSystemAPI.loadAllFlows(), fileSystemAPI.loadAllNodes()])
       .then(([loadedFlows, loadedNodes]) => {
         loadedFlows.forEach((flow) => this.flowStore.merge(flow))
