@@ -11,6 +11,7 @@ import {
   DROP_COMMAND,
   LexicalEditor,
 } from 'lexical'
+import { GripVertical } from 'lucide-react'
 
 import {
   getBlockElement,
@@ -22,6 +23,7 @@ import {
 } from '@/components/lexical/plugins/draggable-block-plugin/utils.ts'
 import { isHTMLElement } from '@/components/lexical/utils/is-html-element.ts'
 import { Portal } from '@/components/portal.tsx'
+import { cn } from '@/utils/cn.ts'
 
 const DRAG_DATA_FORMAT = 'application/x-lexical-drag-block'
 
@@ -161,6 +163,7 @@ export const useDraggableBlockMenu = (
   }, [anchorElem, editor])
 
   function onDragStart(event: ReactDragEvent<HTMLDivElement>): void {
+    console.log(166)
     const dataTransfer = event.dataTransfer
     if (!dataTransfer || !draggableBlockElem) {
       return
@@ -182,18 +185,32 @@ export const useDraggableBlockMenu = (
     hideTargetLine(targetLineRef.current)
   }
 
+  const height = draggableBlockElem?.clientHeight ?? undefined
   return (
     <Portal containerEl={anchorElem}>
-      <div
-        className="icon draggable-block-menu"
-        ref={menuRef}
-        draggable={true}
-        onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
-      >
-        <div className={isEditable ? 'icon' : ''} />
+      <div style={{ height }}>
+        <div
+          className={cn(
+            'rounded cursor-grab opacity-0 absolute left-0 top-0 will-change-transform',
+            'active:cursor-grabbing hover:bg-[#efefef]',
+          )}
+          ref={menuRef}
+          draggable={true}
+          onDragStart={onDragStart}
+          onDragEnd={onDragEnd}
+        >
+          <GripVertical
+            className={cn(
+              '!w-5 !h-5 opacity-30 pointer-events-none',
+              !isEditable && 'hidden',
+            )}
+          />
+        </div>
       </div>
-      <div className="draggable-block-target-line" ref={targetLineRef} />
+      <div
+        className="pointer-events-none bg-[deepskyblue] h-0.5 absolute left-0 top-0 opacity-0 will-change-transform"
+        ref={targetLineRef}
+      />
     </Portal>
   )
 }

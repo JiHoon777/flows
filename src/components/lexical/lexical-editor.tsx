@@ -36,6 +36,7 @@ import { ListMaxIndentLevelPlugin } from '@/components/lexical/plugins/list-max-
 import { OnChangePlugin } from '@/components/lexical/plugins/on-change-plugin.tsx'
 import { TreeViewPlugin } from '@/components/lexical/plugins/tree-view-plugin.tsx'
 import { CAN_USE_DOM } from '@/components/lexical/utils/environment.ts'
+import { cn } from '@/utils/cn.ts'
 
 type Props = {
   initialEditorState: InitialEditorStateType
@@ -100,14 +101,16 @@ const LexicalEditor_ = observer(
 
     return (
       <>
-        <div className={'relative w-full editor-shell'}>
+        <div className={cn('relative w-full', 'editor-shell')}>
           <DragDropPaste />
 
           <RichTextPlugin
             contentEditable={
               <div ref={onRef}>
                 <ContentEditable
-                  className={'w-full min-h-[85vh] border-none outline-none'}
+                  className={
+                    'w-full min-h-[85vh] border-none outline-none px-7 py-3'
+                  }
                 />
               </div>
             }

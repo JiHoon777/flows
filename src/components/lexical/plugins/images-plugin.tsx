@@ -48,8 +48,6 @@ export const ImagesPlugin = (): JSX.Element | null => {
       editor.registerCommand<InsertImagePayload>(
         INSERT_IMAGE_COMMAND,
         (payload) => {
-          console.log('INSERT_IMAGE_COMMAND payload:', payload)
-
           const imageNode = $createImageNode(payload)
           $insertNodes([imageNode])
           if ($isRootOrShadowRoot(imageNode.getParentOrThrow())) {
@@ -70,9 +68,6 @@ export const ImagesPlugin = (): JSX.Element | null => {
       editor.registerCommand<DragEvent>(
         DRAGOVER_COMMAND,
         (event) => {
-          console.log('Dragover event:', event)
-
-          console.log(71111, event)
           return $onDragover(event)
         },
         COMMAND_PRIORITY_LOW,
@@ -80,8 +75,6 @@ export const ImagesPlugin = (): JSX.Element | null => {
       editor.registerCommand<DragEvent>(
         DROP_COMMAND,
         (event) => {
-          console.log('Drop event:', event)
-
           return $onDrop(event, editor)
         },
         COMMAND_PRIORITY_HIGH,
@@ -128,15 +121,12 @@ function $onDragStart(event: DragEvent): boolean {
 
 function $onDragover(event: DragEvent): boolean {
   const node = $getImageNodeInSelection()
-  console.log(133)
   if (!node) {
     return false
   }
-  console.log(137)
   if (!canDropImage(event)) {
     event.preventDefault()
   }
-  console.log(141)
   return true
 }
 
@@ -146,7 +136,6 @@ function $onDrop(event: DragEvent, editor: LexicalEditor): boolean {
     return false
   }
   const data = getDragImageData(event)
-  console.log(139, data)
   if (!data) {
     return false
   }
