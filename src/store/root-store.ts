@@ -42,13 +42,14 @@ export class RootStore {
    * App 진입시 모든 플로우와, 노드들을 초기화한다.
    */
   async initializeApp() {
-    TauriPlatform().then((res) => {
-      this.platform = res
-    })
-
     await fileSystemAPI.checkFlowDirectoryAndCreate()
     await fileSystemAPI.checkNodeDirectoryAndCreaet()
 
+    TauriPlatform()
+      .then((res) => {
+        this.platform = res
+      })
+      .catch((ex) => this.showError(ex))
     Promise.all([fileSystemAPI.loadAllFlows(), fileSystemAPI.loadAllNodes()])
       .then(([loadedFlows, loadedNodes]) => {
         loadedFlows.forEach((flow) => this.flowStore.merge(flow))
