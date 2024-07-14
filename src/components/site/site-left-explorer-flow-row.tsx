@@ -6,9 +6,9 @@ import { observer } from 'mobx-react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { SiteLeftExplorerNodeRow } from '@/components/site/site-left-explorer-node-row'
-import { Badge } from '@/components/ui/badge'
 import { DoFlow } from '@/store/flow/do-flow.ts'
 import { useStore } from '@/store/useStore.ts'
+import { ExplorerView } from '@/store/views/explorer-view.ts'
 import { cn } from '@/utils/cn'
 
 export const SiteLeftExplorerFlowRow = observer(
@@ -36,6 +36,19 @@ export const SiteLeftExplorerFlowRow = observer(
       setIsOpen(false)
     }, [explorerView.isExpandAll])
 
+    const FlowIdsToFlows =
+      flow?.childFlowIds
+        ?.map((id) => store.flowStore.getFlowById(id))
+        .filter((cf) => !!cf) ?? []
+    const NodeIdsToNodes =
+      flow.childNodeIds
+        ?.map((id) => store.nodeStore.getNodeById(id))
+        .filter((cn) => !!cn && cn.type === 'note') ?? []
+    const sortedFlowAndNodes = ExplorerView.sortFlowsOrNodesBySortOption(
+      [...FlowIdsToFlows, ...NodeIdsToNodes],
+      store.explorerView.sortOption,
+    )
+
     const isViewing = flow.id === flowId
     return (
       <motion.div
@@ -61,31 +74,24 @@ export const SiteLeftExplorerFlowRow = observer(
               onClick={() => setIsOpen((p) => !p)}
             />
           </motion.div>
-          <span className={'text-sm'}>{flow.title ?? '-'}</span>
-          <Badge variant={'outline'} className={'py-0.5 px-2 ml-auto'}>
-            flow
-          </Badge>
+          <span className={'text-sm'}>
+            {flow.title ?? '-'} {isViewing && '👀'}
+          </span>
         </div>
         <AnimatePresence>
           {isOpen && (
             <motion.div
-              className={'border-l ml-3.5'}
+              className={'border-l ml-3.5 pl-0.5'}
               initial={{ height: 0 }}
               animate={{ height: 'auto' }}
               exit={{ height: 0 }}
               transition={{ duration: 0.2 }}
             >
-              {flow.childFlowIds?.map((cf) => {
-                const found = store.flowStore.getFlowById(cf)
-                return found ? (
-                  <SiteLeftExplorerFlowRow key={found.id} flow={found} />
-                ) : null
-              })}
-              {flow.childNodeIds?.map((cn) => {
-                const found = store.nodeStore.getNodeById(cn)
-                return found?.type === 'note' ? (
-                  <SiteLeftExplorerNodeRow key={found.id} node={found} />
-                ) : null
+              {sortedFlowAndNodes.map((item) => {
+                if (item instanceof DoFlow) {
+                  return <SiteLeftExplorerFlowRow key={item.id} flow={item} />
+                }
+                return <SiteLeftExplorerNodeRow key={item.id} node={item} />
               })}
             </motion.div>
           )}

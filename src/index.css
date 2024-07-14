@@ -94,8 +94,8 @@
  *  site-left-explorer
  **/
 .site-left-explorer-row {
-  @apply cursor-pointer w-full py-0.5 px-2 flex items-center gap-1 rounded hover:bg-gray-100
+  @apply cursor-pointer w-full py-0.5 px-2 flex items-center gap-1 rounded hover:bg-gray-300/20
 }
 .site-left-explorer-selected-row {
-  @apply bg-gray-100
+  @apply bg-gray-300/40
 }

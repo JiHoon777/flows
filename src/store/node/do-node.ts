@@ -38,6 +38,13 @@ export class DoNode {
   ) {
     this.snapshot = merge({}, this.snapshot, changedData)
 
+    if (typeof changedData.created_at === 'string') {
+      this.snapshot.created_at = new Date(changedData.created_at)
+    }
+    if (typeof changedData.updated_at === 'string') {
+      this.snapshot.updated_at = new Date(changedData.updated_at)
+    }
+
     assignIf(changedData, 'type', (type) => {
       this.type = type
     })
