@@ -1,6 +1,15 @@
-import { Dispatch, useState } from 'react'
+import {
+  ChangeEvent,
+  Dispatch,
+  KeyboardEvent,
+  SetStateAction,
+  useCallback,
+  useRef,
+  useState,
+} from 'react'
 
 import { motion } from 'framer-motion'
+import { debounce } from 'lodash-es'
 import { ChevronRight } from 'lucide-react'
 import { observer } from 'mobx-react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -11,6 +20,8 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from '@/components/ui/context-menu.tsx'
+import { Input } from '@/components/ui/input.tsx'
+import { useOutsideClick } from '@/hooks/use-outside-click.ts'
 import { DoFlow } from '@/store/flow/do-flow.ts'
 import { cn } from '@/utils/cn.ts'
 
@@ -22,12 +33,43 @@ export const ExplorerNodeRowItem = observer(
   }: {
     flow: DoFlow
     isChildOpen: boolean
-    setIsChildOpen: Dispatch<boolean>
+    setIsChildOpen: Dispatch<SetStateAction<boolean>>
   }) => {
     const navigate = useNavigate()
     const { flowId } = useParams<{ flowId?: string }>()
 
     const [isNameEditing, setIsNameEditing] = useState(false)
+    const inputRef = useRef<HTMLInputElement | null>(null)
+    useOutsideClick(inputRef, () => {
+      setIsNameEditing(false)
+    })
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const handleChangeName = useCallback(
+      debounce((e: ChangeEvent<HTMLInputElement>) => {
+        console.log('one time')
+        if (!e.target.value || !e.target.value.trim()) {
+          return
+        }
+
+        flow.store.updateFlow({
+          flowId: flow.id,
+          changedFlow: {
+            data: {
+              title: e.target.value,
+            },
+          },
+        })
+      }, 500),
+      [],
+    )
+
+    const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter' || e.key === 'Escape') {
+        setIsNameEditing(false)
+        inputRef.current = null
+      }
+    }
 
     const isViewing = flow.id === flowId
     return (
@@ -50,13 +92,34 @@ export const ExplorerNodeRowItem = observer(
                 onClick={() => setIsChildOpen((p) => !p)}
               />
             </motion.div>
-            <span className={'text-sm'}>
-              {flow.title ?? '-'} {isViewing && '👀'}
+            <Input
+              ref={inputRef}
+              defaultValue={flow.title}
+              className={cn('h-5 pl-1', !isNameEditing && 'hidden')}
+              onChange={handleChangeName}
+              onKeyDown={handleKeyDown}
+            />
+            <span
+              className={cn(
+                'max-w-full truncate text-sm',
+                isNameEditing && 'hidden',
+              )}
+            >
+              {flow.title ?? '-'}
             </span>
+            {isViewing && <span className={'absolute -right-4'}>👀</span>}
           </div>
         </ContextMenuTrigger>
         <ContextMenuContent>
-          <ContextMenuItem onClick={() => setIsNameEditing(true)}>
+          <ContextMenuItem
+            onClick={() => {
+              setIsNameEditing(true)
+
+              setTimeout(() => {
+                inputRef.current?.focus()
+              }, 300)
+            }}
+          >
             Rename ...
           </ContextMenuItem>
         </ContextMenuContent>

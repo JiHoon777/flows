@@ -22,9 +22,8 @@ export const ExplorerNodeRow = observer(({ node }: { node: DoNode }) => {
       )}
       onClick={() => navigate(`/nodes/${node.id}`)}
     >
-      <span className={'text-sm'}>
-        {node.title} {isViewing && '👀'}
-      </span>
+      <span className={'text-sm'}>{node.title}</span>
+      {isViewing && <span className={'absolute -right-4'}>👀</span>}
     </motion.div>
   )
 })
