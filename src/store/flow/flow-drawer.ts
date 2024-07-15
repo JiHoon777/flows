@@ -291,6 +291,37 @@ export class FlowDrawer {
       })
     }
   }
+  /**
+   * Node 를 제거한다.
+   * Todo, isTrashed : true 로 변경하고, store 의 map 에서 없애고 app 초기화시에 불러오지 말자.
+   * 1. this.nodes 제거
+   * 2. 실제 저장된 node의 isTrashed : true 로 변경
+   */
+  async removeNode(id: string, type: NodeType | 'flow') {
+    const removedNode = this.nodes.find((node) => node.id === id)
+
+    if (!removedNode) {
+      return
+    }
+
+    runInAction(() => {
+      this.nodes = this.nodes.filter((node) => node.id !== id)
+    })
+
+    try {
+      if (type === 'flow') {
+        await this.flow.store.removeFlow(id)
+      } else {
+        await this.rootStore.nodeStore.removeNode(id)
+      }
+    } catch (ex) {
+      this.rootStore.showError(ex)
+
+      runInAction(() => {
+        this.nodes = [...this.nodes, removedNode]
+      })
+    }
+  }
 
   //
   // Utils
