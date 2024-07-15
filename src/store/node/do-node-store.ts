@@ -86,4 +86,20 @@ export class DoNodeStore {
       throw ex
     }
   }
+
+  async removeNode(nodeId: string) {
+    const deletedNode = this.nodesMap[nodeId]
+    runInAction(() => {
+      delete this.nodesMap[nodeId]
+    })
+
+    try {
+      await fileSystemAPI.deleteNode(nodeId)
+    } catch (ex) {
+      runInAction(() => {
+        this.nodesMap[nodeId] = deletedNode
+      })
+      throw ex
+    }
+  }
 }
