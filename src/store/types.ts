@@ -32,8 +32,7 @@ export interface Flow
     ReactFlowNodeBase<FlowNodeData> {
   flowId: string
 
-  childNodeIds: string[]
-
+  childNodeIds?: string[]
   childFlowIds?: string[]
 }
 

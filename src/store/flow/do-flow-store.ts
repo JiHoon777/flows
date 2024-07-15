@@ -89,4 +89,44 @@ export class DoFlowStore {
       throw ex
     }
   }
+
+  /**
+   * flow 를 삭제하면, childNodes, childFlows 를 루트로 보낸다. 다 삭제하자니 좀 그렇자너~ 복잡해~
+   */
+  async removeFlow(flowId: string) {
+    const deletedFlow = this.flowsMap[flowId]
+    runInAction(() => {
+      delete this.flowsMap[flowId]
+    })
+
+    try {
+      await fileSystemAPI.deleteFlow(flowId)
+      const updateChildFlows = (deletedFlow.childFlowIds ?? []).map((id) =>
+        this.flowsMap[id]?.store.updateFlow({
+          flowId: id,
+          changedFlow: { parentFlowId: undefined, targets: [] },
+        }),
+      )
+      const updateChildNodes = (deletedFlow.childNodeIds ?? []).map((id) =>
+        this.rootStore.nodeStore.nodesMap[id]?.store.updateNode({
+          nodeId: id,
+          changedNode: { parentFlowId: undefined, targets: [] },
+        }),
+      )
+
+      // Todo: 에러 처리 어떻게 할 지 생각 필요
+      Promise.all([...updateChildFlows, ...updateChildNodes])
+        .then(() => {
+          console.log('All updates completed successfully')
+        })
+        .catch((ex) => {
+          console.error('An error occurred during the updates: ', ex)
+        })
+    } catch (ex) {
+      runInAction(() => {
+        this.flowsMap[flowId] = deletedFlow
+      })
+      throw ex
+    }
+  }
 }
