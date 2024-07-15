@@ -24,7 +24,7 @@ const modalVariants = cva('w-full rounded-xl bg-background shadow-lg', {
   },
 })
 
-interface ModalOverlayProps
+export interface ModalOverlayProps
   extends VariantProps<typeof modalVariants>,
     PropsWithChildren {
   isOpen: boolean
