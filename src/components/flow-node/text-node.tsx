@@ -19,7 +19,7 @@ import { useStore } from '@/store/useStore.ts'
 import { cn } from '@/utils/cn.ts'
 
 export const TextNode = observer((props: NodeProps<TextNodeData>) => {
-  const { data, id, type } = props
+  const { data, id } = props
   const store = useStore()
   const { open } = useOverlay()
 
