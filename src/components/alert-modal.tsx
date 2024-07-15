@@ -6,8 +6,8 @@ export const AlertModal = ({
   ...props
 }: ModalOverlayProps & { onFinish: () => void }) => {
   return (
-    <ModalOverlay {...props} className={'p-6'}>
-      Are you sure?
+    <ModalOverlay {...props} className={'flex flex-col p-6 gap-6'}>
+      <p>Are you sure?</p>
       <div className={'w-full flex justify-end gap-4'}>
         <Button variant={'outline'} onClick={props.onClose}>
           Cancel
