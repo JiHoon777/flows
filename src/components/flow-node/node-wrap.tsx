@@ -14,7 +14,9 @@ export const NodeWrap = observer(({ children, selected, id, type }: Props) => {
 
   return (
     <div
-      className={cn('w-full h-full flex z-[1] relative !bg-white rounded p-2')}
+      className={cn(
+        'w-full h-full flex z-[1] relative !bg-background rounded p-2',
+      )}
     >
       <div className={'absolute -top-5 text-gray-500 text-xs'}>
         {type === 'flow' && <Map className={'w-4 h-4'} />}
