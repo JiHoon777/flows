@@ -6,6 +6,7 @@ import {
   InitialEditorStateType,
   LexicalComposer,
 } from '@lexical/react/LexicalComposer'
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
@@ -42,6 +43,7 @@ type Props = {
   initialEditorState: InitialEditorStateType
   onChange: (editorState: string) => void
   showTreeView?: boolean
+  editable?: boolean
 }
 
 export const LexicalEditor = observer((props: Props) => {
@@ -64,10 +66,12 @@ const LexicalEditor_ = observer(
     initialEditorState,
     onChange,
     showTreeView = false,
+    editable = true,
   }: {
     initialEditorState: InitialEditorStateType
     onChange: (editorState: string) => void
     showTreeView?: boolean
+    editable?: boolean
   }) => {
     const [floatingAnchorElem, setFloatingAnchorElem] =
       useState<HTMLDivElement | null>(null)
@@ -75,6 +79,7 @@ const LexicalEditor_ = observer(
       useState<boolean>(false)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [isLinkEditMode, setIsLinkEditMode] = useState<boolean>(false)
+    const [editor] = useLexicalComposerContext()
 
     const onRef = (_floatingAnchorElem: HTMLDivElement) => {
       if (_floatingAnchorElem !== null) {
@@ -98,6 +103,10 @@ const LexicalEditor_ = observer(
         window.removeEventListener('resize', updateViewPortWidth)
       }
     }, [isSmallWidthViewport])
+
+    useEffect(() => {
+      editor.setEditable(editable)
+    }, [editable, editor])
 
     return (
       <>

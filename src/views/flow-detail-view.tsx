@@ -21,6 +21,7 @@ import {
   OnConnectStart,
   ReactFlow,
   ReactFlowProvider,
+  useOnSelectionChange,
   useReactFlow,
   useStoreApi,
 } from 'reactflow'
@@ -38,6 +39,22 @@ import { DoFlow } from '@/store/flow/do-flow.ts'
 import { useStore } from '@/store/useStore.ts'
 
 import 'reactflow/dist/style.css'
+
+const nodeOrigin: NodeOrigin = [0.5, 0.5]
+const connectionLineStyle = { stroke: '#e2e8f0', strokeWidth: 3 }
+const defaultEdgeOptions = { style: connectionLineStyle, type: 'text' }
+
+const nodeTypes = {
+  flow: FlowNode,
+  text: TextNode,
+  note: NoteNode,
+}
+
+const edgeTypes = {
+  flow: StraightEdge,
+  text: StraightEdge,
+  note: StraightEdge,
+}
 
 export const FlowDetailViewParamsWrap = observer(() => {
   const { flowId } = useParams<{ flowId: string }>()
@@ -64,7 +81,7 @@ const FlowDetailView_ = observer(({ flowId }: { flowId: string }) => {
   const connectingNodeId = useRef<string | null>(null)
   const flow = appStore.flowStore.getFlowById(flowId) as DoFlow | undefined
   const drawer = flow?.drawer
-
+  const [hasSelectedNode, setHasSelectedNode] = useState(false)
   //
   // context menu
   //
@@ -73,6 +90,13 @@ const FlowDetailView_ = observer(({ flowId }: { flowId: string }) => {
     x: number
     y: number
   } | null>(null)
+
+  //
+  useOnSelectionChange({
+    onChange: ({ nodes }) => {
+      setHasSelectedNode(nodes.length > 0)
+    },
+  })
 
   /**
    * 연결 시작 시 호출되는 함수
@@ -303,6 +327,8 @@ const FlowDetailView_ = observer(({ flowId }: { flowId: string }) => {
          * 초기 로드 시 다이어그램이 화면에 잘 맞게 조정됩니다.
          */
         fitView
+        zoomOnScroll={!hasSelectedNode}
+        panOnDrag={!hasSelectedNode}
       >
         {/**
          * 다이어그램 컨트롤을 표시합니다.
@@ -320,19 +346,3 @@ const FlowDetailView_ = observer(({ flowId }: { flowId: string }) => {
     </main>
   )
 })
-
-const nodeOrigin: NodeOrigin = [0.5, 0.5]
-const connectionLineStyle = { stroke: '#e2e8f0', strokeWidth: 3 }
-const defaultEdgeOptions = { style: connectionLineStyle, type: 'text' }
-
-const nodeTypes = {
-  flow: FlowNode,
-  text: TextNode,
-  note: NoteNode,
-}
-
-const edgeTypes = {
-  flow: StraightEdge,
-  text: StraightEdge,
-  note: StraightEdge,
-}

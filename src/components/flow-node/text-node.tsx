@@ -54,7 +54,7 @@ export const TextNode = observer((props: NodeProps<TextNodeData>) => {
           <Textarea
             className={cn(
               'w-full h-full border-0 py-0.5 px-0.5 rounded',
-              'text-sm font-bold bg-transparent text-gray-900 resize-none',
+              'text-sm font-bold bg-transparent text-foreground resize-none',
             )}
             defaultValue={data.title}
             onChange={(e) => debouncedChangeHandler(e.target.value)}
