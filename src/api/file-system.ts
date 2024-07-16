@@ -106,6 +106,10 @@ export const fileSystemAPI = {
   addNode: async (node: NodeTypes) => {
     if (node.parentFlowId) {
       const flow = await fileSystemAPI.loadFlowFromFile(node.parentFlowId)
+
+      if (!flow.childNodeIds) {
+        flow.childNodeIds = []
+      }
       flow.childNodeIds.push(node.nodeId)
       await fileSystemAPI.saveFlowToFile(flow)
     }
@@ -115,7 +119,7 @@ export const fileSystemAPI = {
     const node = await fileSystemAPI.loadNodeFromFile(nodeId)
     if (node.parentFlowId) {
       const flow = await fileSystemAPI.loadFlowFromFile(node.parentFlowId)
-      flow.childNodeIds = flow.childNodeIds.filter((id) => id !== nodeId)
+      flow.childNodeIds = flow.childNodeIds?.filter((id) => id !== nodeId) ?? []
       await fileSystemAPI.saveFlowToFile(flow)
     }
     const filePath = `${NODE_DIR}/${nodeId}.json`
