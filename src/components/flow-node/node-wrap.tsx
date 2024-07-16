@@ -15,7 +15,7 @@ export const NodeWrap = observer(({ children, selected, id, type }: Props) => {
   return (
     <div
       className={cn(
-        'w-full h-full flex z-[1] relative !bg-background rounded p-2',
+        'w-full h-full flex z-[1] relative !bg-background rounded p-3',
       )}
     >
       <div className={'absolute -top-5 text-gray-500 text-xs'}>
