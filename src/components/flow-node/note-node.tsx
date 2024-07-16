@@ -64,6 +64,7 @@ export const NoteNode = memo((props: NodeProps<NoteNodeData>) => {
                 'nodrag shrink-0 p-2 text-4xl w-full resize-none mx-2 mt-2 font-bold border-0 shadow-none',
                 (!selected || dragging) && 'pointer-events-none',
                 selected && dragging && 'pointer-events-none',
+                'overflow-hidden',
               )}
               defaultValue={data.title}
               onChange={(e) => debouncedChangeHandler(e.target.value)}

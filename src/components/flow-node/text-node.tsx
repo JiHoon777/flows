@@ -5,6 +5,7 @@ import { observer } from 'mobx-react'
 import { NodeProps } from 'reactflow'
 
 import { AlertModal } from '@/components/alert-modal.tsx'
+import { FlTextareaAutoSize } from '@/components/fl-textarea-auto-size.tsx'
 import { NodeWrap } from '@/components/flow-node/node-wrap'
 import {
   ContextMenu,
@@ -12,14 +13,13 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from '@/components/ui/context-menu.tsx'
-import { Textarea } from '@/components/ui/textarea.tsx'
 import { useOverlay } from '@/contexts/overlay/use-overlay.tsx'
 import { TextNodeData } from '@/store/types'
 import { useStore } from '@/store/useStore.ts'
 import { cn } from '@/utils/cn.ts'
 
 export const TextNode = observer((props: NodeProps<TextNodeData>) => {
-  const { data, id } = props
+  const { data, id, dragging, selected } = props
   const store = useStore()
   const { open } = useOverlay()
 
@@ -51,14 +51,25 @@ export const TextNode = observer((props: NodeProps<TextNodeData>) => {
     <ContextMenu>
       <ContextMenuTrigger>
         <NodeWrap {...props}>
-          <Textarea
+          <div
             className={cn(
-              'w-full h-full border-0 py-0.5 px-0.5 rounded',
-              'text-sm font-bold bg-transparent text-foreground resize-none',
+              'relative flex flex-col items-center w-full h-full p-2',
+              'overflow-x-hidden overflow-y-auto scrollbar-hide',
+              selected && 'nowheel',
             )}
-            defaultValue={data.title}
-            onChange={(e) => debouncedChangeHandler(e.target.value)}
-          />
+          >
+            <FlTextareaAutoSize
+              className={cn(
+                'nodrag shrink-0 p-2 text-4xl w-full resize-none mx-2 mt-2 font-bold border-0 shadow-none',
+                (!selected || dragging) && 'pointer-events-none',
+                selected && dragging && 'pointer-events-none',
+                'overflow-hidden',
+              )}
+              defaultValue={data.title}
+              onChange={(e) => debouncedChangeHandler(e.target.value)}
+              draggable
+            />
+          </div>
         </NodeWrap>
       </ContextMenuTrigger>
       <ContextMenuContent>
