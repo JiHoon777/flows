@@ -20,7 +20,7 @@ const NodeDetailView = lazy(() =>
   })),
 )
 
-export function AppRoutes() {
+function App() {
   return (
     <Suspense fallback={<BookLoading />}>
       <Routes>
@@ -33,3 +33,5 @@ export function AppRoutes() {
     </Suspense>
   )
 }
+
+export default App
