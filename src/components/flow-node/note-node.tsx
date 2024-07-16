@@ -55,7 +55,8 @@ export const NoteNode = memo((props: NodeProps<NoteNodeData>) => {
           <div
             className={cn(
               'relative flex flex-col items-center w-full h-full px-2 pt-2',
-              'nowheel overflow-x-hidden overflow-y-auto scrollbar-hide',
+              'overflow-x-hidden overflow-y-auto scrollbar-hide',
+              selected && 'nowheel',
             )}
           >
             <FlTextareaAutoSize
