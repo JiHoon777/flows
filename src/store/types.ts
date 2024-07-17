@@ -12,7 +12,7 @@ interface ReactFlowNodeBase<DATA_TYPE> {
   data: DATA_TYPE
 
   targets?: ReactFlowNodeTarget[]
-  parentFlowId?: string
+  parentFlowId?: string | null
 
   position?: {
     x: number

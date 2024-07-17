@@ -1,7 +1,8 @@
+import { Effect, pipe } from 'effect'
 import { cloneDeep } from 'lodash-es'
 import { action, makeObservable, observable, runInAction } from 'mobx'
 
-import { fileSystemAPI } from '@/api/file-system.ts'
+import { AppError, ClientError } from '@/api/error.ts'
 import { DoFlow } from '@/store/flow/do-flow.ts'
 import { RootStore } from '@/store/root-store.ts'
 import { Flow, FlowNodeData } from '@/store/types.ts'
@@ -45,23 +46,26 @@ export class DoFlowStore {
   // api
   //
 
-  async createFlow({ flow }: { flow: Flow }): Promise<DoFlow> {
+  createFlow({ flow }: { flow: Flow }): Effect.Effect<DoFlow, AppError, never> {
     const createdFlow = this.merge(flow)
 
-    try {
-      await fileSystemAPI.saveFlowToFile(flow)
-
-      return createdFlow
-    } catch (ex) {
-      runInAction(() => {
-        delete this.flowsMap[flow.flowId]
-      })
-
-      throw ex
-    }
+    return pipe(
+      this.rootStore.api.createFlow(flow),
+      Effect.map(() => createdFlow),
+      Effect.catchAll((e) =>
+        pipe(
+          Effect.sync(() => {
+            runInAction(() => {
+              delete this.flowsMap[flow.flowId]
+            })
+          }),
+          Effect.flatMap(() => Effect.fail(e)),
+        ),
+      ),
+    )
   }
 
-  async updateFlow({
+  updateFlow({
     flowId,
     changedFlow,
   }: {
@@ -69,64 +73,69 @@ export class DoFlowStore {
     changedFlow: Partial<Omit<Flow, 'data'>> & {
       data?: Partial<FlowNodeData>
     }
-  }): Promise<DoFlow> {
+  }): Effect.Effect<DoFlow, AppError, never> {
     const existing = this.flowsMap[flowId]
 
     if (!existing) {
-      throw new Error('could not find flow')
+      return Effect.fail(new ClientError('could not find flow'))
     }
 
-    // todo: cloneDeep 말고
     const dataBeforeMerge = cloneDeep(existing.snapshot)
     existing.merge({ ...changedFlow, updated_at: new Date() })
 
-    try {
-      await fileSystemAPI.saveFlowToFile(existing.snapshot)
-
-      return existing
-    } catch (ex) {
-      existing.merge(dataBeforeMerge)
-      throw ex
-    }
+    return pipe(
+      this.rootStore.api.updateFlow(existing.snapshot),
+      Effect.map(() => existing),
+      Effect.catchAll((e) =>
+        pipe(
+          Effect.sync(() => {
+            runInAction(() => {
+              existing.merge(dataBeforeMerge)
+            })
+          }),
+          Effect.flatMap(() => Effect.fail(e)),
+        ),
+      ),
+    )
   }
 
   /**
    * flow 를 삭제하면, childNodes, childFlows 를 루트로 보낸다. 다 삭제하자니 좀 그렇자너~ 복잡해~
    */
-  async removeFlow(flowId: string) {
+  removeFlow(flowId: string): Effect.Effect<void, AppError> {
     const deletedFlow = this.flowsMap[flowId]
     runInAction(() => {
       delete this.flowsMap[flowId]
     })
 
-    try {
-      await fileSystemAPI.deleteFlow(flowId)
-      const updateChildFlows = (deletedFlow.childFlowIds ?? []).map((id) =>
-        this.flowsMap[id]?.store.updateFlow({
-          flowId: id,
-          changedFlow: { parentFlowId: undefined, targets: [] },
-        }),
-      )
-      const updateChildNodes = (deletedFlow.childNodeIds ?? []).map((id) =>
-        this.rootStore.nodeStore.nodesMap[id]?.store.updateNode({
-          nodeId: id,
-          changedNode: { parentFlowId: undefined, targets: [] },
-        }),
-      )
+    for (const childFlowId of deletedFlow.childFlowIds ?? []) {
+      const childFlow = this.flowsMap[childFlowId]
 
-      // Todo: 에러 처리 어떻게 할 지 생각 필요
-      Promise.all([...updateChildFlows, ...updateChildNodes])
-        .then(() => {
-          console.log('All updates completed successfully')
-        })
-        .catch((ex) => {
-          console.error('An error occurred during the updates: ', ex)
-        })
-    } catch (ex) {
-      runInAction(() => {
-        this.flowsMap[flowId] = deletedFlow
-      })
-      throw ex
+      if (childFlow) {
+        childFlow.merge({ parentFlowId: null, targets: [] })
+      }
     }
+
+    for (const childNodeId of deletedFlow.childNodeIds ?? []) {
+      const childNode = this.rootStore.nodeStore.nodesMap[childNodeId]
+
+      if (childNode) {
+        childNode.merge({ parentFlowId: null, targets: [] })
+      }
+    }
+
+    return pipe(
+      this.rootStore.api.deleteFlow(flowId),
+      Effect.catchAll((err) =>
+        pipe(
+          Effect.sync(() => {
+            runInAction(() => {
+              this.flowsMap[flowId] = deletedFlow
+            })
+          }),
+          Effect.flatMap(() => Effect.fail(err)),
+        ),
+      ),
+    )
   }
 }

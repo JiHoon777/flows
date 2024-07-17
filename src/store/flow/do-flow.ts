@@ -1,8 +1,11 @@
+import { Effect, pipe } from 'effect'
 import { merge } from 'lodash-es'
 import { action, makeObservable, observable } from 'mobx'
 
+import { AppError } from '@/api/error.ts'
 import { DoFlowStore } from '@/store/flow/do-flow-store.ts'
 import { FlowDrawer } from '@/store/flow/flow-drawer.ts'
+import { DoNode } from '@/store/node/do-node.ts'
 import { Flow, FlowNodeData, NodeTypes } from '@/store/types.ts'
 import { assignIf } from '@/store/utils/store.utils.ts'
 
@@ -71,24 +74,42 @@ export class DoFlow {
   //
   // api
   //
-  async createChildFlow(flow: Flow) {
-    const createdFlow = await this.store.createFlow({
-      flow,
-    })
-    await this.store.updateFlow({
-      flowId: this.id,
-      changedFlow: {
-        childFlowIds: [...(this.snapshot.childFlowIds ?? []), createdFlow.id],
-      },
-    })
+  createChildFlow(flow: Flow): Effect.Effect<DoFlow, AppError> {
+    return pipe(
+      this.store.createFlow({ flow }),
+      Effect.flatMap((createdFlow) =>
+        pipe(
+          this.store.updateFlow({
+            flowId: this.id,
+            changedFlow: {
+              childFlowIds: [
+                ...(this.snapshot.childFlowIds ?? []),
+                createdFlow.id,
+              ],
+            },
+          }),
+          Effect.map(() => createdFlow),
+        ),
+      ),
+    )
   }
-  async createChildNode(node: NodeTypes) {
-    const createdNode = await this.store.rootStore.nodeStore.createNode(node)
-    await this.store.updateFlow({
-      flowId: this.id,
-      changedFlow: {
-        childNodeIds: [...(this.snapshot.childNodeIds ?? []), createdNode.id],
-      },
-    })
+  createChildNode(node: NodeTypes): Effect.Effect<DoNode, AppError> {
+    return pipe(
+      this.store.rootStore.nodeStore.createNode(node),
+      Effect.flatMap((createdNode) =>
+        pipe(
+          this.store.updateFlow({
+            flowId: this.id,
+            changedFlow: {
+              childNodeIds: [
+                ...(this.snapshot.childNodeIds ?? []),
+                createdNode.id,
+              ],
+            },
+          }),
+          Effect.map(() => createdNode),
+        ),
+      ),
+    )
   }
 }

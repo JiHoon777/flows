@@ -11,7 +11,9 @@ export class FileSystemError extends Error {
   }
 }
 
-export type AppError = FileSystemError
+export class ClientError extends Error {
+  tag = 'client'
+}
 
 export const formatUnknownError = (error: unknown): string => {
   if (error instanceof Error) {
@@ -28,3 +30,5 @@ export const formatUnknownError = (error: unknown): string => {
 export const handleFileSystemError = (e: UnknownException) => {
   return Effect.fail(new FileSystemError(formatUnknownError(e), e))
 }
+
+export type AppError = FileSystemError | ClientError

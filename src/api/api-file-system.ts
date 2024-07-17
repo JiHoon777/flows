@@ -9,11 +9,7 @@ import {
 import { Effect, pipe } from 'effect'
 
 import { IApiFileSystem } from '@/api/api.interface.ts'
-import {
-  AppError,
-  FileSystemError,
-  handleFileSystemError,
-} from '@/api/error.ts'
+import { FileSystemError, handleFileSystemError } from '@/api/error.ts'
 import { Flow, NodeTypes } from '@/store/types.ts'
 
 const FLOW_DIR = `flows/flow`
@@ -24,7 +20,7 @@ export class ApiFileSystem implements IApiFileSystem {
   // Check the directory when the app initializes for the first time,
   // and create it if it doesn't exist.
   //
-  checkFlowDirectoryAndCreate(): Effect.Effect<void, AppError> {
+  checkFlowDirectoryAndCreate(): Effect.Effect<void, FileSystemError> {
     return pipe(
       Effect.tryPromise(() =>
         readDir(FLOW_DIR, { dir: BaseDirectory.Document }),
@@ -40,7 +36,7 @@ export class ApiFileSystem implements IApiFileSystem {
       Effect.catchAll(handleFileSystemError),
     )
   }
-  checkNodeDirectoryAndCreate(): Effect.Effect<void, AppError> {
+  checkNodeDirectoryAndCreate(): Effect.Effect<void, FileSystemError> {
     return pipe(
       Effect.tryPromise(() =>
         readDir(NODE_DIR, { dir: BaseDirectory.Document }),
@@ -60,10 +56,10 @@ export class ApiFileSystem implements IApiFileSystem {
   //
   // CRUD Flow
   //
-  createFlow(data: Flow): Effect.Effect<void, AppError> {
+  createFlow(data: Flow): Effect.Effect<void, FileSystemError> {
     return this.updateFlow(data)
   }
-  getFlow(flowId: string): Effect.Effect<Flow, AppError> {
+  getFlow(flowId: string): Effect.Effect<Flow, FileSystemError> {
     const filePath = `${FLOW_DIR}/${flowId}.json`
 
     return pipe(
@@ -79,7 +75,7 @@ export class ApiFileSystem implements IApiFileSystem {
       Effect.catchAll(handleFileSystemError),
     )
   }
-  deleteFlow(flowId: string): Effect.Effect<void, AppError> {
+  deleteFlow(flowId: string): Effect.Effect<void, FileSystemError> {
     const filePath = `${FLOW_DIR}/${flowId}.json`
 
     return pipe(
@@ -98,6 +94,36 @@ export class ApiFileSystem implements IApiFileSystem {
             )
           : Effect.succeed(flow),
       ),
+      Effect.flatMap((flow) =>
+        pipe(
+          Effect.forEach(flow.childFlowIds ?? [], (childFlowId) =>
+            pipe(
+              this.getFlow(childFlowId),
+              Effect.flatMap((childFlow) =>
+                this.updateFlow({
+                  ...childFlow,
+                  parentFlowId: undefined,
+                  targets: [],
+                }),
+              ),
+            ),
+          ),
+          Effect.flatMap(() =>
+            Effect.forEach(flow.childNodeIds ?? [], (childNodeId) =>
+              pipe(
+                this.getNode(childNodeId),
+                Effect.flatMap((childNode) =>
+                  this.updateNode({
+                    ...childNode,
+                    parentFlowId: undefined,
+                    targets: [],
+                  }),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
       Effect.flatMap(() => this.deleteJsonFile(filePath)),
       Effect.catchAll((e) => {
         if (e instanceof FileSystemError) {
@@ -108,7 +134,7 @@ export class ApiFileSystem implements IApiFileSystem {
     )
   }
 
-  getAllFlows(): Effect.Effect<Flow[], AppError> {
+  getAllFlows(): Effect.Effect<Flow[], FileSystemError> {
     return pipe(
       Effect.tryPromise(() =>
         readDir(FLOW_DIR, { dir: BaseDirectory.Document }),
@@ -126,10 +152,10 @@ export class ApiFileSystem implements IApiFileSystem {
   //
   // CRUD Node
   //
-  createNode(data: NodeTypes): Effect.Effect<void, AppError> {
+  createNode(data: NodeTypes): Effect.Effect<void, FileSystemError> {
     return this.updateNode(data)
   }
-  getNode(nodeId: string): Effect.Effect<NodeTypes, AppError> {
+  getNode(nodeId: string): Effect.Effect<NodeTypes, FileSystemError> {
     const filePath = `${NODE_DIR}/${nodeId}.json`
 
     return pipe(
@@ -139,7 +165,7 @@ export class ApiFileSystem implements IApiFileSystem {
   }
   updateNode(
     data: Partial<NodeTypes> & Pick<NodeTypes, 'nodeId'>,
-  ): Effect.Effect<void, AppError> {
+  ): Effect.Effect<void, FileSystemError> {
     const filePath = `${NODE_DIR}/${data.nodeId}.json`
 
     return pipe(
@@ -147,7 +173,7 @@ export class ApiFileSystem implements IApiFileSystem {
       Effect.catchAll(handleFileSystemError),
     )
   }
-  deleteNode(nodeId: string): Effect.Effect<void, AppError> {
+  deleteNode(nodeId: string): Effect.Effect<void, FileSystemError> {
     const filePath = `${NODE_DIR}/${nodeId}.json`
 
     return pipe(
@@ -177,7 +203,7 @@ export class ApiFileSystem implements IApiFileSystem {
     )
   }
 
-  getAllNodes(): Effect.Effect<NodeTypes[], AppError> {
+  getAllNodes(): Effect.Effect<NodeTypes[], FileSystemError> {
     return pipe(
       Effect.tryPromise(() =>
         readDir(NODE_DIR, { dir: BaseDirectory.Document }),

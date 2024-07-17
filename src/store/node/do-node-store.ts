@@ -1,7 +1,8 @@
+import { Effect, pipe } from 'effect'
 import { cloneDeep } from 'lodash-es'
 import { action, makeObservable, observable, runInAction } from 'mobx'
 
-import { fileSystemAPI } from '@/api/file-system.ts'
+import { AppError } from '@/api/error.ts'
 import { DoNode } from '@/store/node/do-node.ts'
 import { RootStore } from '@/store/root-store.ts'
 import { Flow, NodeDataTypes, NodeTypes } from '@/store/types.ts'
@@ -44,22 +45,26 @@ export class DoNodeStore {
   //
   // api
   //
-  async createNode(node: NodeTypes): Promise<DoNode> {
+  createNode(node: NodeTypes): Effect.Effect<DoNode, AppError> {
     const createdNode = this.merge(node)
 
-    try {
-      await fileSystemAPI.saveNodeToFile(node)
-      return createdNode
-    } catch (ex) {
-      runInAction(() => {
-        delete this.nodesMap[node.nodeId]
-      })
-
-      throw ex
-    }
+    return pipe(
+      this.rootStore.api.createNode(node),
+      Effect.map(() => createdNode),
+      Effect.catchAll((e) =>
+        pipe(
+          Effect.sync(() => {
+            runInAction(() => {
+              delete this.nodesMap[node.nodeId]
+            })
+          }),
+          Effect.flatMap(() => Effect.fail(e)),
+        ),
+      ),
+    )
   }
 
-  async updateNode({
+  updateNode({
     nodeId,
     changedNode,
   }: {
@@ -67,7 +72,7 @@ export class DoNodeStore {
     changedNode: Partial<Omit<Flow, 'data'>> & {
       data?: Partial<NodeDataTypes>
     }
-  }): Promise<DoNode> {
+  }): Effect.Effect<DoNode, AppError> {
     const existing = this.nodesMap[nodeId]
 
     if (!existing) {
@@ -77,29 +82,40 @@ export class DoNodeStore {
     const dataBeforeMerge = cloneDeep(existing.snapshot)
     existing.merge(changedNode)
 
-    try {
-      await fileSystemAPI.saveNodeToFile(existing.snapshot)
-
-      return existing
-    } catch (ex) {
-      existing.merge(dataBeforeMerge)
-      throw ex
-    }
+    return pipe(
+      this.rootStore.api.updateNode(existing.snapshot),
+      Effect.map(() => existing),
+      Effect.catchAll((e) =>
+        pipe(
+          Effect.sync(() => {
+            runInAction(() => {
+              existing.merge(dataBeforeMerge)
+            })
+          }),
+          Effect.flatMap(() => Effect.fail(e)),
+        ),
+      ),
+    )
   }
 
-  async removeNode(nodeId: string) {
+  removeNode(nodeId: string): Effect.Effect<void, AppError> {
     const deletedNode = this.nodesMap[nodeId]
     runInAction(() => {
       delete this.nodesMap[nodeId]
     })
 
-    try {
-      await fileSystemAPI.deleteNode(nodeId)
-    } catch (ex) {
-      runInAction(() => {
-        this.nodesMap[nodeId] = deletedNode
-      })
-      throw ex
-    }
+    return pipe(
+      this.rootStore.api.deleteNode(nodeId),
+      Effect.catchAll((e) =>
+        pipe(
+          Effect.sync(() => {
+            runInAction(() => {
+              this.nodesMap[nodeId] = deletedNode
+            })
+          }),
+          Effect.flatMap(() => Effect.fail(e)),
+        ),
+      ),
+    )
   }
 }
