@@ -1,37 +1,18 @@
-import { lazy, Suspense } from 'react'
+import { observer } from 'mobx-react'
 
-import { Route, Routes } from 'react-router-dom'
-
+import { AppRoutes } from '@/app-routes.tsx'
 import { BookLoading } from '@/components/loading/book-loading.tsx'
+import { AppDataLoader } from '@/components/site/app-data-loader.tsx'
+import { useStore } from '@/store/useStore.ts'
 
-const SiteLayout = lazy(() =>
-  import('@/components/site/site-layout.tsx').then((module) => ({
-    default: module.SiteLayout,
-  })),
-)
-const FlowDetailView = lazy(() =>
-  import('@/views/flow-detail-view.tsx').then((module) => ({
-    default: module.FlowDetailViewParamsWrap,
-  })),
-)
-const NodeDetailView = lazy(() =>
-  import('@/views/node-detail-view.tsx').then((module) => ({
-    default: module.NodeDetailViewParamsWrap,
-  })),
-)
+// Todo: App Data 받아오는동안 풀로딩 화면 이쁜걸루
+export const App = observer(() => {
+  const store = useStore()
 
-function App() {
   return (
-    <Suspense fallback={<BookLoading />}>
-      <Routes>
-        <Route path={'/'} element={<SiteLayout />}>
-          <Route index element={null} />
-          <Route path={'flows/:flowId'} element={<FlowDetailView />} />
-          <Route path={'nodes/:nodeId'} element={<NodeDetailView />} />
-        </Route>
-      </Routes>
-    </Suspense>
+    <>
+      {store.appLoaded ? <AppRoutes /> : <BookLoading />}
+      <AppDataLoader />
+    </>
   )
-}
-
-export default App
+})

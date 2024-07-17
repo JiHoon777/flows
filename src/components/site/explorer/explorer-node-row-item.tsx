@@ -15,6 +15,7 @@ import { ChevronRight } from 'lucide-react'
 import { observer } from 'mobx-react'
 import { useNavigate, useParams } from 'react-router-dom'
 
+import { AlertModal } from '@/components/alert-modal.tsx'
 import {
   ContextMenu,
   ContextMenuContent,
@@ -22,6 +23,7 @@ import {
   ContextMenuTrigger,
 } from '@/components/ui/context-menu.tsx'
 import { Input } from '@/components/ui/input.tsx'
+import { useOverlay } from '@/contexts/overlay/use-overlay.tsx'
 import { useOutsideClick } from '@/hooks/use-outside-click.ts'
 import { DoFlow } from '@/store/flow/do-flow.ts'
 import { useStore } from '@/store/useStore.ts'
@@ -39,6 +41,7 @@ export const ExplorerNodeRowItem = observer(
   }) => {
     const store = useStore()
     const navigate = useNavigate()
+    const { open } = useOverlay()
     const { flowId } = useParams<{ flowId?: string }>()
 
     const [isNameEditing, setIsNameEditing] = useState(false)
@@ -74,6 +77,18 @@ export const ExplorerNodeRowItem = observer(
         setIsNameEditing(false)
         inputRef.current = null
       }
+    }
+
+    const openDelete = () => {
+      open(({ isOpen, exit }) => (
+        <AlertModal
+          isOpen={isOpen}
+          onClose={exit}
+          onFinish={() =>
+            Effect.runPromise(store.flowStore.removeFlow(flow.id))
+          }
+        />
+      ))
     }
 
     const isViewing = flow.id === flowId
@@ -127,6 +142,7 @@ export const ExplorerNodeRowItem = observer(
           >
             Rename ...
           </ContextMenuItem>
+          <ContextMenuItem onClick={openDelete}>Delete ...</ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>
     )

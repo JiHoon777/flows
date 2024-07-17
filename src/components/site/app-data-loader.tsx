@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 
 import { useStore } from '@/store/useStore.ts'
 
-export const SiteDataLoader = () => {
+export const AppDataLoader = () => {
   const store = useStore()
 
   useEffect(() => {

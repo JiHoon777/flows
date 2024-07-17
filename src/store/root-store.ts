@@ -48,7 +48,7 @@ export class RootStore {
   /**
    * App 진입시 모든 플로우와, 노드들을 초기화한다.
    */
-  async initializeApp() {
+  initializeApp() {
     const initializedEffect = pipe(
       Effect.all([
         this.api.checkFlowDirectoryAndCreate(),
@@ -76,21 +76,20 @@ export class RootStore {
           this.showError(e)
         }),
       ),
-      Effect.match({
-        onSuccess: () => {
-          runInAction(() => {
-            this.appLoaded = true
-          })
-        },
-        onFailure: (e) => {
-          runInAction(() => {
-            this.failAppLoaded = true
-          })
-          this.showError(e)
-        },
-      }),
     )
 
-    return Effect.runPromise(initializedEffect)
+    Effect.runPromise(initializedEffect)
+      .then(() => {
+        console.log('hi')
+        runInAction(() => {
+          this.appLoaded = true
+        })
+      })
+      .catch((ex) => {
+        runInAction(() => {
+          this.failAppLoaded = true
+        })
+        this.showError(ex)
+      })
   }
 }

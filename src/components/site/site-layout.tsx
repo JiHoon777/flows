@@ -2,7 +2,6 @@ import { Outlet } from 'react-router-dom'
 
 import { Providers } from '@/components/providers.tsx'
 import { Explorer } from '@/components/site/explorer/explorer.tsx'
-import { SiteDataLoader } from '@/components/site/site-data-loader.tsx'
 import {
   ResizableHandle,
   ResizablePanel,
@@ -26,7 +25,6 @@ export const SiteLayout = () => {
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
-      <SiteDataLoader />
     </Providers>
   )
 }

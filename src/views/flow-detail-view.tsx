@@ -8,7 +8,7 @@ import {
 
 import { Map, NotebookPen, Type } from 'lucide-react'
 import { observer } from 'mobx-react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import {
   Background,
   ConnectionLineType,
@@ -77,6 +77,7 @@ export const FlowDetailView = observer(({ flowId }: { flowId: string }) => {
 const FlowDetailView_ = observer(({ flowId }: { flowId: string }) => {
   const appStore = useStore()
   const store = useStoreApi()
+  const navigate = useNavigate()
   const { screenToFlowPosition } = useReactFlow()
   const connectingNodeId = useRef<string | null>(null)
   const flow = appStore.flowStore.getFlowById(flowId) as DoFlow | undefined
@@ -202,6 +203,11 @@ const FlowDetailView_ = observer(({ flowId }: { flowId: string }) => {
     [drawer],
   )
 
+  useEffect(() => {
+    if (!flow) {
+      navigate('/')
+    }
+  }, [flow, navigate])
   /**
    * 컴포넌트가 마운트될 때 초기화 함수 호출
    *
