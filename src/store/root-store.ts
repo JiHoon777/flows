@@ -9,6 +9,9 @@ import { DoFlowStore } from '@/store/flow/do-flow-store.ts'
 import { DoNodeStore } from '@/store/node/do-node-store.ts'
 import { ExplorerView } from '@/store/views/explorer-view.ts'
 
+const isPrimitive = (value: any) =>
+  value === null || (typeof value !== 'object' && typeof value !== 'function')
+
 export class RootStore {
   appLoaded: boolean = false
   failAppLoaded: boolean = false
@@ -42,7 +45,11 @@ export class RootStore {
   }
 
   showError(ex: AppError) {
-    console.error(`${ex?.message ?? 'unknown message'}, ex: ${ex}`)
+    const errorMessage = ex.message ?? 'unknown message'
+    const errorOrigin = isPrimitive(ex) ? ex : JSON.stringify(ex)
+    console.error(
+      `errorMessage: ${errorMessage},\n\n errorOrigin: ${errorOrigin}`,
+    )
   }
 
   /**
@@ -80,7 +87,6 @@ export class RootStore {
 
     Effect.runPromise(initializedEffect)
       .then(() => {
-        console.log('hi')
         runInAction(() => {
           this.appLoaded = true
         })

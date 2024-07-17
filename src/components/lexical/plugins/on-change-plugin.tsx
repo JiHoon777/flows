@@ -42,7 +42,7 @@ export const OnChangePlugin = ({
       editor.setEditorState(editorState)
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editor])
+  }, [editor, initialEditorState])
 
   return null
 }

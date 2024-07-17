@@ -40,11 +40,16 @@ export class ExplorerView {
 
   get explorerList() {
     return ExplorerView.sortFlowsOrNodesBySortOption(
-      Object.values(this.flowStore.flowsMap).filter(
-        (flow) => !flow.parentFlowId,
-      ),
+      [
+        ...Object.values(this.flowStore.flowsMap).filter(
+          (flow) => !flow.parentFlowId,
+        ),
+        ...Object.values(this.rootStore.nodeStore.nodesMap).filter(
+          (node) => !node.parentFlowId && node.type === 'note',
+        ),
+      ],
       this.sortOption,
-    ) as DoFlow[]
+    )
   }
 
   //

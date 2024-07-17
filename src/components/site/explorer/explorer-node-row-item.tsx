@@ -53,7 +53,6 @@ export const ExplorerNodeRowItem = observer(
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const handleChangeName = useCallback(
       debounce((e: ChangeEvent<HTMLInputElement>) => {
-        console.log('one time')
         if (!e.target.value || !e.target.value.trim()) {
           return
         }
@@ -85,7 +84,9 @@ export const ExplorerNodeRowItem = observer(
           isOpen={isOpen}
           onClose={exit}
           onFinish={() =>
-            Effect.runPromise(store.flowStore.removeFlow(flow.id))
+            Effect.runPromise(store.flowStore.removeFlow(flow.id)).catch(
+              store.showError,
+            )
           }
         />
       ))

@@ -80,6 +80,9 @@ export class ApiFileSystem implements IApiFileSystem {
 
     return pipe(
       this.getFlow(flowId),
+      /**
+       * 부모 플로우가 있을때 childFlowIds 에서 삭제할 flow 를 제거한다.
+       */
       Effect.flatMap((flow) =>
         flow.parentFlowId
           ? pipe(
@@ -94,8 +97,11 @@ export class ApiFileSystem implements IApiFileSystem {
             )
           : Effect.succeed(flow),
       ),
-      Effect.flatMap((flow) =>
-        pipe(
+      /**
+       * 자식 플로우, 노드가 있으면 돌면서 parentFlowId 를 제거한다.
+       */
+      Effect.flatMap((flow) => {
+        return pipe(
           Effect.forEach(flow.childFlowIds ?? [], (childFlowId) =>
             pipe(
               this.getFlow(childFlowId),
@@ -122,15 +128,14 @@ export class ApiFileSystem implements IApiFileSystem {
               ),
             ),
           ),
-        ),
-      ),
-      Effect.flatMap(() => this.deleteJsonFile(filePath)),
-      Effect.catchAll((e) => {
-        if (e instanceof FileSystemError) {
-          return Effect.fail(e)
-        }
-        return handleFileSystemError(e)
+        )
       }),
+      Effect.flatMap(() => this.deleteJsonFile(filePath)),
+      Effect.catchAll((e) =>
+        e instanceof FileSystemError
+          ? Effect.fail(e)
+          : handleFileSystemError(e),
+      ),
     )
   }
 
@@ -193,13 +198,11 @@ export class ApiFileSystem implements IApiFileSystem {
           : Effect.succeed(node),
       ),
       Effect.flatMap(() => this.deleteJsonFile(filePath)),
-      Effect.catchAll((e) => {
-        if (e instanceof FileSystemError) {
-          return Effect.fail(e)
-        }
-
-        return handleFileSystemError(e)
-      }),
+      Effect.catchAll((e) =>
+        e instanceof FileSystemError
+          ? Effect.fail(e)
+          : handleFileSystemError(e),
+      ),
     )
   }
 

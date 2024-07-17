@@ -1,12 +1,11 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 
 import { Effect } from 'effect'
 import { observer } from 'mobx-react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import { LexicalEditor } from '@/components/lexical/lexical-editor.tsx'
-import { BookLoading } from '@/components/loading/book-loading.tsx'
-import { NoteNodeData } from '@/store/types.ts'
+import { DoNode } from '@/store/node/do-node.ts'
 import { useStore } from '@/store/useStore.ts'
 
 export const NodeDetailViewParamsWrap = observer(() => {
@@ -21,8 +20,8 @@ export const NodeDetailViewParamsWrap = observer(() => {
 
 export const NodeDetailView = observer(({ nodeId }: { nodeId: string }) => {
   const store = useStore()
-  const node = store.nodeStore.getNodeById(nodeId)
-  const [isNodeChanging, setIsNodeChanging] = useState(false)
+  const navigate = useNavigate()
+  const node: DoNode | undefined = store.nodeStore.getNodeById(nodeId)
 
   const handleChange = useCallback(
     (v: string) => {
@@ -37,24 +36,28 @@ export const NodeDetailView = observer(({ nodeId }: { nodeId: string }) => {
         }),
       ).catch((ex) => store.showError(ex))
     },
-    [node.id, node.store],
+    [node?.id, node?.store, store],
   )
 
+  const initialEditorState = useMemo(() => {
+    if (!node || node.snapshot.type !== 'note') {
+      return null
+    }
+
+    return node.snapshot.data.content ?? null
+  }, [node])
+
   useEffect(() => {
-    setIsNodeChanging(true)
-
-    const timeout = setTimeout(() => setIsNodeChanging(false), 100)
-
-    return () => clearTimeout(timeout)
-  }, [nodeId])
-
-  if (isNodeChanging) {
-    return <BookLoading />
-  }
+    if (!node) {
+      navigate('/')
+    }
+  }, [navigate, node])
 
   if (node?.type !== 'note') {
     return <div>{node?.type} 은 내용 편집을 지원하지 않습니다.</div>
   }
+
+  console.log(60, initialEditorState)
 
   return (
     <main className={'w-full h-screen overflow-y-auto'}>
@@ -69,9 +72,7 @@ export const NodeDetailView = observer(({ nodeId }: { nodeId: string }) => {
         </header>
         <LexicalEditor
           showTreeView={false}
-          initialEditorState={
-            (node.snapshot.data as NoteNodeData)?.content ?? null
-          }
+          initialEditorState={initialEditorState}
           onChange={handleChange}
         />
       </div>
