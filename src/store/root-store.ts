@@ -1,6 +1,8 @@
 import { Platform, platform as TauriPlatform } from '@tauri-apps/api/os'
 import { action, makeObservable, observable, runInAction } from 'mobx'
 
+import { ApiFileSystem } from '@/api/api-file-system.ts'
+import { Apis } from '@/api/api.interface.ts'
 import { fileSystemAPI } from '@/api/file-system.ts'
 import { DoFlowStore } from '@/store/flow/do-flow-store.ts'
 import { DoNodeStore } from '@/store/node/do-node-store.ts'
@@ -8,7 +10,9 @@ import { ExplorerView } from '@/store/views/explorer-view.ts'
 
 export class RootStore {
   appLoaded: boolean = false
+  failAppLoaded: boolean = false
 
+  api: Apis
   flowStore: DoFlowStore
   nodeStore: DoNodeStore
 
@@ -17,6 +21,7 @@ export class RootStore {
   explorerView: ExplorerView
 
   constructor() {
+    this.api = new ApiFileSystem()
     this.flowStore = new DoFlowStore(this)
     this.nodeStore = new DoNodeStore(this)
 
