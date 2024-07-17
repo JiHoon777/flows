@@ -8,6 +8,7 @@ import {
   useState,
 } from 'react'
 
+import { Effect } from 'effect'
 import { motion } from 'framer-motion'
 import { debounce } from 'lodash-es'
 import { ChevronRight } from 'lucide-react'
@@ -23,6 +24,7 @@ import {
 import { Input } from '@/components/ui/input.tsx'
 import { useOutsideClick } from '@/hooks/use-outside-click.ts'
 import { DoFlow } from '@/store/flow/do-flow.ts'
+import { useStore } from '@/store/useStore.ts'
 import { cn } from '@/utils/cn.ts'
 
 export const ExplorerNodeRowItem = observer(
@@ -35,6 +37,7 @@ export const ExplorerNodeRowItem = observer(
     isChildOpen: boolean
     setIsChildOpen: Dispatch<SetStateAction<boolean>>
   }) => {
+    const store = useStore()
     const navigate = useNavigate()
     const { flowId } = useParams<{ flowId?: string }>()
 
@@ -52,14 +55,16 @@ export const ExplorerNodeRowItem = observer(
           return
         }
 
-        flow.store.updateFlow({
-          flowId: flow.id,
-          changedFlow: {
-            data: {
-              title: e.target.value,
+        Effect.runPromise(
+          flow.store.updateFlow({
+            flowId: flow.id,
+            changedFlow: {
+              data: {
+                title: e.target.value,
+              },
             },
-          },
-        })
+          }),
+        ).catch(store.showError)
       }, 500),
       [],
     )

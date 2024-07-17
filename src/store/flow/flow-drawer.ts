@@ -1,3 +1,4 @@
+import { Effect } from 'effect'
 import { action, makeObservable, observable, runInAction } from 'mobx'
 import { nanoid } from 'nanoid'
 import {
@@ -110,7 +111,7 @@ export class FlowDrawer {
   /**
    * 노드를 엣지로 연결합니다.
    */
-  async connectNodes(sourceNode: Node, targetNode: Node) {
+  connectNodes(sourceNode: Node, targetNode: Node) {
     const isSourceNodeFlow = sourceNode.type === 'flow'
 
     // 자기 자신으로 연결시, 중복 연결시 데이터가 계속 추가되는 이슈 수정
@@ -144,34 +145,43 @@ export class FlowDrawer {
       ...(flowOrNode.snapshot.targets ?? []),
       { id: targetNode.id },
     ]
-    try {
-      if (isSourceNodeFlow) {
-        await this.rootStore.flowStore.updateFlow({
+
+    const restoreOnError = () => {
+      runInAction(() => {
+        this.edges = this.edges.filter((edge) => edge.id !== edgeToCreate.id)
+      })
+    }
+
+    if (isSourceNodeFlow) {
+      Effect.runPromise(
+        this.rootStore.flowStore.updateFlow({
           flowId: sourceNode.id,
           changedFlow: {
             targets,
           },
-        })
-      } else {
-        await this.rootStore.nodeStore.updateNode({
+        }),
+      ).catch((err) => {
+        this.rootStore.showError(err)
+        restoreOnError()
+      })
+    } else {
+      Effect.runPromise(
+        this.rootStore.nodeStore.updateNode({
           nodeId: sourceNode.id,
           changedNode: {
             targets,
           },
-        })
-      }
-    } catch (ex) {
-      this.rootStore.showError(ex)
-
-      runInAction(() => {
-        this.edges = this.edges.filter((edge) => edge.id !== edgeToCreate.id)
+        }),
+      ).catch((err) => {
+        this.rootStore.showError(err)
+        restoreOnError()
       })
     }
   }
   /**
    * FlowNode 를 추가하고, Flow 를 저장한다.
    */
-  async addFlowNode(position: XYPosition) {
+  addFlowNode(position: XYPosition) {
     const reactFlowNode = FlowDrawer.createReactFlowNodeByNodeType({
       nodeType: 'flow',
       position,
@@ -187,20 +197,17 @@ export class FlowDrawer {
       this.nodes = [...this.nodes, reactFlowNode]
     })
 
-    try {
-      await this.flow.createChildFlow(flow)
-    } catch (ex) {
-      this.rootStore.showError(ex)
-
+    Effect.runPromise(this.flow.createChildFlow(flow)).catch((err) => {
+      this.rootStore.showError(err)
       runInAction(() => {
         this.nodes = this.nodes.filter((node) => node.id !== reactFlowNode.id)
       })
-    }
+    })
   }
   /**
    * Node 를 추가하고, 저장한다.
    */
-  async addNode({
+  addNode({
     nodeType,
     position,
   }: {
@@ -223,22 +230,20 @@ export class FlowDrawer {
       this.nodes = [...this.nodes, reactFlowNode]
     })
 
-    try {
-      await this.flow.createChildNode(node)
-    } catch (ex) {
-      this.rootStore.showError(ex)
+    Effect.runPromise(this.flow.createChildNode(node)).catch((err) => {
+      this.rootStore.showError(err)
 
       runInAction(() => {
         this.nodes = this.nodes.filter((node) => node.id !== reactFlowNode.id)
       })
-    }
+    })
   }
   /**
    * 지정된 노드의 레이블을 업데이트합니다.
    *
    * 현재 상태에서 주어진 nodeId를 가진 노드를 찾아 해당 노드의 레이블을 제공된 값으로 업데이트합니다.
    */
-  async updateNodeTitle({
+  updateNodeTitle({
     id,
     type,
     title,
@@ -248,25 +253,29 @@ export class FlowDrawer {
     title: string
   }) {
     if (type === 'flow') {
-      await this.flow.store.updateFlow({
-        flowId: id,
-        changedFlow: {
-          data: { title },
-        },
-      })
+      Effect.runPromise(
+        this.flow.store.updateFlow({
+          flowId: id,
+          changedFlow: {
+            data: { title },
+          },
+        }),
+      ).catch(this.rootStore.showError)
     } else {
-      await this.rootStore.nodeStore.updateNode({
-        nodeId: id,
-        changedNode: {
-          data: { title },
-        },
-      })
+      Effect.runPromise(
+        this.rootStore.nodeStore.updateNode({
+          nodeId: id,
+          changedNode: {
+            data: { title },
+          },
+        }),
+      ).catch(this.rootStore.showError)
     }
   }
   /**
    * Node 의 포지션을 변경한다.
    */
-  async updateNodePosition({
+  updateNodePosition({
     id,
     type,
     position,
@@ -276,19 +285,23 @@ export class FlowDrawer {
     position: XYPosition
   }) {
     if (type === 'flow') {
-      await this.flow.store.updateFlow({
-        flowId: id,
-        changedFlow: {
-          position,
-        },
-      })
+      Effect.runPromise(
+        this.flow.store.updateFlow({
+          flowId: id,
+          changedFlow: {
+            position,
+          },
+        }),
+      ).catch(this.rootStore.showError)
     } else {
-      await this.rootStore.nodeStore.updateNode({
-        nodeId: id,
-        changedNode: {
-          position,
-        },
-      })
+      Effect.runPromise(
+        this.rootStore.nodeStore.updateNode({
+          nodeId: id,
+          changedNode: {
+            position,
+          },
+        }),
+      ).catch(this.rootStore.showError)
     }
   }
   /**
@@ -297,7 +310,7 @@ export class FlowDrawer {
    * 1. this.nodes 제거
    * 2. 실제 저장된 node의 isTrashed : true 로 변경
    */
-  async removeNode(id: string, type: NodeType | 'flow') {
+  removeNode(id: string, type: NodeType | 'flow') {
     const removedNode = this.nodes.find((node) => node.id === id)
 
     if (!removedNode) {
@@ -308,18 +321,24 @@ export class FlowDrawer {
       this.nodes = this.nodes.filter((node) => node.id !== id)
     })
 
-    try {
-      if (type === 'flow') {
-        await this.flow.store.removeFlow(id)
-      } else {
-        await this.rootStore.nodeStore.removeNode(id)
-      }
-    } catch (ex) {
-      this.rootStore.showError(ex)
-
+    const restoreOnError = () => {
       runInAction(() => {
         this.nodes = [...this.nodes, removedNode]
       })
+    }
+
+    if (type === 'flow') {
+      Effect.runPromise(this.flow.store.removeFlow(id)).catch((err) => {
+        this.rootStore.showError(err)
+        restoreOnError()
+      })
+    } else {
+      Effect.runPromise(this.rootStore.nodeStore.removeNode(id)).catch(
+        (err) => {
+          this.rootStore.showError(err)
+          restoreOnError()
+        },
+      )
     }
   }
 

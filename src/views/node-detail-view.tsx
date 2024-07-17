@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
+import { Effect } from 'effect'
 import { observer } from 'mobx-react'
 import { useParams } from 'react-router-dom'
 
@@ -23,16 +24,21 @@ export const NodeDetailView = observer(({ nodeId }: { nodeId: string }) => {
   const node = store.nodeStore.getNodeById(nodeId)
   const [isNodeChanging, setIsNodeChanging] = useState(false)
 
-  // const handleChange = useCallback(
-  //   (content: string) => {
-  //     if (!node || node.type !== 'note' || node.data.content !== content) {
-  //       return
-  //     }
-  //
-  //     updateNode(node.nodeId, { data: { content } })
-  //   },
-  //   [node, updateNode],
-  // )
+  const handleChange = useCallback(
+    (v: string) => {
+      Effect.runPromise(
+        node.store.updateNode({
+          nodeId: node.id,
+          changedNode: {
+            data: {
+              content: v,
+            },
+          },
+        }),
+      ).catch((ex) => store.showError(ex))
+    },
+    [node.id, node.store],
+  )
 
   useEffect(() => {
     setIsNodeChanging(true)
@@ -66,16 +72,7 @@ export const NodeDetailView = observer(({ nodeId }: { nodeId: string }) => {
           initialEditorState={
             (node.snapshot.data as NoteNodeData)?.content ?? null
           }
-          onChange={(v) =>
-            node.store.updateNode({
-              nodeId: node.id,
-              changedNode: {
-                data: {
-                  content: v,
-                },
-              },
-            })
-          }
+          onChange={handleChange}
         />
       </div>
     </main>

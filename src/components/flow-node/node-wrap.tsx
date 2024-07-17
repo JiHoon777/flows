@@ -1,8 +1,15 @@
 import { PropsWithChildren } from 'react'
 
+import { Effect } from 'effect'
 import { Map, NotebookPen, Type } from 'lucide-react'
 import { observer } from 'mobx-react'
-import { Handle, NodeProps, NodeResizer, Position } from 'reactflow'
+import {
+  Handle,
+  NodeProps,
+  NodeResizer,
+  Position,
+  ResizeDragEvent,
+} from 'reactflow'
 
 import { useStore } from '@/store/useStore.ts'
 import { cn } from '@/utils/cn'
@@ -11,6 +18,29 @@ type Props = PropsWithChildren & NodeProps
 
 export const NodeWrap = observer(({ children, selected, id, type }: Props) => {
   const store = useStore()
+
+  const handleResizeEnd = (
+    _: ResizeDragEvent,
+    { width, height }: { width: number; height: number },
+  ) => {
+    if (type === 'flow') {
+      Effect.runPromise(
+        store.flowStore.updateFlow({
+          flowId: id,
+          changedFlow: { style: { width, height } },
+        }),
+      ).catch(store.showError)
+      // id, { style: { width, height } }
+      return
+    }
+
+    Effect.runPromise(
+      store.nodeStore.updateNode({
+        nodeId: id,
+        changedNode: { style: { width, height } },
+      }),
+    ).catch(store.showError)
+  }
 
   return (
     <div
@@ -29,20 +59,7 @@ export const NodeWrap = observer(({ children, selected, id, type }: Props) => {
         minHeight={100}
         lineClassName={'!border-transparent !border-2'}
         handleClassName={'!border-transparent !bg-transparent'}
-        onResizeEnd={(_, { width, height }) => {
-          if (type === 'flow') {
-            store.flowStore.updateFlow({
-              flowId: id,
-              changedFlow: { style: { width, height } },
-            })
-            // id, { style: { width, height } }
-            return
-          }
-          store.nodeStore.updateNode({
-            nodeId: id,
-            changedNode: { style: { width, height } },
-          })
-        }}
+        onResizeEnd={handleResizeEnd}
       />
       <div
         className={

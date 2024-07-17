@@ -4,6 +4,7 @@ import { action, makeObservable, observable, runInAction } from 'mobx'
 
 import { ApiFileSystem } from '@/api/api-file-system.ts'
 import { Apis } from '@/api/api.interface.ts'
+import { AppError } from '@/api/error.ts'
 import { DoFlowStore } from '@/store/flow/do-flow-store.ts'
 import { DoNodeStore } from '@/store/node/do-node-store.ts'
 import { ExplorerView } from '@/store/views/explorer-view.ts'
@@ -40,8 +41,8 @@ export class RootStore {
     return this.platform === 'darwin'
   }
 
-  showError(ex: any) {
-    console.error(ex)
+  showError(ex: AppError) {
+    console.error(`${ex?.message ?? 'unknown message'}, ex: ${ex}`)
   }
 
   /**

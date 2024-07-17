@@ -1,3 +1,4 @@
+import { Effect } from 'effect'
 import { computed, makeObservable, observable, runInAction } from 'mobx'
 import { nanoid } from 'nanoid'
 
@@ -50,17 +51,19 @@ export class ExplorerView {
   // action
   //
   createFlowOnRoot() {
-    this.flowStore.createFlow({
-      flow: {
-        flowId: nanoid(),
-        created_at: new Date(),
-        updated_at: new Date(),
-        childNodeIds: [],
-        data: {
-          title: 'Untitled',
+    Effect.runPromise(
+      this.flowStore.createFlow({
+        flow: {
+          flowId: nanoid(),
+          created_at: new Date(),
+          updated_at: new Date(),
+          childNodeIds: [],
+          data: {
+            title: 'Untitled',
+          },
         },
-      },
-    })
+      }),
+    ).catch((ex) => this.rootStore.showError(ex))
   }
 
   setSortOption(changedOption: ExplorerSortOption) {
