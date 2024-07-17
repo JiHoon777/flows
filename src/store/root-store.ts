@@ -1,9 +1,9 @@
 import { Platform, platform as TauriPlatform } from '@tauri-apps/api/os'
+import { Effect, pipe } from 'effect'
 import { action, makeObservable, observable, runInAction } from 'mobx'
 
 import { ApiFileSystem } from '@/api/api-file-system.ts'
 import { Apis } from '@/api/api.interface.ts'
-import { fileSystemAPI } from '@/api/file-system.ts'
 import { DoFlowStore } from '@/store/flow/do-flow-store.ts'
 import { DoNodeStore } from '@/store/node/do-node-store.ts'
 import { ExplorerView } from '@/store/views/explorer-view.ts'
@@ -30,6 +30,7 @@ export class RootStore {
 
     makeObservable(this, {
       appLoaded: observable,
+      failAppLoaded: observable,
 
       initializeApp: action,
     })
@@ -47,26 +48,48 @@ export class RootStore {
    * App 진입시 모든 플로우와, 노드들을 초기화한다.
    */
   async initializeApp() {
-    await fileSystemAPI.checkFlowDirectoryAndCreate()
-    await fileSystemAPI.checkNodeDirectoryAndCreaet()
+    const initializedEffect = pipe(
+      Effect.all([
+        this.api.checkFlowDirectoryAndCreate(),
+        this.api.checkNodeDirectoryAndCreate(),
+      ]),
+      Effect.flatMap(() => Effect.promise(() => TauriPlatform())),
+      Effect.tap((platform) =>
+        Effect.sync(() => {
+          runInAction(() => {
+            this.platform = platform
+          })
+        }),
+      ),
+      Effect.flatMap(() =>
+        Effect.all([this.api.getAllFlows(), this.api.getAllNodes()]),
+      ),
+      Effect.tap(([flows, nodes]) =>
+        Effect.sync(() => {
+          flows.forEach((flow) => this.flowStore.merge(flow))
+          nodes.forEach((node) => this.nodeStore.merge(node))
+        }),
+      ),
+      Effect.tapError((e) =>
+        Effect.sync(() => {
+          this.showError(e)
+        }),
+      ),
+      Effect.match({
+        onSuccess: () => {
+          runInAction(() => {
+            this.appLoaded = true
+          })
+        },
+        onFailure: (e) => {
+          runInAction(() => {
+            this.failAppLoaded = true
+          })
+          this.showError(e)
+        },
+      }),
+    )
 
-    TauriPlatform()
-      .then((res) => {
-        this.platform = res
-      })
-      .catch((ex) => this.showError(ex))
-    Promise.all([fileSystemAPI.loadAllFlows(), fileSystemAPI.loadAllNodes()])
-      .then(([loadedFlows, loadedNodes]) => {
-        loadedFlows.forEach((flow) => this.flowStore.merge(flow))
-        loadedNodes.forEach((node) => this.nodeStore.merge(node))
-      })
-      .catch((ex) => {
-        this.showError(ex)
-      })
-      .finally(() => {
-        runInAction(() => {
-          this.appLoaded = true
-        })
-      })
+    return Effect.runPromise(initializedEffect)
   }
 }
