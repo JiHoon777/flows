@@ -13,10 +13,13 @@ import {
   Background,
   ConnectionLineType,
   Controls,
+  DefaultEdgeOptions,
   EdgeChange,
+  EdgeTypes,
   NodeChange,
   NodeDragHandler,
   NodeOrigin,
+  NodeTypes,
   OnConnectEnd,
   OnConnectStart,
   ReactFlow,
@@ -30,7 +33,7 @@ import {
   FlowContextMenuContent,
   MenuItem,
 } from '@/components/flow-context-menu-content'
-import { StraightEdge } from '@/components/flow-edge/straight-edge'
+import { BezierEdge } from '@/components/flow-edge/bezier-edge.tsx'
 import { FlowNode } from '@/components/flow-node/flow-node'
 import { NoteNode } from '@/components/flow-node/note-node'
 import { TextNode } from '@/components/flow-node/text-node'
@@ -41,19 +44,18 @@ import { useStore } from '@/store/useStore.ts'
 import 'reactflow/dist/style.css'
 
 const nodeOrigin: NodeOrigin = [0.5, 0.5]
-const connectionLineStyle = { stroke: '#e2e8f0', strokeWidth: 3 }
-const defaultEdgeOptions = { style: connectionLineStyle, type: 'text' }
+const defaultEdgeOptions: DefaultEdgeOptions = {
+  type: 'bezierAnimated',
+}
 
-const nodeTypes = {
+const nodeTypes: NodeTypes = {
   flow: FlowNode,
   text: TextNode,
   note: NoteNode,
 }
 
-const edgeTypes = {
-  flow: StraightEdge,
-  text: StraightEdge,
-  note: StraightEdge,
+const edgeTypes: EdgeTypes = {
+  bezierAnimated: BezierEdge,
 }
 
 export const FlowDetailViewParamsWrap = observer(() => {
@@ -306,11 +308,6 @@ const FlowDetailView_ = observer(({ flowId }: { flowId: string }) => {
          * 노드의 위치를 부모 노드에 상대적으로 설정할 때 사용됩니다.
          */
         nodeOrigin={nodeOrigin}
-        /**
-         * 연결선의 스타일을 설정합니다.
-         * 연결선의 색상과 두께를 정의합니다.
-         */
-        connectionLineStyle={connectionLineStyle}
         /**
          * 기본 엣지 옵션을 설정합니다.
          * 모든 엣지에 공통적으로 적용될 스타일과 타입을 정의합니다.

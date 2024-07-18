@@ -18,6 +18,7 @@ import {
   NodeDataTypes,
   NodeType,
   NodeTypes,
+  ReactFlowNodeTarget,
 } from '@/store/types.ts'
 
 export class FlowDrawer {
@@ -118,10 +119,7 @@ export class FlowDrawer {
     const isSelf = sourceNode.id === targetNode.id
     const isDuplicated =
       this.edges.findIndex((edge) => {
-        return (
-          (edge.source === sourceNode.id && edge.target === targetNode.id) ||
-          (edge.source === targetNode.id && edge.target === sourceNode.id)
-        )
+        return edge.source === sourceNode.id && edge.target === targetNode.id
       }) > -1
 
     if (isSelf || isDuplicated) {
@@ -177,6 +175,12 @@ export class FlowDrawer {
         restoreOnError()
       })
     }
+  }
+  updateEdge(edgeId: string, edge: Partial<Omit<ReactFlowNodeTarget, 'id'>>) {}
+  deleteEdge(edgeId: string) {
+    runInAction(() => {
+      this.edges = this.edges.filter((edge) => edge.id !== edgeId)
+    })
   }
   /**
    * FlowNode 를 추가하고, Flow 를 저장한다.

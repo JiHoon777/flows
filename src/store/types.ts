@@ -4,8 +4,12 @@ interface EditableItemBase {
   isTrashed?: boolean
 }
 
-interface ReactFlowNodeTarget {
+/**
+ * Edge Data
+ **/
+export interface ReactFlowNodeTarget {
   id: string
+  label?: string
 }
 
 interface ReactFlowNodeBase<DATA_TYPE> {
