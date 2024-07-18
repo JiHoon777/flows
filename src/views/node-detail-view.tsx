@@ -57,8 +57,6 @@ export const NodeDetailView = observer(({ nodeId }: { nodeId: string }) => {
     return <div>{node?.type} 은 내용 편집을 지원하지 않습니다.</div>
   }
 
-  console.log(60, initialEditorState)
-
   return (
     <main className={'w-full h-screen overflow-y-auto'}>
       <div

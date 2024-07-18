@@ -1,6 +1,7 @@
-import { memo, useCallback } from 'react'
+import { useCallback } from 'react'
 
 import { debounce } from 'lodash-es'
+import { observer } from 'mobx-react'
 import { NodeProps } from 'reactflow'
 
 import { AlertModal } from '@/components/alert-modal.tsx'
@@ -18,7 +19,7 @@ import { NoteNodeData } from '@/store/types'
 import { useStore } from '@/store/useStore.ts'
 import { cn } from '@/utils/cn.ts'
 
-export const NoteNode = memo((props: NodeProps<NoteNodeData>) => {
+export const NoteNode = observer((props: NodeProps<NoteNodeData>) => {
   const { id, data, selected, dragging } = props
   const store = useStore()
   const { open } = useOverlay()
@@ -41,7 +42,7 @@ export const NoteNode = memo((props: NodeProps<NoteNodeData>) => {
     debounce((v: string) => {
       drawer?.updateNodeTitle({
         id,
-        type: 'text',
+        type: 'note',
         title: v,
       })
     }, 500),
