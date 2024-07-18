@@ -1,6 +1,7 @@
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
 
-import { SquareX, Type } from 'lucide-react'
+import { debounce } from 'lodash-es'
+import { SquareX } from 'lucide-react'
 import { observer } from 'mobx-react'
 import {
   BaseEdge,
@@ -10,6 +11,7 @@ import {
   useReactFlow,
 } from 'reactflow'
 
+import { FlTextareaAutoSize } from '@/components/fl-textarea-auto-size.tsx'
 import { EdgeAnimate } from '@/components/flow-edge/edge-animate.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import { useStore } from '@/store/useStore.ts'
@@ -49,21 +51,13 @@ export const BezierEdge = observer((props: EdgeProps) => {
     return store.flowStore.getFlowById(parentFlowId)?.drawer
   })()
 
-  const [isEditing, setIsEditing] = useState(false)
-
-  const onEdgeClick = useCallback((evt: any) => {
-    evt.stopPropagation()
-    setIsEditing(true)
-  }, [])
-
-  const onTextChange = useCallback((evt: any) => {
-    // setEdgeText(evt.target.value);
-  }, [])
-
-  const onTextBlur = useCallback(() => {
-    setIsEditing(false)
-    // Here you might want to update the edge data in your state management
-  }, [])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const onTextChange = useCallback(
+    debounce((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      drawer?.updateEdge(id, { label: e.target.value })
+    }, 500),
+    [drawer, id],
+  )
 
   const onDelete = useCallback(() => {
     drawer?.deleteEdge(id)
@@ -83,18 +77,43 @@ export const BezierEdge = observer((props: EdgeProps) => {
     <>
       <BaseEdge path={edgePath} {...props} />
       <EdgeAnimate id={id} style={style} />
-      {props.selected && (
+      <EdgeLabelRenderer>
+        <div
+          style={{
+            transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
+            pointerEvents: 'all',
+          }}
+          className="nodrag nopan absolute"
+        >
+          {selected && (
+            <FlTextareaAutoSize
+              defaultValue={data?.label ?? ''}
+              onChange={onTextChange}
+              className={
+                'resize-none bg-background border-none p-1 rounded max-w-[200px]'
+              }
+            />
+          )}
+          {!selected && !!data?.label && (
+            <div
+              className={
+                'bg-background p-1 rounded max-w-[200px] break-all whitespace-pre-wrap'
+              }
+            >
+              {data?.label || 'Edge Label'}
+            </div>
+          )}
+        </div>
+      </EdgeLabelRenderer>
+      {selected && (
         <EdgeLabelRenderer>
           <div
             style={{
-              transform: `translate(-50%, -50%) translate(${labelX - 60}px,${labelY + 20}px)`,
+              transform: `translate(-50%, -50%) translate(${labelX}px,${labelY - 30}px)`,
               pointerEvents: 'all',
             }}
             className="nodrag nopan absolute bg-background shadow-lg px-1.5 py-1.5 rounded-lg flex gap-1"
           >
-            <Button variant={'ghost'} size={'xs'} onClick={onEdgeClick}>
-              <Type className={'w-4 h-4'} />
-            </Button>
             <Button variant={'ghost'} size={'xs'} onClick={onDelete}>
               <SquareX className={'w-4 h-4'} />
             </Button>

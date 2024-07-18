@@ -176,7 +176,85 @@ export class FlowDrawer {
       })
     }
   }
-  updateEdge(edgeId: string, edge: Partial<Omit<ReactFlowNodeTarget, 'id'>>) {}
+  updateEdge(
+    edgeId: string,
+    updatingEdgeData: Partial<Omit<ReactFlowNodeTarget, 'id'>>,
+  ) {
+    const updatingEdge = this.edges.find((edge) => edge.id === edgeId)
+
+    if (!updatingEdge) {
+      return
+    }
+
+    const restoreOnError = () => {
+      this.edges.map((edge) =>
+        edge.id === edgeId ? { ...updatingEdge } : edge,
+      )
+    }
+
+    runInAction(() => {
+      this.edges = this.edges.map((edge) =>
+        edge.id === edgeId
+          ? {
+              ...edge,
+              data: {
+                ...edge.data,
+                ...updatingEdgeData,
+              },
+            }
+          : edge,
+      )
+    })
+
+    const sourceNode = this.nodes.find(
+      (node) => node.id === updatingEdge.source,
+    )
+
+    if (!sourceNode) {
+      restoreOnError()
+      return
+    }
+
+    if (sourceNode.type === 'flow') {
+      Effect.runPromise(
+        this.flow.store.updateFlow({
+          flowId: updatingEdge.source,
+          changedFlow: {
+            targets: (
+              this.flow.store.getFlowById(updatingEdge.source)?.snapshot
+                .targets ?? []
+            ).map((target) =>
+              target.id === updatingEdge.target
+                ? { ...target, ...updatingEdgeData }
+                : target,
+            ),
+          },
+        }),
+      ).catch((ex) => {
+        restoreOnError()
+        this.rootStore.showError(ex)
+      })
+    } else {
+      Effect.runPromise(
+        this.rootStore.nodeStore.updateNode({
+          nodeId: updatingEdge.source,
+          changedNode: {
+            targets: (
+              this.rootStore.nodeStore.getNodeById(updatingEdge.source)
+                ?.snapshot.targets ?? []
+            ).map((target) =>
+              target.id === updatingEdge.target
+                ? { ...target, ...updatingEdgeData }
+                : target,
+            ),
+          },
+        }),
+      ).catch((ex) => {
+        restoreOnError()
+        this.rootStore.showError(ex)
+      })
+    }
+  }
   deleteEdge(edgeId: string) {
     runInAction(() => {
       this.edges = this.edges.filter((edge) => edge.id !== edgeId)
@@ -428,6 +506,9 @@ export class FlowDrawer {
           id: nanoid(),
           source: 'flowId' in origin ? origin.flowId : origin.nodeId,
           target: target.id,
+          data: {
+            label: target.label ?? undefined,
+          },
         })
       })
     }
