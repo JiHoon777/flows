@@ -9,7 +9,7 @@ import { useStore } from '@/store/useStore.ts'
 
 export const FlowNode = observer(
   (props: NodeProps<FlowNodeData> & { type: 'flow' }) => {
-    const { id, type } = props
+    const { id } = props
     const store = useStore()
     const flow = store.flowStore.getFlowById(id)
 

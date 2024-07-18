@@ -2,7 +2,6 @@ import { PropsWithChildren, useCallback } from 'react'
 
 import { Effect } from 'effect'
 import { debounce } from 'lodash-es'
-import { Map, NotebookPen, Type } from 'lucide-react'
 import { observer } from 'mobx-react'
 import {
   Handle,
@@ -13,7 +12,8 @@ import {
 } from 'reactflow'
 
 import { AlertModal } from '@/components/alert-modal.tsx'
-import { FlTextareaAutoSize } from '@/components/fl-textarea-auto-size.tsx'
+import { NodeContent } from '@/components/flow-node/node-content.tsx'
+import { NodeIcon } from '@/components/flow-node/node-icon.tsx'
 import { useGetNodeDrawer } from '@/components/flow-node/useGetNodeDrawer.ts'
 import {
   ContextMenu,
@@ -35,28 +35,31 @@ export const NodeWrap = observer(
 
     const drawer = useGetNodeDrawer(id, type)
 
-    const handleResizeEnd = (
-      _: ResizeDragEvent,
-      { width, height }: { width: number; height: number },
-    ) => {
-      if (type === 'flow') {
+    const handleResizeEnd = useCallback(
+      (
+        _: ResizeDragEvent,
+        { width, height }: { width: number; height: number },
+      ) => {
+        if (type === 'flow') {
+          Effect.runPromise(
+            store.flowStore.updateFlow({
+              flowId: id,
+              changedFlow: { style: { width, height } },
+            }),
+          ).catch(store.showError)
+          // id, { style: { width, height } }
+          return
+        }
+
         Effect.runPromise(
-          store.flowStore.updateFlow({
-            flowId: id,
-            changedFlow: { style: { width, height } },
+          store.nodeStore.updateNode({
+            nodeId: id,
+            changedNode: { style: { width, height } },
           }),
         ).catch(store.showError)
-        // id, { style: { width, height } }
-        return
-      }
-
-      Effect.runPromise(
-        store.nodeStore.updateNode({
-          nodeId: id,
-          changedNode: { style: { width, height } },
-        }),
-      ).catch(store.showError)
-    }
+      },
+      [id, store.flowStore, store.nodeStore, store.showError, type],
+    )
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const debouncedChangeHandler = useCallback(
@@ -70,7 +73,7 @@ export const NodeWrap = observer(
       [debounce, drawer],
     )
 
-    const handleRemove = () => {
+    const handleRemove = useCallback(() => {
       open(({ isOpen, exit }) => (
         <AlertModal
           isOpen={isOpen}
@@ -78,7 +81,7 @@ export const NodeWrap = observer(
           onFinish={() => drawer?.removeNode(id, type)}
         />
       ))
-    }
+    }, [drawer, id, open, type])
 
     return (
       <ContextMenu>
@@ -88,45 +91,24 @@ export const NodeWrap = observer(
               'w-full h-full flex z-[1] relative !bg-background rounded p-3',
             )}
           >
-            <div className={'absolute -top-5 text-gray-500 text-xs'}>
-              {type === 'flow' && <Map className={'w-4 h-4'} />}
-              {type === 'note' && <NotebookPen className={'w-4 h-4'} />}
-              {type === 'text' && <Type className={'w-4 h-4'} />}
-            </div>
+            <NodeIcon type={type} />
             <NodeResizer
               isVisible
               minWidth={150}
               minHeight={100}
-              lineClassName={'!border-transparent !border-2'}
+              lineClassName={'!border-transparent !border-[10px]'}
               handleClassName={'!border-transparent !bg-transparent'}
               onResizeEnd={handleResizeEnd}
             />
-            <div
-              className={
-                'border-border border border-dashed z-[1] relative w-full flex flex-col items-center gap-3'
-              }
+
+            <NodeContent
+              selected={selected}
+              dragging={dragging}
+              title={data.title}
+              onTitleChange={debouncedChangeHandler}
             >
-              <div
-                className={cn(
-                  'relative flex flex-col items-center w-full h-full px-2 pt-2',
-                  'overflow-x-hidden overflow-y-auto scrollbar-hide',
-                  selected && 'nowheel',
-                )}
-              >
-                <FlTextareaAutoSize
-                  className={cn(
-                    'nodrag shrink-0 p-2 text-4xl w-full resize-none mx-2 mt-2 font-bold border-0 shadow-none',
-                    (!selected || dragging) && 'pointer-events-none',
-                    selected && dragging && 'pointer-events-none',
-                    'overflow-hidden',
-                  )}
-                  defaultValue={data.title}
-                  onChange={(e) => debouncedChangeHandler(e.target.value)}
-                  draggable
-                />
-                {children}
-              </div>
-            </div>
+              {children}
+            </NodeContent>
 
             <Handle
               type="target"
