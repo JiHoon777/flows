@@ -1,5 +1,4 @@
 import { Effect, pipe } from 'effect'
-import { merge } from 'lodash-es'
 import { action, makeObservable, observable } from 'mobx'
 
 import { AppError } from '@/api/error.ts'
@@ -8,6 +7,7 @@ import { FlowDrawer } from '@/store/flow/flow-drawer.ts'
 import { DoNode } from '@/store/node/do-node.ts'
 import { Flow, FlowNodeData, NodeTypes } from '@/store/types.ts'
 import { assignIf } from '@/store/utils/store.utils.ts'
+import { customMerge } from '@/utils/custom-merge.ts'
 
 export class DoFlow {
   store: DoFlowStore
@@ -44,7 +44,7 @@ export class DoFlow {
       data?: Partial<FlowNodeData>
     },
   ) {
-    this.snapshot = merge({}, this.snapshot, changedData)
+    this.snapshot = customMerge(this.snapshot, changedData)
 
     if (typeof changedData.created_at === 'string') {
       this.snapshot.created_at = new Date(changedData.created_at)

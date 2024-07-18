@@ -1,9 +1,9 @@
-import { merge } from 'lodash-es'
 import { action, makeObservable, observable } from 'mobx'
 
 import { DoNodeStore } from '@/store/node/do-node-store.ts'
 import { NodeDataTypes, NodeType, NodeTypes } from '@/store/types.ts'
 import { assignIf } from '@/store/utils/store.utils.ts'
+import { customMerge } from '@/utils/custom-merge.ts'
 
 export class DoNode {
   store: DoNodeStore
@@ -36,7 +36,7 @@ export class DoNode {
       data?: Partial<NodeDataTypes>
     },
   ) {
-    this.snapshot = merge({}, this.snapshot, changedData)
+    this.snapshot = customMerge(this.snapshot, changedData)
 
     if (typeof changedData.created_at === 'string') {
       this.snapshot.created_at = new Date(changedData.created_at)

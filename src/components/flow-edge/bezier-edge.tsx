@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { ChangeEvent, useCallback } from 'react'
 
 import { debounce } from 'lodash-es'
 import { SquareX } from 'lucide-react'
@@ -53,7 +53,7 @@ export const BezierEdge = observer((props: EdgeProps) => {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const onTextChange = useCallback(
-    debounce((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    debounce((e: ChangeEvent<HTMLTextAreaElement>) => {
       drawer?.updateEdge(id, { label: e.target.value })
     }, 500),
     [drawer, id],
@@ -72,7 +72,6 @@ export const BezierEdge = observer((props: EdgeProps) => {
     targetPosition,
   })
 
-  console.log(data)
   return (
     <>
       <BaseEdge path={edgePath} {...props} />

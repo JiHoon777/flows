@@ -1,5 +1,7 @@
 import { CSSProperties } from 'react'
 
+import { cn } from '@/utils/cn.ts'
+
 export const EdgeAnimate = ({
   style,
   id,
@@ -14,8 +16,9 @@ export const EdgeAnimate = ({
       <path
         d={`M-${arrowSize / 2},-${arrowSize / 2} L0,0 L-${arrowSize / 2},${arrowSize / 2}`}
         fill="none"
-        stroke={style?.stroke || 'black'}
+        stroke={style?.stroke}
         strokeWidth="1"
+        className={cn('', !style?.stroke && 'stroke-foreground')}
       >
         <animateMotion
           dur={`${animationDuration}s`}

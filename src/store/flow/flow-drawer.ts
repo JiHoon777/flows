@@ -221,8 +221,7 @@ export class FlowDrawer {
           flowId: updatingEdge.source,
           changedFlow: {
             targets: (
-              this.flow.store.getFlowById(updatingEdge.source)?.snapshot
-                .targets ?? []
+              this.flow.store.getFlowById(sourceNode.id)?.snapshot.targets ?? []
             ).map((target) =>
               target.id === updatingEdge.target
                 ? { ...target, ...updatingEdgeData }
@@ -240,8 +239,8 @@ export class FlowDrawer {
           nodeId: updatingEdge.source,
           changedNode: {
             targets: (
-              this.rootStore.nodeStore.getNodeById(updatingEdge.source)
-                ?.snapshot.targets ?? []
+              this.rootStore.nodeStore.getNodeById(sourceNode.id)?.snapshot
+                .targets ?? []
             ).map((target) =>
               target.id === updatingEdge.target
                 ? { ...target, ...updatingEdgeData }
@@ -256,9 +255,61 @@ export class FlowDrawer {
     }
   }
   deleteEdge(edgeId: string) {
+    const deletingEdge = this.edges.find((edge) => edge.id === edgeId)
+
+    if (!deletingEdge) {
+      return
+    }
+
+    const restoreOnError = () => {
+      runInAction(() => {
+        this.edges.push(deletingEdge)
+      })
+    }
+
     runInAction(() => {
       this.edges = this.edges.filter((edge) => edge.id !== edgeId)
     })
+
+    const sourceNode = this.nodes.find(
+      (node) => node.id === deletingEdge.source,
+    )
+
+    if (!sourceNode) {
+      restoreOnError()
+      return
+    }
+
+    if (sourceNode.type === 'flow') {
+      Effect.runPromise(
+        this.flow.store.updateFlow({
+          flowId: sourceNode.id,
+          changedFlow: {
+            targets: (
+              this.flow.store.getFlowById(sourceNode.id)?.snapshot.targets ?? []
+            ).filter((target) => target.id !== deletingEdge.target),
+          },
+        }),
+      ).catch((ex) => {
+        restoreOnError()
+        this.rootStore.showError(ex)
+      })
+    } else {
+      Effect.runPromise(
+        this.rootStore.nodeStore.updateNode({
+          nodeId: sourceNode.id,
+          changedNode: {
+            targets: (
+              this.rootStore.nodeStore.getNodeById(sourceNode.id)?.snapshot
+                .targets ?? []
+            ).filter((target) => target.id !== deletingEdge.target),
+          },
+        }),
+      ).catch((ex) => {
+        restoreOnError()
+        this.rootStore.showError(ex)
+      })
+    }
   }
   /**
    * FlowNode 를 추가하고, Flow 를 저장한다.
