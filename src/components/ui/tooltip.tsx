@@ -1,11 +1,11 @@
 import * as React from 'react'
-import { PropsWithChildren } from 'react'
+import { PropsWithChildren, ReactNode } from 'react'
 
 import * as TooltipPrimitive from '@radix-ui/react-tooltip'
 
 import { cn } from '@/utils/cn'
 
-export const TooltipProvider = TooltipPrimitive.Provider
+const TooltipProvider = TooltipPrimitive.Provider
 
 const Tooltip_ = TooltipPrimitive.Root
 
@@ -26,20 +26,23 @@ const TooltipContent_ = React.forwardRef<
   />
 ))
 
-export const TooltipWrap = ({
+type TooltipWrapProps = PropsWithChildren &
+  Pick<
+    React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content>,
+    'sideOffset' | 'side' | 'className'
+  > & {
+    asChild?: boolean
+    content: ReactNode
+  }
+
+const TooltipWrap = ({
   className,
   sideOffset = 4,
   children,
   content,
   asChild,
   side,
-}: PropsWithChildren &
-  Pick<
-    React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content>,
-    'sideOffset' | 'content' | 'side' | 'className'
-  > & {
-    asChild?: boolean
-  }) => {
+}: TooltipWrapProps) => {
   return (
     <Tooltip_>
       <TooltipTrigger_ asChild={asChild}>{children}</TooltipTrigger_>
@@ -53,3 +56,6 @@ export const TooltipWrap = ({
     </Tooltip_>
   )
 }
+
+export { TooltipProvider, TooltipWrap }
+export type { TooltipWrapProps }

@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { observer } from 'mobx-react'
 
+import { ButtonWithTooltip } from '@/components/button-with-tooltip.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import {
   DropdownMenu,
@@ -30,15 +31,15 @@ export const ExplorerToolbar = observer(() => {
 
   return (
     <div className={'w-full flex items-center justify-center'}>
-      <TooltipWrap side={'bottom'} content={'Add Flow'} asChild>
-        <Button
-          variant={'ghost'}
-          size={'icon'}
-          onClick={() => explorerView.createFlowOnRoot()}
-        >
-          <FolderPlus className={IconCn} />
-        </Button>
-      </TooltipWrap>
+      <ButtonWithTooltip
+        variant={'ghost'}
+        size={'icon'}
+        side={'bottom'}
+        tooltipContent={'Add Flow'}
+        onClick={() => explorerView.createFlowOnRoot()}
+      >
+        <FolderPlus className={IconCn} />
+      </ButtonWithTooltip>
       <TooltipWrap side={'bottom'} content={'Change Sort Order'}>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -64,36 +65,30 @@ export const ExplorerToolbar = observer(() => {
           </DropdownMenuContent>
         </DropdownMenu>
       </TooltipWrap>
-      <TooltipWrap
+      <ButtonWithTooltip
+        variant={'ghost'}
+        size={'icon'}
         side={'bottom'}
-        content={explorerView.isExpandAll ? 'Collapse All' : 'Expand All'}
-        asChild
+        onClick={() => explorerView.toggleIsExpandAll()}
+        tooltipContent={
+          explorerView.isExpandAll ? 'Collapse All' : 'Expand All'
+        }
       >
-        <Button
-          variant={'ghost'}
-          size={'icon'}
-          onClick={() => explorerView.toggleIsExpandAll()}
-        >
-          {explorerView.isExpandAll && <ChevronsDownUp className={IconCn} />}
-          {!explorerView.isExpandAll && <ChevronsUpDown className={IconCn} />}
-        </Button>
-      </TooltipWrap>
-      <TooltipWrap
+        {explorerView.isExpandAll && <ChevronsDownUp className={IconCn} />}
+        {!explorerView.isExpandAll && <ChevronsUpDown className={IconCn} />}
+      </ButtonWithTooltip>
+      <ButtonWithTooltip
         side={'bottom'}
-        content={theme === 'light' ? 'Light theme' : 'Dark theme'}
-        asChild
+        tooltipContent={theme === 'light' ? 'Light theme' : 'Dark theme'}
+        variant={'ghost'}
+        size={'icon'}
+        onClick={() =>
+          theme === 'light' ? setTheme('dark') : setTheme('light')
+        }
       >
-        <Button
-          variant={'ghost'}
-          size={'icon'}
-          onClick={() =>
-            theme === 'light' ? setTheme('dark') : setTheme('light')
-          }
-        >
-          {theme === 'light' && <Sun className={IconCn} />}
-          {theme === 'dark' && <MoonStar className={IconCn} />}
-        </Button>
-      </TooltipWrap>
+        {theme === 'light' && <Sun className={IconCn} />}
+        {theme === 'dark' && <MoonStar className={IconCn} />}
+      </ButtonWithTooltip>
     </div>
   )
 })
