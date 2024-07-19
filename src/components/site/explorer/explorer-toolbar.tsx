@@ -21,8 +21,12 @@ import { TooltipWrap } from '@/components/ui/tooltip.tsx'
 import { useTheme } from '@/contexts/theme-provider.tsx'
 import { useStore } from '@/store/useStore.ts'
 import { ExplorerSortOption } from '@/store/views/explorer-view.ts'
+import { cn } from '@/utils/cn.ts'
 
-const IconCn = 'w-[1.1rem] h-[1.1rem] text-gray-500'
+const cns = {
+  container: cn('w-full flex items-center justify-center'),
+  icon: cn('w-[1.1rem] h-[1.1rem] text-gray-500'),
+}
 
 export const ExplorerToolbar = observer(() => {
   const store = useStore()
@@ -30,7 +34,7 @@ export const ExplorerToolbar = observer(() => {
   const explorerView = store.explorerView
 
   return (
-    <div className={'w-full flex items-center justify-center'}>
+    <div className={cns.container}>
       <ButtonWithTooltip
         variant={'ghost'}
         size={'icon'}
@@ -38,14 +42,14 @@ export const ExplorerToolbar = observer(() => {
         tooltipContent={'Add Flow'}
         onClick={() => explorerView.createFlowOnRoot()}
       >
-        <FolderPlus className={IconCn} />
+        <FolderPlus className={cns.icon} />
       </ButtonWithTooltip>
       <TooltipWrap side={'bottom'} content={'Change Sort Order'}>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant={'ghost'} size={'icon'} asChild>
               <div>
-                <ArrowUpNarrowWide className={IconCn} />
+                <ArrowUpNarrowWide className={cns.icon} />
               </div>
             </Button>
           </DropdownMenuTrigger>
@@ -74,8 +78,8 @@ export const ExplorerToolbar = observer(() => {
           explorerView.isExpandAll ? 'Collapse All' : 'Expand All'
         }
       >
-        {explorerView.isExpandAll && <ChevronsDownUp className={IconCn} />}
-        {!explorerView.isExpandAll && <ChevronsUpDown className={IconCn} />}
+        {explorerView.isExpandAll && <ChevronsDownUp className={cns.icon} />}
+        {!explorerView.isExpandAll && <ChevronsUpDown className={cns.icon} />}
       </ButtonWithTooltip>
       <ButtonWithTooltip
         side={'bottom'}
@@ -86,8 +90,8 @@ export const ExplorerToolbar = observer(() => {
           theme === 'light' ? setTheme('dark') : setTheme('light')
         }
       >
-        {theme === 'light' && <Sun className={IconCn} />}
-        {theme === 'dark' && <MoonStar className={IconCn} />}
+        {theme === 'light' && <Sun className={cns.icon} />}
+        {theme === 'dark' && <MoonStar className={cns.icon} />}
       </ButtonWithTooltip>
     </div>
   )
