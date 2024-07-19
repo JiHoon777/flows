@@ -22,8 +22,8 @@ import {
   ContextMenuTrigger,
 } from '@/components/ui/context-menu.tsx'
 import { useOverlay } from '@/contexts/overlay/use-overlay.tsx'
-import { NodeType } from '@/store/types.ts'
 import { useStore } from '@/store/useStore.ts'
+import { NodeType } from '@/types/base-type.ts'
 import { cn } from '@/utils/cn'
 
 type Props = PropsWithChildren & NodeProps & { type: NodeType | 'flow' }
@@ -86,7 +86,7 @@ export const NodeWrap = observer(
     return (
       <ContextMenu>
         <ContextMenuTrigger>
-          <div
+          <section
             className={cn(
               'w-full h-full flex z-[1] relative !bg-background rounded p-3',
             )}
@@ -124,7 +124,7 @@ export const NodeWrap = observer(
                 selected && '!border-primary',
               )}
             />
-          </div>
+          </section>
         </ContextMenuTrigger>
         <ContextMenuContent>
           <ContextMenuItem onClick={handleRemove}>Remove</ContextMenuItem>

@@ -5,7 +5,7 @@ import { action, makeObservable, observable, runInAction } from 'mobx'
 import { AppError, ClientError } from '@/api/error.ts'
 import { DoFlow } from '@/store/flow/do-flow.ts'
 import { RootStore } from '@/store/root-store.ts'
-import { Flow, FlowNodeData } from '@/store/types.ts'
+import { Flow, FlowNodeData } from '@/types/flow.type.ts'
 
 export class DoFlowStore {
   rootStore: RootStore

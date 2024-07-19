@@ -12,14 +12,9 @@ import {
 } from 'reactflow'
 
 import { DoFlow } from '@/store/flow/do-flow.ts'
-import {
-  Flow,
-  FlowNodeData,
-  NodeDataTypes,
-  NodeType,
-  NodeTypes,
-  ReactFlowNodeTarget,
-} from '@/store/types.ts'
+import { NodeType, ReactFlowNodeTarget } from '@/types/base-type.ts'
+import { Flow, FlowNodeData } from '@/types/flow.type.ts'
+import { NodeDataTypes, NodeTypes } from '@/types/types.ts'
 
 export class FlowDrawer {
   flow: DoFlow

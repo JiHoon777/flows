@@ -1,5 +1,5 @@
-import { NodeType } from '@/store/types.ts'
 import { useStore } from '@/store/useStore.ts'
+import { NodeType } from '@/types/base-type.ts'
 
 export const useGetNodeDrawer = (nodeId: string, type: NodeType | 'flow') => {
   const store = useStore()

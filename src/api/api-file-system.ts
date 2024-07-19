@@ -10,7 +10,8 @@ import { Effect, pipe } from 'effect'
 
 import { IApiFileSystem } from '@/api/api.interface.ts'
 import { FileSystemError, handleFileSystemError } from '@/api/error.ts'
-import { Flow, NodeTypes } from '@/store/types.ts'
+import { Flow } from '@/types/flow.type.ts'
+import { NodeTypes } from '@/types/types.ts'
 
 const FLOW_DIR = `flows/flow`
 const NODE_DIR = `flows/node`

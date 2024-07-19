@@ -1,7 +1,8 @@
 import { Effect } from 'effect'
 
 import { AppError } from '@/api/error.ts'
-import { Flow, NodeTypes } from '@/store/types'
+import { Flow } from '@/types/flow.type.ts'
+import { NodeTypes } from '@/types/types.ts'
 
 interface IApiCommon {
   //

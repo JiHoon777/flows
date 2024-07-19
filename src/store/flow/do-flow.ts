@@ -5,8 +5,9 @@ import { AppError } from '@/api/error.ts'
 import { DoFlowStore } from '@/store/flow/do-flow-store.ts'
 import { FlowDrawer } from '@/store/flow/flow-drawer.ts'
 import { DoNode } from '@/store/node/do-node.ts'
-import { Flow, FlowNodeData, NodeTypes } from '@/store/types.ts'
 import { assignIf } from '@/store/utils/store.utils.ts'
+import { Flow, FlowNodeData } from '@/types/flow.type.ts'
+import { NodeTypes } from '@/types/types.ts'
 import { customMerge } from '@/utils/custom-merge.ts'
 
 export class DoFlow {
