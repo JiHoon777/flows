@@ -1,10 +1,12 @@
-import { useCallback, useEffect, useMemo } from 'react'
+import { ChangeEvent, useCallback, useEffect, useMemo } from 'react'
 
 import { Effect } from 'effect'
 import { observer } from 'mobx-react'
 import { useNavigate, useParams } from 'react-router-dom'
 
+import { FlTextareaAutoSize } from '@/components/fl-textarea-auto-size.tsx'
 import { LexicalEditor } from '@/components/lexical/lexical-editor.tsx'
+import { useDebounce } from '@/hooks/use-debounce.ts'
 import { DoNode } from '@/store/node/do-node.ts'
 import { useStore } from '@/store/useStore.ts'
 
@@ -23,7 +25,24 @@ export const NodeDetailView = observer(({ nodeId }: { nodeId: string }) => {
   const navigate = useNavigate()
   const node: DoNode | undefined = store.nodeStore.getNodeById(nodeId)
 
-  const handleChange = useCallback(
+  const changeTitle = useCallback(
+    (e: ChangeEvent<HTMLTextAreaElement>) => {
+      Effect.runPromise(
+        node.store.updateNode({
+          nodeId: node.id,
+          changedNode: {
+            data: {
+              title: e.target.value,
+            },
+          },
+        }),
+      ).catch((ex) => store.showError(ex))
+    },
+    [node.id, node.store, store],
+  )
+  const handleChangeTitle = useDebounce(changeTitle, 300)
+
+  const handleChangeContent = useCallback(
     (v: string) => {
       Effect.runPromise(
         node.store.updateNode({
@@ -58,20 +77,26 @@ export const NodeDetailView = observer(({ nodeId }: { nodeId: string }) => {
   }
 
   return (
-    <main className={'w-full h-screen overflow-y-auto'}>
+    <main className={'h-screen w-full overflow-y-auto'}>
       <div
         className={
-          'max-w-[1024px] w-full flex flex-col mx-auto gap-6 mt-10 mb-6'
+          'mx-auto mb-6 mt-10 flex w-full max-w-[1024px] flex-col gap-3'
         }
       >
         {/* Meta Data; Title, Tag, ...*/}
-        <header className={'flex flex-col gap-1 shrink-0'}>
-          <h1 className={'font-bold text-2xl'}>{node.title}</h1>
+        <header className={'flex shrink-0 flex-col gap-1'}>
+          <FlTextareaAutoSize
+            className={
+              'resize-none border-none text-6xl font-bold shadow-none focus-visible:ring-0'
+            }
+            defaultValue={node.title}
+            onChange={handleChangeTitle}
+          />
         </header>
         <LexicalEditor
           showTreeView={false}
           initialEditorState={initialEditorState}
-          onChange={handleChange}
+          onChange={handleChangeContent}
         />
       </div>
     </main>

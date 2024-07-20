@@ -2,7 +2,7 @@ import { action, makeObservable, observable } from 'mobx'
 
 import { DoNodeStore } from '@/store/node/do-node-store.ts'
 import { assignIf } from '@/store/utils/store.utils.ts'
-import { NodeType } from '@/types/base-type.ts'
+import { NodeType } from '@/types/base.type.ts'
 import { NodeDataTypes, NodeTypes } from '@/types/types.ts'
 import { customMerge } from '@/utils/custom-merge.ts'
 
