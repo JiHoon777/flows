@@ -1,7 +1,11 @@
+import { FlowDrawer } from '@/store/flow/flow-drawer.ts'
 import { useStore } from '@/store/useStore.ts'
-import { NodeType } from '@/types/base-type.ts'
+import { NodeType } from '@/types/base.type.ts'
 
-export const useGetNodeDrawer = (nodeId: string, type: NodeType | 'flow') => {
+export const useGetNodeDrawer = (
+  nodeId: string,
+  type: NodeType | 'flow',
+): FlowDrawer | undefined => {
   const store = useStore()
 
   let parentFlowId = '-1'

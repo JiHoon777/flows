@@ -9,13 +9,13 @@ export const EdgeLabel = observer(
   ({
     label,
     selected,
-    onTextChange,
+    onChangeLabel,
     labelX,
     labelY,
   }: {
     label: string
     selected: boolean
-    onTextChange: (e: ChangeEvent<HTMLTextAreaElement>) => void
+    onChangeLabel: (e: ChangeEvent<HTMLTextAreaElement>) => void
     labelX: number
     labelY: number
   }) => {
@@ -31,7 +31,7 @@ export const EdgeLabel = observer(
           {selected && (
             <FlTextareaAutoSize
               defaultValue={label ?? ''}
-              onChange={onTextChange}
+              onChange={onChangeLabel}
               className={
                 'max-w-[200px] resize-none rounded border-none bg-background p-1'
               }
