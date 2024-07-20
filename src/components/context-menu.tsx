@@ -33,7 +33,7 @@ export interface ContextMenuProps {
 export type ContextMenuModel = ContextMenuProps['model']
 
 export interface ContextMenuRef {
-  show: (event: React.MouseEvent) => void
+  show: (event: React.MouseEvent | TouchEvent) => void
 }
 
 export const ContextMenu = forwardRef<ContextMenuRef, ContextMenuProps>(
@@ -47,9 +47,14 @@ export const ContextMenu = forwardRef<ContextMenuRef, ContextMenuProps>(
     useOutsideClick(menuRef, () => setIsVisible(false))
 
     useImperativeHandle(ref, () => ({
-      show: (event: React.MouseEvent) => {
+      show: (event: React.MouseEvent | TouchEvent) => {
         event.preventDefault()
-        setPosition({ x: event.clientX, y: event.clientY })
+
+        const isTouchEvent = 'touches' in event
+        const x = isTouchEvent ? event.touches[0].clientX : event.clientX
+        const y = isTouchEvent ? event.touches[0].clientY : event.clientY
+
+        setPosition({ x, y })
         setIsVisible(true)
         setActiveIndex(-1)
       },

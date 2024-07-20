@@ -30,9 +30,10 @@ import {
 } from 'reactflow'
 
 import {
-  FlowContextMenuContent,
-  MenuItem,
-} from '@/components/flow-context-menu-content'
+  ContextMenu,
+  ContextMenuModel,
+  ContextMenuRef,
+} from '@/components/context-menu.tsx'
 import { BezierEdge } from '@/components/flow-edge/bezier-edge.tsx'
 import { FlowNode } from '@/components/flow-node/flow-node'
 import { NoteNode } from '@/components/flow-node/note-node'
@@ -85,6 +86,8 @@ const FlowDetailView_ = observer(({ flowId }: { flowId: string }) => {
   const flow = appStore.flowStore.getFlowById(flowId) as DoFlow | undefined
   const drawer = flow?.drawer
   const [hasSelectedNode, setHasSelectedNode] = useState(false)
+  const contextMenuRef = useRef<ContextMenuRef | null>(null)
+
   //
   // context menu
   //
@@ -183,12 +186,7 @@ const FlowDetailView_ = observer(({ flowId }: { flowId: string }) => {
   const onPaneContextMenu = useCallback((e: ReactMouseEvent | TouchEvent) => {
     e.preventDefault()
 
-    const isTouchEvent = 'touches' in e
-    setPaneContextMenuPosition({
-      e,
-      x: isTouchEvent ? e.touches[0].clientX : e.clientX,
-      y: isTouchEvent ? e.touches[0].clientY : e.clientY,
-    })
+    contextMenuRef.current?.show(e)
   }, [])
 
   const onNodesChange = useCallback(
@@ -223,32 +221,34 @@ const FlowDetailView_ = observer(({ flowId }: { flowId: string }) => {
     drawer?.initialize()
   }, [appStore.appLoaded, drawer])
 
-  const paneContextMenuItems: MenuItem[] = (() => {
-    if (!paneContextMenuPosition) {
-      return []
-    }
-    const { x, y } = paneContextMenuPosition
-    const panePosition = screenToFlowPosition({ x, y })
+  const contextMenuModel: ContextMenuModel = (() => {
+    // if (!paneContextMenuPosition) {
+    //   return []
+    // }
+    // const { x, y } = paneContextMenuPosition
+    // const panePosition = screenToFlowPosition({ x, y })
     const position = {
-      x: panePosition.x,
-      y: panePosition.y,
+      // x: panePosition.x,
+      // y: panePosition.y,
+      x: 0,
+      y: 0,
     }
 
     return [
       {
-        leftIcon: <NotebookPen className={'w-4 h-4'} />,
-        text: 'Create Note',
-        onClick: () => drawer?.addNode({ nodeType: 'note', position }),
+        leftIcon: <NotebookPen className={'h-4 w-4'} />,
+        label: 'Create Note',
+        command: () => drawer?.addNode({ nodeType: 'note', position }),
       },
       {
-        leftIcon: <Map className={'w-4 h-4'} />,
-        text: 'Create Flow',
-        onClick: () => drawer?.addFlowNode(position),
+        leftIcon: <Map className={'h-4 w-4'} />,
+        label: 'Create Flow',
+        command: () => drawer?.addFlowNode(position),
       },
       {
-        leftIcon: <Type className={'w-4 h-4'} />,
-        text: 'Create Text',
-        onClick: () => drawer?.addNode({ nodeType: 'text', position }),
+        leftIcon: <Type className={'h-4 w-4'} />,
+        label: 'Create Text',
+        command: () => drawer?.addNode({ nodeType: 'text', position }),
       },
     ]
   })()
@@ -260,7 +260,7 @@ const FlowDetailView_ = observer(({ flowId }: { flowId: string }) => {
   const nodes = drawer.nodes
   const edges = drawer.edges
   return (
-    <main className={'w-full h-screen'}>
+    <main className={'h-screen w-full'}>
       <ReactFlow
         /**
          * 다이어그램에서 사용될 노드들을 정의합니다.
@@ -339,12 +339,7 @@ const FlowDetailView_ = observer(({ flowId }: { flowId: string }) => {
          */}
         <Controls showInteractive={false} />
         <Background />
-        <FlowContextMenuContent
-          isOpen={!!paneContextMenuPosition}
-          position={paneContextMenuPosition}
-          menuItems={paneContextMenuItems}
-          onClose={() => setPaneContextMenuPosition(null)}
-        />
+        <ContextMenu ref={contextMenuRef} model={contextMenuModel} />
       </ReactFlow>
     </main>
   )
