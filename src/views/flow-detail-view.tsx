@@ -88,16 +88,6 @@ const FlowDetailView_ = observer(({ flowId }: { flowId: string }) => {
   const [hasSelectedNode, setHasSelectedNode] = useState(false)
   const contextMenuRef = useRef<ContextMenuRef | null>(null)
 
-  //
-  // context menu
-  //
-  const [paneContextMenuPosition, setPaneContextMenuPosition] = useState<{
-    e: ReactMouseEvent | TouchEvent
-    x: number
-    y: number
-  } | null>(null)
-
-  //
   useOnSelectionChange({
     onChange: ({ nodes }) => {
       setHasSelectedNode(nodes.length > 0)
@@ -221,37 +211,32 @@ const FlowDetailView_ = observer(({ flowId }: { flowId: string }) => {
     drawer?.initialize()
   }, [appStore.appLoaded, drawer])
 
-  const contextMenuModel: ContextMenuModel = (() => {
-    // if (!paneContextMenuPosition) {
-    //   return []
-    // }
-    // const { x, y } = paneContextMenuPosition
-    // const panePosition = screenToFlowPosition({ x, y })
-    const position = {
-      // x: panePosition.x,
-      // y: panePosition.y,
-      x: 0,
-      y: 0,
-    }
-
-    return [
-      {
-        leftIcon: <NotebookPen className={'h-4 w-4'} />,
-        label: 'Create Note',
-        command: () => drawer?.addNode({ nodeType: 'note', position }),
-      },
-      {
-        leftIcon: <Map className={'h-4 w-4'} />,
-        label: 'Create Flow',
-        command: () => drawer?.addFlowNode(position),
-      },
-      {
-        leftIcon: <Type className={'h-4 w-4'} />,
-        label: 'Create Text',
-        command: () => drawer?.addNode({ nodeType: 'text', position }),
-      },
-    ]
-  })()
+  const contextMenuModel: ContextMenuModel = [
+    {
+      leftIcon: <NotebookPen className={'h-4 w-4'} />,
+      label: 'Create Note',
+      command: ({ contextMenuPosition: { x, y } }) =>
+        drawer?.addNode({
+          nodeType: 'note',
+          position: screenToFlowPosition({ x, y }),
+        }),
+    },
+    {
+      leftIcon: <Map className={'h-4 w-4'} />,
+      label: 'Create Flow',
+      command: ({ contextMenuPosition: { x, y } }) =>
+        drawer?.addFlowNode(screenToFlowPosition({ x, y })),
+    },
+    {
+      leftIcon: <Type className={'h-4 w-4'} />,
+      label: 'Create Text',
+      command: ({ contextMenuPosition: { x, y } }) =>
+        drawer?.addNode({
+          nodeType: 'text',
+          position: screenToFlowPosition({ x, y }),
+        }),
+    },
+  ]
 
   if (!drawer?.loaded) {
     return <BookLoading />

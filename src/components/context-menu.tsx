@@ -16,7 +16,7 @@ interface ContextMenuItem {
   type?: 'item'
   label: string
   leftIcon?: React.ReactNode
-  command?: () => void
+  command?: (data: { contextMenuPosition: { x: number; y: number } }) => void
   disabled?: boolean
 }
 
@@ -98,7 +98,9 @@ export const ContextMenu = forwardRef<ContextMenuRef, ContextMenuProps>(
             if (activeIndex >= 0 && activeIndex < model.length) {
               const item = model[activeIndex]
               if (item.type !== 'separator' && !item.disabled && item.command) {
-                item.command()
+                item.command({
+                  contextMenuPosition: position,
+                })
                 setIsVisible(false)
               }
             }
@@ -135,6 +137,7 @@ export const ContextMenu = forwardRef<ContextMenuRef, ContextMenuProps>(
               activeIndex={activeIndex}
               setActiveIndex={setActiveIndex}
               setIsVisible={setIsVisible}
+              menuPosition={position}
             />
           ))}
         </div>
@@ -149,12 +152,14 @@ const ContextMenuItem = ({
   activeIndex,
   setActiveIndex,
   setIsVisible,
+  menuPosition,
 }: {
   item: ContextMenuItems
   index: number
   activeIndex: number
   setActiveIndex: Dispatch<number>
   setIsVisible: Dispatch<boolean>
+  menuPosition: { x: number; y: number }
 }) => {
   if (item.type === 'separator') {
     return <div key={index} className="my-1 h-px bg-gray-200" />
@@ -165,7 +170,7 @@ const ContextMenuItem = ({
       key={index}
       onClick={() => {
         if (!item.disabled && item.command) {
-          item.command()
+          item.command({ contextMenuPosition: menuPosition })
           setIsVisible(false)
         }
       }}
