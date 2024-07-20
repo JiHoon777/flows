@@ -21,8 +21,10 @@ export const useOutsideClick = <T extends HTMLElement>(
       }
     }
 
+    addEventListener('mousedown', handleOutsideClick)
     addEventListener('click', handleOutsideClick)
     return () => {
+      removeEventListener('mousedown', handleOutsideClick)
       removeEventListener('click', handleOutsideClick)
     }
   }, [callback, ref, isRun])

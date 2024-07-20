@@ -12,7 +12,7 @@ import {
 } from 'reactflow'
 
 import { DoFlow } from '@/store/flow/do-flow.ts'
-import { NodeType, ReactFlowNodeTarget } from '@/types/base-type.ts'
+import { NodeType, ReactFlowNodeTarget } from '@/types/base.type.ts'
 import { Flow, FlowNodeData } from '@/types/flow.type.ts'
 import { NodeDataTypes, NodeTypes } from '@/types/types.ts'
 
