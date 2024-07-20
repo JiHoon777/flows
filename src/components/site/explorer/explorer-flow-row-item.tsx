@@ -16,11 +16,7 @@ import { observer } from 'mobx-react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { AlertModal } from '@/components/alert-modal.tsx'
-import {
-  ContextMenuModel,
-  ContextMenuRef,
-  Menu,
-} from '@/components/menu/menu.tsx'
+import { Menu, MenuModel, MenuRef } from '@/components/menu/menu.tsx'
 import { Input } from '@/components/ui/input.tsx'
 import { useOverlay } from '@/contexts/overlay/use-overlay.tsx'
 import { useOutsideClick } from '@/hooks/use-outside-click.ts'
@@ -42,7 +38,7 @@ export const ExplorerFlowRowItem = observer(
     const navigate = useNavigate()
     const { open } = useOverlay()
     const { flowId } = useParams<{ flowId?: string }>()
-    const contextMenuRef = useRef<ContextMenuRef | null>(null)
+    const contextMenuRef = useRef<MenuRef | null>(null)
 
     const [isNameEditing, setIsNameEditing] = useState(false)
     const inputRef = useRef<HTMLInputElement | null>(null)
@@ -92,7 +88,7 @@ export const ExplorerFlowRowItem = observer(
       ))
     }
 
-    const contextmenuModel: ContextMenuModel = [
+    const contextmenuModel: MenuModel = [
       {
         label: 'Rename ...',
         command: () => {

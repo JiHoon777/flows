@@ -6,11 +6,7 @@ import { observer } from 'mobx-react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { AlertModal } from '@/components/alert-modal.tsx'
-import {
-  ContextMenuModel,
-  ContextMenuRef,
-  Menu,
-} from '@/components/menu/menu.tsx'
+import { Menu, MenuModel, MenuRef } from '@/components/menu/menu.tsx'
 import { useOverlay } from '@/contexts/overlay/use-overlay.tsx'
 import { DoNode } from '@/store/node/do-node.ts'
 import { useStore } from '@/store/useStore.ts'
@@ -21,7 +17,7 @@ export const ExplorerNodeRow = observer(({ node }: { node: DoNode }) => {
   const store = useStore()
   const { nodeId } = useParams<{ nodeId?: string }>()
   const { open } = useOverlay()
-  const contextMenuRef = useRef<ContextMenuRef | null>(null)
+  const contextMenuRef = useRef<MenuRef | null>(null)
 
   const openDelete = () => {
     open(({ isOpen, exit }) => (
@@ -33,7 +29,7 @@ export const ExplorerNodeRow = observer(({ node }: { node: DoNode }) => {
     ))
   }
 
-  const contextMenuModel: ContextMenuModel = [
+  const contextMenuModel: MenuModel = [
     {
       label: 'Delete ...',
       command: openDelete,

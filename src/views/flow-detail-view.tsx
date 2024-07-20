@@ -34,11 +34,7 @@ import { FlowNode } from '@/components/flow-node/flow-node'
 import { NoteNode } from '@/components/flow-node/note-node'
 import { TextNode } from '@/components/flow-node/text-node'
 import { BookLoading } from '@/components/loading/book-loading'
-import {
-  ContextMenuModel,
-  ContextMenuRef,
-  Menu,
-} from '@/components/menu/menu.tsx'
+import { Menu, MenuModel, MenuRef } from '@/components/menu/menu.tsx'
 import { DoFlow } from '@/store/flow/do-flow.ts'
 import { useStore } from '@/store/useStore.ts'
 
@@ -86,7 +82,7 @@ const FlowDetailView_ = observer(({ flowId }: { flowId: string }) => {
   const flow = appStore.flowStore.getFlowById(flowId) as DoFlow | undefined
   const drawer = flow?.drawer
   const [hasSelectedNode, setHasSelectedNode] = useState(false)
-  const contextMenuRef = useRef<ContextMenuRef | null>(null)
+  const contextMenuRef = useRef<MenuRef | null>(null)
 
   useOnSelectionChange({
     onChange: ({ nodes }) => {
@@ -192,7 +188,7 @@ const FlowDetailView_ = observer(({ flowId }: { flowId: string }) => {
     drawer?.initialize()
   }, [appStore.appLoaded, drawer])
 
-  const contextMenuModel: ContextMenuModel = [
+  const contextMenuModel: MenuModel = [
     {
       leftIcon: <NotebookPen className={'h-4 w-4'} />,
       label: 'Create Note',

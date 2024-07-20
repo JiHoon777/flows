@@ -1,6 +1,7 @@
+import { useRef } from 'react'
+
 import {
   ArrowUpNarrowWide,
-  Check,
   ChevronsDownUp,
   ChevronsUpDown,
   FolderPlus,
@@ -10,13 +11,9 @@ import {
 import { observer } from 'mobx-react'
 
 import { ButtonWithTooltip } from '@/components/button-with-tooltip.tsx'
+import { Menu, MenuRef } from '@/components/menu/menu.tsx'
+import { useCreateMenuModel } from '@/components/menu/use-create-menu-model.ts'
 import { Button } from '@/components/ui/button.tsx'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu.tsx'
 import { TooltipWrap } from '@/components/ui/tooltip.tsx'
 import { useTheme } from '@/contexts/theme-provider.tsx'
 import { useStore } from '@/store/useStore.ts'
@@ -26,14 +23,24 @@ import { cn } from '@/utils/cn.ts'
 const cns = {
   container: cn('flex w-full items-center justify-center'),
   icon: cn('h-[1.1rem] w-[1.1rem] text-gray-500'),
-  dropdownMenuItem: cn('relative pl-7 text-sm text-gray-500'),
-  dropdownMenuItemIcon: cn('absolute left-2 top-2 h-4 w-4'),
 }
 
 export const ExplorerToolbar = observer(() => {
   const store = useStore()
   const { theme, setTheme } = useTheme()
+  const sortingMenuRef = useRef<MenuRef | null>(null)
+
   const explorerView = store.explorerView
+
+  const dropdownMenuModel = useCreateMenuModel(
+    () =>
+      Object.values(ExplorerSortOption).map((item) => ({
+        checked: explorerView.sortOption === item,
+        label: item,
+        command: () => explorerView.setSortOption(item),
+      })),
+    [explorerView.sortOption],
+  )
 
   return (
     <div className={cns.container}>
@@ -47,30 +54,22 @@ export const ExplorerToolbar = observer(() => {
         <FolderPlus className={cns.icon} />
       </ButtonWithTooltip>
       <TooltipWrap side={'bottom'} content={'Change Sort Order'}>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant={'ghost'} size={'icon'} asChild>
-              <div>
-                <ArrowUpNarrowWide className={cns.icon} />
-              </div>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            {Object.values(ExplorerSortOption).map((item) => (
-              <DropdownMenuItem
-                key={item}
-                onClick={() => explorerView.setSortOption(item)}
-                className={cns.dropdownMenuItem}
-              >
-                {explorerView.sortOption === item && (
-                  <Check className={cns.dropdownMenuItemIcon} />
-                )}
-                {item}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <Button
+          variant={'ghost'}
+          size={'icon'}
+          asChild
+          onClick={(e) => sortingMenuRef.current?.show(e)}
+        >
+          <div>
+            <ArrowUpNarrowWide className={cns.icon} />
+          </div>
+        </Button>
       </TooltipWrap>
+      <Menu
+        ref={sortingMenuRef}
+        model={dropdownMenuModel}
+        variant={'dropdown'}
+      />
       <ButtonWithTooltip
         variant={'ghost'}
         size={'icon'}

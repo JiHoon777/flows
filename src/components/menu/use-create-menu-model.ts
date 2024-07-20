@@ -1,11 +1,11 @@
 import { DependencyList, useMemo } from 'react'
 
-import { ContextMenuModel } from '@/components/menu/menu.tsx'
+import { MenuModel } from '@/components/menu/menu.tsx'
 
 export const useCreateMenuModel = (
-  menuModel: () => ContextMenuModel,
+  menuModel: () => MenuModel,
   deps: DependencyList = [],
-): ContextMenuModel => {
+): MenuModel => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   return useMemo(menuModel, [...deps])
 }

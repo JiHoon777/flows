@@ -7,6 +7,7 @@ import {
   useState,
 } from 'react'
 
+import { cva, VariantProps } from 'class-variance-authority'
 import { observer } from 'mobx-react'
 
 import {
@@ -17,25 +18,40 @@ import { Portal } from '@/components/portal.tsx'
 import { useOutsideClick } from '@/hooks/use-outside-click.ts'
 import { cn } from '@/utils/cn.ts'
 
-interface ContextMenuProps {
+const menuVariants = cva(
+  cn(
+    'fixed z-50 rounded-lg bg-secondary bg-opacity-80 px-1.5 py-1.5 shadow-lg backdrop-blur-xl',
+  ),
+  {
+    variants: {
+      variant: {
+        dropdown: '',
+        contextMenu: '',
+      },
+    },
+  },
+)
+
+type MenuProps = {
   model: Array<ContextMenuItems>
-}
+} & VariantProps<typeof menuVariants>
 
-type ContextMenuModel = ContextMenuProps['model']
+type MenuModel = MenuProps['model']
 
-interface ContextMenuRef {
+type MenuRef = {
   show: (event: React.MouseEvent | TouchEvent) => void
+  close: () => void
 }
 
 const Menu = observer(
-  forwardRef<ContextMenuRef, ContextMenuProps>(({ model }, ref) => {
+  forwardRef<MenuRef, MenuProps>(({ model, variant }, ref) => {
     const [isVisible, setIsVisible] = useState(false)
     const [position, setPosition] = useState({ x: 0, y: 0 })
     const [activeIndex, setActiveIndex] = useState(-1)
 
     const menuRef = useRef<HTMLDivElement | null>(null)
 
-    useOutsideClick(menuRef, () => setIsVisible(false))
+    useOutsideClick(menuRef, () => setIsVisible(false), isVisible)
 
     useImperativeHandle(ref, () => ({
       show: (event: React.MouseEvent | TouchEvent) => {
@@ -48,6 +64,9 @@ const Menu = observer(
         setPosition({ x, y })
         setIsVisible(true)
         setActiveIndex(-1)
+      },
+      close: () => {
+        setIsVisible(false)
       },
     }))
 
@@ -114,10 +133,7 @@ const Menu = observer(
       <Portal>
         <div
           ref={menuRef}
-          className={cn(
-            'fixed z-50 rounded-lg bg-gray-200',
-            'bg-opacity-80 p-2 py-1 shadow-lg backdrop-blur-xl',
-          )}
+          className={cn(menuVariants({ variant }))}
           style={{ top: position.y, left: position.x }}
         >
           {model.map((item, index) => (
@@ -137,4 +153,4 @@ const Menu = observer(
   }),
 )
 export { Menu }
-export type { ContextMenuProps, ContextMenuModel, ContextMenuRef }
+export type { MenuProps, MenuModel, MenuRef }

@@ -14,11 +14,7 @@ import { AlertModal } from '@/components/alert-modal.tsx'
 import { NodeContent } from '@/components/flow-node/node-content.tsx'
 import { NodeIcon } from '@/components/flow-node/node-icon.tsx'
 import { useGetNodeDrawer } from '@/components/flow-node/useGetNodeDrawer.ts'
-import {
-  ContextMenuModel,
-  ContextMenuRef,
-  Menu,
-} from '@/components/menu/menu.tsx'
+import { Menu, MenuModel, MenuRef } from '@/components/menu/menu.tsx'
 import { useOverlay } from '@/contexts/overlay/use-overlay.tsx'
 import { useDebounce } from '@/hooks/use-debounce.ts'
 import { useStore } from '@/store/useStore.ts'
@@ -33,7 +29,7 @@ export const NodeWrap = observer(
     const { open } = useOverlay()
     const drawer = useGetNodeDrawer(id, type)
 
-    const contextMenuRef = useRef<ContextMenuRef | null>(null)
+    const contextMenuRef = useRef<MenuRef | null>(null)
 
     const handleFlowNodeResizeEnd = useCallback(
       (
@@ -88,7 +84,7 @@ export const NodeWrap = observer(
       ))
     }, [drawer, id, open, type])
 
-    const contextMenuModel: ContextMenuModel = [
+    const contextMenuModel: MenuModel = [
       { label: 'Remove ...', command: handleRemove },
     ]
 
