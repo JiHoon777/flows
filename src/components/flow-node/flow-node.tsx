@@ -14,12 +14,12 @@ export const FlowNode = observer((props: NodeProps<FlowNodeData>) => {
 
   return (
     <NodeWrap {...props} type={'flow'}>
-      <div className={'w-full flex flex-col gap-2'}>
-        <p className={'text-left w-full text-xs px-2 font-extralight'}>
+      <div className={'flex w-full flex-col gap-2'}>
+        <p className={'w-full px-2 text-left text-xs font-extralight'}>
           Cards: {(flow.childNodeIds ?? []).length}, Flow:{' '}
           {(flow.childFlowIds ?? []).length}
         </p>
-        <div className={'w-full h-full flex flex-wrap gap-4'}>
+        <div className={'flex h-full w-full flex-wrap gap-4'}>
           <For
             each={flow.childNodeIds ?? []}
             map={(nodeId) => store.nodeStore.getNodeById(nodeId)}

@@ -1,19 +1,12 @@
 import { ChangeEvent, useCallback } from 'react'
 
 import { debounce } from 'lodash-es'
-import { SquareX } from 'lucide-react'
 import { observer } from 'mobx-react'
-import {
-  BaseEdge,
-  EdgeLabelRenderer,
-  EdgeProps,
-  getBezierPath,
-  useReactFlow,
-} from 'reactflow'
+import { BaseEdge, EdgeProps, getBezierPath, useReactFlow } from 'reactflow'
 
-import { FlTextareaAutoSize } from '@/components/fl-textarea-auto-size.tsx'
 import { EdgeAnimate } from '@/components/flow-edge/edge-animate.tsx'
-import { Button } from '@/components/ui/button.tsx'
+import { EdgeLabel } from '@/components/flow-edge/edge-label.tsx'
+import { EdgeMenu } from '@/components/flow-edge/edge-menu.tsx'
 import { useStore } from '@/store/useStore.ts'
 
 export const BezierEdge = observer((props: EdgeProps) => {
@@ -76,48 +69,15 @@ export const BezierEdge = observer((props: EdgeProps) => {
     <>
       <BaseEdge path={edgePath} {...props} />
       <EdgeAnimate id={id} style={style} />
-      <EdgeLabelRenderer>
-        <div
-          style={{
-            transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
-            pointerEvents: 'all',
-          }}
-          className="nodrag nopan absolute"
-        >
-          {selected && (
-            <FlTextareaAutoSize
-              defaultValue={data?.label ?? ''}
-              onChange={onTextChange}
-              className={
-                'resize-none bg-background border-none p-1 rounded max-w-[200px]'
-              }
-            />
-          )}
-          {!selected && !!data?.label && (
-            <div
-              className={
-                'bg-background p-1 rounded max-w-[200px] break-all whitespace-pre-wrap'
-              }
-            >
-              {data?.label || 'Edge Label'}
-            </div>
-          )}
-        </div>
-      </EdgeLabelRenderer>
+      <EdgeLabel
+        label={data?.label ?? ''}
+        labelX={labelX}
+        labelY={labelY}
+        selected={!!selected}
+        onTextChange={onTextChange}
+      />
       {selected && (
-        <EdgeLabelRenderer>
-          <div
-            style={{
-              transform: `translate(-50%, -50%) translate(${labelX}px,${labelY - 30}px)`,
-              pointerEvents: 'all',
-            }}
-            className="nodrag nopan absolute bg-background shadow-lg px-1.5 py-1.5 rounded-lg flex gap-1"
-          >
-            <Button variant={'ghost'} size={'xs'} onClick={onDelete}>
-              <SquareX className={'w-4 h-4'} />
-            </Button>
-          </div>
-        </EdgeLabelRenderer>
+        <EdgeMenu labelX={labelX} labelY={labelY} onDelete={onDelete} />
       )}
     </>
   )
