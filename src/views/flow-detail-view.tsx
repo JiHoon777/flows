@@ -33,7 +33,7 @@ import {
   ContextMenu,
   ContextMenuModel,
   ContextMenuRef,
-} from '@/components/context-menu.tsx'
+} from '@/components/context-menu/context-menu.tsx'
 import { BezierEdge } from '@/components/flow-edge/bezier-edge.tsx'
 import { FlowNode } from '@/components/flow-node/flow-node'
 import { NoteNode } from '@/components/flow-node/note-node'

@@ -20,7 +20,7 @@ import {
   ContextMenu,
   ContextMenuModel,
   ContextMenuRef,
-} from '@/components/context-menu.tsx'
+} from '@/components/context-menu/context-menu.tsx'
 import { Input } from '@/components/ui/input.tsx'
 import { useOverlay } from '@/contexts/overlay/use-overlay.tsx'
 import { useOutsideClick } from '@/hooks/use-outside-click.ts'

@@ -15,7 +15,7 @@ import {
   ContextMenu,
   ContextMenuModel,
   ContextMenuRef,
-} from '@/components/context-menu.tsx'
+} from '@/components/context-menu/context-menu.tsx'
 import { NodeContent } from '@/components/flow-node/node-content.tsx'
 import { NodeIcon } from '@/components/flow-node/node-icon.tsx'
 import { useGetNodeDrawer } from '@/components/flow-node/useGetNodeDrawer.ts'

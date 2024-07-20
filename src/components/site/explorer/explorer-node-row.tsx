@@ -10,7 +10,7 @@ import {
   ContextMenu,
   ContextMenuModel,
   ContextMenuRef,
-} from '@/components/context-menu.tsx'
+} from '@/components/context-menu/context-menu.tsx'
 import { useOverlay } from '@/contexts/overlay/use-overlay.tsx'
 import { DoNode } from '@/store/node/do-node.ts'
 import { useStore } from '@/store/useStore.ts'
