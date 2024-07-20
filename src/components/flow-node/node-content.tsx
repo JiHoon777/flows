@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { ChangeEvent } from 'react'
 
 import { FlTextareaAutoSize } from '@/components/fl-textarea-auto-size.tsx'
 import { cn } from '@/utils/cn'
@@ -7,7 +7,7 @@ type NodeContentProps = {
   selected: boolean
   dragging: boolean
   title: string
-  onTitleChange: (value: string) => void
+  onChangeTitle: (e: ChangeEvent<HTMLTextAreaElement>) => void
   children: React.ReactNode
 }
 
@@ -15,7 +15,7 @@ export const NodeContent: React.FC<NodeContentProps> = ({
   selected,
   dragging,
   title,
-  onTitleChange,
+  onChangeTitle,
   children,
 }) => {
   return (
@@ -35,7 +35,7 @@ export const NodeContent: React.FC<NodeContentProps> = ({
             'overflow-hidden',
           )}
           defaultValue={title}
-          onChange={(e) => onTitleChange(e.target.value)}
+          onChange={onChangeTitle}
           draggable
         />
         {children}

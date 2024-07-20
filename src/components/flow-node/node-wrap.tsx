@@ -1,4 +1,4 @@
-import { PropsWithChildren, useCallback, useRef } from 'react'
+import { ChangeEvent, PropsWithChildren, useCallback, useRef } from 'react'
 
 import { Effect } from 'effect'
 import { observer } from 'mobx-react'
@@ -67,16 +67,16 @@ export const NodeWrap = observer(
     )
 
     const updateNodeTitle = useCallback(
-      (v: string) => {
+      (e: ChangeEvent<HTMLTextAreaElement>) => {
         drawer?.updateNodeTitle({
           id,
           type,
-          title: v,
+          title: e.target.value,
         })
       },
       [drawer, id, type],
     )
-    const debouncedUpdateNodeTitle = useDebounce(updateNodeTitle, 500)
+    const onChangeTitle = useDebounce(updateNodeTitle, 500)
 
     const handleRemove = useCallback(() => {
       open(({ isOpen, exit }) => (
@@ -115,7 +115,7 @@ export const NodeWrap = observer(
           selected={selected}
           dragging={dragging}
           title={data.title}
-          onTitleChange={debouncedUpdateNodeTitle}
+          onChangeTitle={onChangeTitle}
         >
           {children}
         </NodeContent>
