@@ -11,10 +11,10 @@ import {
 export const SiteLayout = () => {
   return (
     <Providers>
-      <div className={'flex w-screen h-screen overflow-hidden bg-background'}>
+      <div className={'flex h-screen w-screen overflow-hidden bg-background'}>
         <ResizablePanelGroup
           direction={'horizontal'}
-          className={'w-full h-screen'}
+          className={'h-screen w-full'}
         >
           <ResizablePanel className={'h-full'} minSize={1} defaultSize={15}>
             <Explorer />
