@@ -106,7 +106,7 @@ const ContextMenu = observer(
       return () => {
         document.removeEventListener('keydown', handleKeyDown)
       }
-    }, [activeIndex, isVisible, model])
+    }, [activeIndex, isVisible, model, position])
 
     if (!isVisible) return null
 
