@@ -97,6 +97,7 @@ export const NodeWrap = observer(
         className={cn(
           'relative z-[1] flex h-full w-full rounded !bg-background p-3',
         )}
+        onContextMenu={(e) => contextMenuRef.current?.show(e)}
       >
         <NodeIcon type={type} />
         <NodeResizer
