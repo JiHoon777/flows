@@ -66,5 +66,6 @@ module.exports = {
     'jsx-a11y/no-noninteractive-element-interactions': 'off',
     'jsx-a11y/role-supports-aria-props': 'off',
     'react/prop-types': 'off',
+    'jsx-a11y/no-noninteractive-tabindex': 'off',
   },
 }

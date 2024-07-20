@@ -18,10 +18,9 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { AlertModal } from '@/components/alert-modal.tsx'
 import {
   ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTrigger,
-} from '@/components/ui/context-menu.tsx'
+  ContextMenuModel,
+  ContextMenuRef,
+} from '@/components/context-menu.tsx'
 import { Input } from '@/components/ui/input.tsx'
 import { useOverlay } from '@/contexts/overlay/use-overlay.tsx'
 import { useOutsideClick } from '@/hooks/use-outside-click.ts'
@@ -43,6 +42,7 @@ export const ExplorerFlowRowItem = observer(
     const navigate = useNavigate()
     const { open } = useOverlay()
     const { flowId } = useParams<{ flowId?: string }>()
+    const contextMenuRef = useRef<ContextMenuRef | null>(null)
 
     const [isNameEditing, setIsNameEditing] = useState(false)
     const inputRef = useRef<HTMLInputElement | null>(null)
@@ -92,60 +92,62 @@ export const ExplorerFlowRowItem = observer(
       ))
     }
 
+    const contextmenuModel: ContextMenuModel = [
+      {
+        label: 'Rename ...',
+        command: () => {
+          setIsNameEditing(true)
+
+          setTimeout(() => {
+            inputRef.current?.focus()
+          }, 300)
+        },
+      },
+      {
+        label: 'Delete ...',
+        command: openDelete,
+      },
+    ]
+
     const isViewing = flow.id === flowId
     return (
-      <ContextMenu>
-        <ContextMenuTrigger>
-          <div
-            className={cn(
-              'site-left-explorer-row',
-              isViewing && 'site-left-explorer-selected-row',
-            )}
-            onClick={() => navigate(`/flows/${flow.id}`)}
-          >
-            <motion.div
-              initial={false}
-              animate={{ rotate: !isChildOpen ? 0 : 90 }}
-              transition={{ duration: 0.2 }}
-            >
-              <ChevronRight
-                className={'w-4 h-4 text-gray-500'}
-                onClick={() => setIsChildOpen((p) => !p)}
-              />
-            </motion.div>
-            <Input
-              ref={inputRef}
-              defaultValue={flow.title}
-              className={cn('h-5 pl-1', !isNameEditing && 'hidden')}
-              onChange={handleChangeName}
-              onKeyDown={handleKeyDown}
-            />
-            <span
-              className={cn(
-                'max-w-full truncate text-sm',
-                isNameEditing && 'hidden',
-              )}
-            >
-              {flow.title ?? '-'}
-            </span>
-            {isViewing && <span className={'absolute -right-4'}>👀</span>}
-          </div>
-        </ContextMenuTrigger>
-        <ContextMenuContent>
-          <ContextMenuItem
-            onClick={() => {
-              setIsNameEditing(true)
+      <div
+        className={cn(
+          'site-left-explorer-row',
+          isViewing && 'site-left-explorer-selected-row',
+        )}
+        onClick={() => navigate(`/flows/${flow.id}`)}
+        onContextMenu={(e) => contextMenuRef.current?.show(e)}
+      >
+        <motion.div
+          initial={false}
+          animate={{ rotate: !isChildOpen ? 0 : 90 }}
+          transition={{ duration: 0.2 }}
+        >
+          <ChevronRight
+            className={'h-4 w-4 text-gray-500'}
+            onClick={() => setIsChildOpen((p) => !p)}
+          />
+        </motion.div>
 
-              setTimeout(() => {
-                inputRef.current?.focus()
-              }, 300)
-            }}
-          >
-            Rename ...
-          </ContextMenuItem>
-          <ContextMenuItem onClick={openDelete}>Delete ...</ContextMenuItem>
-        </ContextMenuContent>
-      </ContextMenu>
+        <Input
+          ref={inputRef}
+          defaultValue={flow.title}
+          className={cn('h-5 pl-1', !isNameEditing && 'hidden')}
+          onChange={handleChangeName}
+          onKeyDown={handleKeyDown}
+        />
+        <span
+          className={cn(
+            'max-w-full truncate text-sm',
+            isNameEditing && 'hidden',
+          )}
+        >
+          {flow.title ?? '-'}
+        </span>
+        {isViewing && <span className={'absolute -right-4'}>👀</span>}
+        <ContextMenu ref={contextMenuRef} model={contextmenuModel} />
+      </div>
     )
   },
 )

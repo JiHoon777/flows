@@ -58,7 +58,7 @@ export const ExplorerFlowRow = observer(({ flow }: { flow: DoFlow }) => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className={'border-l ml-3.5 pl-0.5'}
+            className={'ml-3.5 border-l pl-0.5'}
             initial={{ height: 0 }}
             animate={{ height: 'auto' }}
             exit={{ height: 0 }}
