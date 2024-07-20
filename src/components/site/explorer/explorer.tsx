@@ -11,9 +11,9 @@ export const Explorer = observer(() => {
 
   const explorerList = store.explorerView.explorerList
   return (
-    <div className={'w-full flex flex-col gap-2 p-4 '}>
+    <div className={'flex w-full flex-col gap-2 p-4'}>
       <ExplorerToolbar />
-      <section className={'w-full flex flex-col gap-1.5'}>
+      <section className={'flex w-full flex-col gap-1.5'}>
         {explorerList.map((flow) =>
           flow instanceof DoFlow ? (
             <ExplorerFlowRow key={flow.id} flow={flow} />
