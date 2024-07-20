@@ -64,12 +64,12 @@ export const ExplorerToolbar = observer(() => {
             <ArrowUpNarrowWide className={cns.icon} />
           </div>
         </Button>
+        <Menu
+          ref={sortingMenuRef}
+          model={dropdownMenuModel}
+          variant={'dropdown'}
+        />
       </TooltipWrap>
-      <Menu
-        ref={sortingMenuRef}
-        model={dropdownMenuModel}
-        variant={'dropdown'}
-      />
       <ButtonWithTooltip
         variant={'ghost'}
         size={'icon'}
