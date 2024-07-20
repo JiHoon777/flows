@@ -24,8 +24,10 @@ import { ExplorerSortOption } from '@/store/views/explorer-view.ts'
 import { cn } from '@/utils/cn.ts'
 
 const cns = {
-  container: cn('w-full flex items-center justify-center'),
-  icon: cn('w-[1.1rem] h-[1.1rem] text-gray-500'),
+  container: cn('flex w-full items-center justify-center'),
+  icon: cn('h-[1.1rem] w-[1.1rem] text-gray-500'),
+  dropdownMenuItem: cn('relative pl-7 text-sm text-gray-500'),
+  dropdownMenuItemIcon: cn('absolute left-2 top-2 h-4 w-4'),
 }
 
 export const ExplorerToolbar = observer(() => {
@@ -58,10 +60,10 @@ export const ExplorerToolbar = observer(() => {
               <DropdownMenuItem
                 key={item}
                 onClick={() => explorerView.setSortOption(item)}
-                className={'relative text-gray-500 text-sm pl-7'}
+                className={cns.dropdownMenuItem}
               >
                 {explorerView.sortOption === item && (
-                  <Check className={'w-4 h-4 absolute top-2 left-2'} />
+                  <Check className={cns.dropdownMenuItemIcon} />
                 )}
                 {item}
               </DropdownMenuItem>

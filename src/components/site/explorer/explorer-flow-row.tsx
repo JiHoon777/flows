@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { observer } from 'mobx-react'
 
-import { ExplorerNodeRowItem } from '@/components/site/explorer/explorer-node-row-item.tsx'
+import { ExplorerFlowRowItem } from '@/components/site/explorer/explorer-flow-row-item.tsx'
 import { ExplorerNodeRow } from '@/components/site/explorer/explorer-node-row.tsx'
 import { DoFlow } from '@/store/flow/do-flow.ts'
 import { useStore } from '@/store/useStore.ts'
@@ -50,7 +50,7 @@ export const ExplorerFlowRow = observer(({ flow }: { flow: DoFlow }) => {
       exit={{ height: 0, opacity: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <ExplorerNodeRowItem
+      <ExplorerFlowRowItem
         flow={flow}
         isChildOpen={isOpen}
         setIsChildOpen={setIsOpen}

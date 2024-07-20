@@ -29,7 +29,7 @@ import { DoFlow } from '@/store/flow/do-flow.ts'
 import { useStore } from '@/store/useStore.ts'
 import { cn } from '@/utils/cn.ts'
 
-export const ExplorerNodeRowItem = observer(
+export const ExplorerFlowRowItem = observer(
   ({
     flow,
     isChildOpen,

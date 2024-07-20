@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/context-menu.tsx'
 import { useOverlay } from '@/contexts/overlay/use-overlay.tsx'
 import { useStore } from '@/store/useStore.ts'
-import { NodeType } from '@/types/base-type.ts'
+import { NodeType } from '@/types/base.type.ts'
 import { cn } from '@/utils/cn'
 
 type Props = PropsWithChildren & NodeProps & { type: NodeType | 'flow' }
