@@ -19,17 +19,17 @@ export const NodeContent: React.FC<NodeContentProps> = ({
   children,
 }) => {
   return (
-    <div className="border-border border border-dashed z-[1] relative w-full flex flex-col items-center gap-3">
+    <div className="relative z-[1] flex w-full flex-col items-center gap-3 border border-dashed border-border">
       <div
         className={cn(
-          'relative flex flex-col items-center w-full h-full px-2 pt-2',
-          'overflow-x-hidden overflow-y-auto scrollbar-hide',
+          'relative flex h-full w-full flex-col items-center px-2 pt-2',
+          'overflow-y-auto overflow-x-hidden scrollbar-hide',
           selected && 'nowheel',
         )}
       >
         <FlTextareaAutoSize
           className={cn(
-            'nodrag shrink-0 p-2 text-4xl w-full resize-none mx-2 mt-2 font-bold border-0 shadow-none',
+            'nodrag mx-2 mt-2 w-full shrink-0 resize-none border-0 p-2 text-4xl font-bold shadow-none',
             (!selected || dragging) && 'pointer-events-none',
             selected && dragging && 'pointer-events-none',
             'overflow-hidden',
