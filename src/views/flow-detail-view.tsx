@@ -94,25 +94,10 @@ const FlowDetailView_ = observer(({ flowId }: { flowId: string }) => {
     },
   })
 
-  /**
-   * 연결 시작 시 호출되는 함수
-   *
-   * 연결이 시작될 때 노드의 ID를 저장합니다.
-   *
-   * @param _ - 사용되지 않는 첫 번째 매개변수
-   * @param {Object} params - 노드 ID를 포함하는 객체
-   */
   const onConnectStart: OnConnectStart = useCallback((_, { nodeId }) => {
     connectingNodeId.current = nodeId
   }, [])
 
-  /**
-   * 연결 종료 시 호출되는 함수
-   *
-   * 연결이 종료될 때 자식 노드의 위치를 계산하고 새로운 자식 노드를 추가합니다.
-   *
-   * @param {MouseEvent | TouchEvent} event - 마우스 또는 터치 이벤트
-   */
   const onConnectEnd: OnConnectEnd = useCallback(
     (event) => {
       const target = event.target as Element
@@ -198,11 +183,7 @@ const FlowDetailView_ = observer(({ flowId }: { flowId: string }) => {
       navigate('/')
     }
   }, [flow, navigate])
-  /**
-   * 컴포넌트가 마운트될 때 초기화 함수 호출
-   *
-   * id가 변경될 때마다 initialize 함수를 호출합니다.
-   */
+
   useEffect(() => {
     if (!appStore.appLoaded) {
       return
@@ -247,61 +228,17 @@ const FlowDetailView_ = observer(({ flowId }: { flowId: string }) => {
   return (
     <main className={'h-screen w-full'}>
       <ReactFlow
-        /**
-         * 다이어그램에서 사용될 노드들을 정의합니다.
-         * 이 노드들은 화면에 렌더링되며, 상태 관리에서 가져온 값들입니다.
-         */
         nodes={nodes}
-        /**
-         * 다이어그램에서 사용될 엣지들을 정의합니다.
-         * 이 엣지들은 노드들 간의 연결을 나타내며, 상태 관리에서 가져온 값들입니다.
-         */
         edges={edges}
-        /**
-         * 사용자 정의 노드 타입을 정의합니다.
-         * 'mindMap' 타입의 노드를 사용하기 위해 커스텀 노드 컴포넌트를 설정합니다.
-         */
         nodeTypes={nodeTypes}
-        /**
-         * 사용자 정의 엣지 타입을 정의합니다.
-         * 'mindMap' 타입의 엣지를 사용하기 위해 커스텀 엣지 컴포넌트를 설정합니다.
-         */
         edgeTypes={edgeTypes}
-        /**
-         * 노드 변경 이벤트 핸들러를 설정합니다.
-         * 노드의 위치나 속성이 변경될 때 호출됩니다.
-         */
         onNodesChange={onNodesChange}
-        /**
-         * 엣지 변경 이벤트 핸들러를 설정합니다.
-         * 엣지의 연결 상태나 속성이 변경될 때 호출됩니다.
-         */
         onEdgesChange={onEdgesChange}
-        /**
-         * 연결 시작 이벤트 핸들러를 설정합니다.
-         * 노드 간의 연결이 시작될 때 호출됩니다.
-         */
         onConnectStart={onConnectStart}
-        /**
-         * 연결 종료 이벤트 핸들러를 설정합니다.
-         * 노드 간의 연결이 완료될 때 호출됩니다.
-         */
         onConnectEnd={onConnectEnd}
         onNodeDragStop={onNodeDragStop}
-        /**
-         * 노드의 원점을 설정합니다.
-         * 노드의 위치를 부모 노드에 상대적으로 설정할 때 사용됩니다.
-         */
         nodeOrigin={nodeOrigin}
-        /**
-         * 기본 엣지 옵션을 설정합니다.
-         * 모든 엣지에 공통적으로 적용될 스타일과 타입을 정의합니다.
-         */
         defaultEdgeOptions={defaultEdgeOptions}
-        /**
-         * 연결선의 타입을 설정합니다.
-         * 연결선의 종류를 설정하여 다양한 스타일의 연결선을 사용할 수 있습니다.
-         */
         connectionLineType={ConnectionLineType.Straight}
         onPaneContextMenu={onPaneContextMenu}
         onNodeContextMenu={(e) => {
@@ -310,18 +247,10 @@ const FlowDetailView_ = observer(({ flowId }: { flowId: string }) => {
         onEdgeContextMenu={(e) => {
           e.preventDefault()
         }}
-        /**
-         * 다이어그램을 뷰포트에 맞게 조정합니다.
-         * 초기 로드 시 다이어그램이 화면에 잘 맞게 조정됩니다.
-         */
         fitView
         zoomOnScroll={!hasSelectedNode}
         panOnDrag={!hasSelectedNode}
       >
-        {/**
-         * 다이어그램 컨트롤을 표시합니다.
-         * showInteractive 가 false 일 경우, 사용자가 상호작용할 수 없는 컨트롤만 표시됩니다.
-         */}
         <Controls showInteractive={false} />
         <Background />
         <ContextMenu ref={contextMenuRef} model={contextMenuModel} />
