@@ -17,10 +17,10 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import { AlertModal } from '@/components/alert-modal.tsx'
 import {
-  ContextMenu,
   ContextMenuModel,
   ContextMenuRef,
-} from '@/components/context-menu/context-menu.tsx'
+  Menu,
+} from '@/components/menu/menu.tsx'
 import { Input } from '@/components/ui/input.tsx'
 import { useOverlay } from '@/contexts/overlay/use-overlay.tsx'
 import { useOutsideClick } from '@/hooks/use-outside-click.ts'
@@ -146,7 +146,7 @@ export const ExplorerFlowRowItem = observer(
           {flow.title ?? '-'}
         </span>
         {isViewing && <span className={'absolute -right-4'}>👀</span>}
-        <ContextMenu ref={contextMenuRef} model={contextmenuModel} />
+        <Menu ref={contextMenuRef} model={contextmenuModel} />
       </div>
     )
   },

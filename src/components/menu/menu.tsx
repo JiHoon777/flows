@@ -12,7 +12,7 @@ import { observer } from 'mobx-react'
 import {
   ContextMenuItem,
   ContextMenuItems,
-} from '@/components/context-menu/context-menu-item.tsx'
+} from '@/components/menu/menu-item.tsx'
 import { Portal } from '@/components/portal.tsx'
 import { useOutsideClick } from '@/hooks/use-outside-click.ts'
 import { cn } from '@/utils/cn.ts'
@@ -27,7 +27,7 @@ interface ContextMenuRef {
   show: (event: React.MouseEvent | TouchEvent) => void
 }
 
-const ContextMenu = observer(
+const Menu = observer(
   forwardRef<ContextMenuRef, ContextMenuProps>(({ model }, ref) => {
     const [isVisible, setIsVisible] = useState(false)
     const [position, setPosition] = useState({ x: 0, y: 0 })
@@ -136,5 +136,5 @@ const ContextMenu = observer(
     )
   }),
 )
-export { ContextMenu }
+export { Menu }
 export type { ContextMenuProps, ContextMenuModel, ContextMenuRef }

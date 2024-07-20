@@ -29,16 +29,16 @@ import {
   useStoreApi,
 } from 'reactflow'
 
-import {
-  ContextMenu,
-  ContextMenuModel,
-  ContextMenuRef,
-} from '@/components/context-menu/context-menu.tsx'
 import { BezierEdge } from '@/components/flow-edge/bezier-edge.tsx'
 import { FlowNode } from '@/components/flow-node/flow-node'
 import { NoteNode } from '@/components/flow-node/note-node'
 import { TextNode } from '@/components/flow-node/text-node'
 import { BookLoading } from '@/components/loading/book-loading'
+import {
+  ContextMenuModel,
+  ContextMenuRef,
+  Menu,
+} from '@/components/menu/menu.tsx'
 import { DoFlow } from '@/store/flow/do-flow.ts'
 import { useStore } from '@/store/useStore.ts'
 
@@ -253,7 +253,7 @@ const FlowDetailView_ = observer(({ flowId }: { flowId: string }) => {
       >
         <Controls showInteractive={false} />
         <Background />
-        <ContextMenu ref={contextMenuRef} model={contextMenuModel} />
+        <Menu ref={contextMenuRef} model={contextMenuModel} />
       </ReactFlow>
     </main>
   )

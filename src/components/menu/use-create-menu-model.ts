@@ -1,8 +1,8 @@
 import { DependencyList, useMemo } from 'react'
 
-import { ContextMenuModel } from '@/components/context-menu/context-menu.tsx'
+import { ContextMenuModel } from '@/components/menu/menu.tsx'
 
-export const useCreateContextMenuModel = (
+export const useCreateMenuModel = (
   menuModel: () => ContextMenuModel,
   deps: DependencyList = [],
 ): ContextMenuModel => {

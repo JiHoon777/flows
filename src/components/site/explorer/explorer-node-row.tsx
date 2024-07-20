@@ -7,10 +7,10 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import { AlertModal } from '@/components/alert-modal.tsx'
 import {
-  ContextMenu,
   ContextMenuModel,
   ContextMenuRef,
-} from '@/components/context-menu/context-menu.tsx'
+  Menu,
+} from '@/components/menu/menu.tsx'
 import { useOverlay } from '@/contexts/overlay/use-overlay.tsx'
 import { DoNode } from '@/store/node/do-node.ts'
 import { useStore } from '@/store/useStore.ts'
@@ -56,7 +56,7 @@ export const ExplorerNodeRow = observer(({ node }: { node: DoNode }) => {
     >
       <span className={'max-w-full truncate text-sm'}>{node.title}</span>
       {isViewing && <span className={'absolute -right-4'}>👀</span>}
-      <ContextMenu ref={contextMenuRef} model={contextMenuModel} />
+      <Menu ref={contextMenuRef} model={contextMenuModel} />
     </motion.div>
   )
 })

@@ -5,7 +5,7 @@ import { observer } from 'mobx-react'
 
 import { cn } from '@/utils/cn.ts'
 
-interface ContextMenuItem {
+interface MenuItem {
   type?: 'item'
   label: string
   leftIcon?: React.ReactNode
@@ -17,7 +17,7 @@ interface ContextMenuSeparatorItem {
   type: 'separator'
 }
 
-export type ContextMenuItems = ContextMenuItem | ContextMenuSeparatorItem
+export type ContextMenuItems = MenuItem | ContextMenuSeparatorItem
 
 export const ContextMenuItem = observer(
   ({

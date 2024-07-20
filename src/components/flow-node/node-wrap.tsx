@@ -11,14 +11,14 @@ import {
 } from 'reactflow'
 
 import { AlertModal } from '@/components/alert-modal.tsx'
-import {
-  ContextMenu,
-  ContextMenuModel,
-  ContextMenuRef,
-} from '@/components/context-menu/context-menu.tsx'
 import { NodeContent } from '@/components/flow-node/node-content.tsx'
 import { NodeIcon } from '@/components/flow-node/node-icon.tsx'
 import { useGetNodeDrawer } from '@/components/flow-node/useGetNodeDrawer.ts'
+import {
+  ContextMenuModel,
+  ContextMenuRef,
+  Menu,
+} from '@/components/menu/menu.tsx'
 import { useOverlay } from '@/contexts/overlay/use-overlay.tsx'
 import { useDebounce } from '@/hooks/use-debounce.ts'
 import { useStore } from '@/store/useStore.ts'
@@ -134,7 +134,7 @@ export const NodeWrap = observer(
             selected && '!border-primary',
           )}
         />
-        <ContextMenu ref={contextMenuRef} model={contextMenuModel} />
+        <Menu ref={contextMenuRef} model={contextMenuModel} />
       </section>
     )
   },
