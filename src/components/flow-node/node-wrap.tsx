@@ -1,7 +1,6 @@
 import { PropsWithChildren, useCallback } from 'react'
 
 import { Effect } from 'effect'
-import { debounce } from 'lodash-es'
 import { observer } from 'mobx-react'
 import {
   Handle,
@@ -22,6 +21,7 @@ import {
   ContextMenuTrigger,
 } from '@/components/ui/context-menu.tsx'
 import { useOverlay } from '@/contexts/overlay/use-overlay.tsx'
+import { useDebounce } from '@/hooks/use-debounce.ts'
 import { useStore } from '@/store/useStore.ts'
 import { NodeType } from '@/types/base.type.ts'
 import { cn } from '@/utils/cn'
@@ -35,22 +35,27 @@ export const NodeWrap = observer(
 
     const drawer = useGetNodeDrawer(id, type)
 
-    const handleResizeEnd = useCallback(
+    const handleFlowNodeResizeEnd = useCallback(
       (
         _: ResizeDragEvent,
         { width, height }: { width: number; height: number },
       ) => {
-        if (type === 'flow') {
-          Effect.runPromise(
-            store.flowStore.updateFlow({
-              flowId: id,
-              changedFlow: { style: { width, height } },
-            }),
-          ).catch(store.showError)
-          // id, { style: { width, height } }
-          return
-        }
+        Effect.runPromise(
+          store.flowStore.updateFlow({
+            flowId: id,
+            changedFlow: { style: { width, height } },
+          }),
+        ).catch(store.showError)
+        // id, { style: { width, height } }
+      },
+      [id, store.flowStore, store.showError],
+    )
 
+    const handleElseNodeResizeEnd = useCallback(
+      (
+        _: ResizeDragEvent,
+        { width, height }: { width: number; height: number },
+      ) => {
         Effect.runPromise(
           store.nodeStore.updateNode({
             nodeId: id,
@@ -58,20 +63,20 @@ export const NodeWrap = observer(
           }),
         ).catch(store.showError)
       },
-      [id, store.flowStore, store.nodeStore, store.showError, type],
+      [id, store.nodeStore, store.showError],
     )
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const debouncedChangeHandler = useCallback(
-      debounce((v: string) => {
+    const updateNodeTitle = useCallback(
+      (v: string) => {
         drawer?.updateNodeTitle({
           id,
           type,
           title: v,
         })
-      }, 500),
-      [debounce, drawer],
+      },
+      [drawer, id, type],
     )
+    const debouncedUpdateNodeTitle = useDebounce(updateNodeTitle, 500)
 
     const handleRemove = useCallback(() => {
       open(({ isOpen, exit }) => (
@@ -88,7 +93,7 @@ export const NodeWrap = observer(
         <ContextMenuTrigger>
           <section
             className={cn(
-              'w-full h-full flex z-[1] relative !bg-background rounded p-3',
+              'relative z-[1] flex h-full w-full rounded !bg-background p-3',
             )}
           >
             <NodeIcon type={type} />
@@ -98,14 +103,18 @@ export const NodeWrap = observer(
               minHeight={100}
               lineClassName={'!border-transparent !border-[10px]'}
               handleClassName={'!border-transparent !bg-transparent'}
-              onResizeEnd={handleResizeEnd}
+              onResizeEnd={
+                type === 'flow'
+                  ? handleFlowNodeResizeEnd
+                  : handleElseNodeResizeEnd
+              }
             />
 
             <NodeContent
               selected={selected}
               dragging={dragging}
               title={data.title}
-              onTitleChange={debouncedChangeHandler}
+              onTitleChange={debouncedUpdateNodeTitle}
             >
               {children}
             </NodeContent>
@@ -113,7 +122,7 @@ export const NodeWrap = observer(
             <Handle
               type="target"
               position={Position.Top}
-              className={'!top-[50%] !pointer-events-none !opacity-0'}
+              className={'!pointer-events-none !top-[50%] !opacity-0'}
             />
             <Handle
               type="source"
