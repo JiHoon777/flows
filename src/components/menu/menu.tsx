@@ -91,7 +91,6 @@ const Menu = observer(
           nextIndex !== currentIndex
         )
 
-        console.log(nextIndex)
         return nextIndex
       }
 
