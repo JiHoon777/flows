@@ -56,6 +56,7 @@ const Menu = observer(
     useImperativeHandle(ref, () => ({
       show: (event: React.MouseEvent | TouchEvent) => {
         event.preventDefault()
+        event.stopPropagation()
 
         const isTouchEvent = 'touches' in event
         const x = isTouchEvent ? event.touches[0].clientX : event.clientX
