@@ -9,7 +9,9 @@ import { Switch } from '@/components/switch.tsx'
 import { useDebounce } from '@/hooks/use-debounce.ts'
 import { DoNode } from '@/store/node/do-node.ts'
 import { useStore } from '@/store/useStore.ts'
+import { KanbanNodeDetailView } from '@/views/node-detail-view/kanban-node-detail-view.tsx'
 import { NoteNodeDetailView } from '@/views/node-detail-view/note-node-detail-view.tsx'
+import { TableNodeDetailView } from '@/views/node-detail-view/table-node-detail-view.tsx'
 
 export const NodeDetailViewParamsWrap = observer(() => {
   const store = useStore()
@@ -42,6 +44,7 @@ export const NodeDetailView = observer(({ node }: { node: DoNode }) => {
   )
   const handleChangeTitle = useDebounce(changeTitle, 300)
 
+  console.log(node.type)
   return (
     <main className={'h-screen w-full overflow-y-auto'}>
       <div
@@ -64,10 +67,10 @@ export const NodeDetailView = observer(({ node }: { node: DoNode }) => {
             <NoteNodeDetailView node={node} />
           </Switch.Case>
           <Switch.Case is={'kanban'}>
-            <NoteNodeDetailView node={node} />
+            <KanbanNodeDetailView node={node} />
           </Switch.Case>
           <Switch.Case is={'table'}>
-            <NoteNodeDetailView node={node} />
+            <TableNodeDetailView node={node} />
           </Switch.Case>
           <Switch.Default>
             지원되지 않는 타입입니다. type : {node.type}

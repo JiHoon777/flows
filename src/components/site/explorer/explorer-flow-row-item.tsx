@@ -57,9 +57,7 @@ export const ExplorerFlowRowItem = observer(
           flow.store.updateFlow({
             flowId: flow.id,
             changedFlow: {
-              data: {
-                title: e.target.value,
-              },
+              title: e.target.value,
             },
           }),
         ).catch(store.showError)

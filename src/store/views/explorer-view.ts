@@ -45,7 +45,7 @@ export class ExplorerView {
           (flow) => !flow.parentFlowId,
         ),
         ...Object.values(this.rootStore.nodeStore.nodesMap).filter(
-          (node) => !node.parentFlowId && node.type === 'note',
+          (node) => !node.parentFlowId && node.type !== 'text',
         ),
       ],
       this.sortOption,
@@ -146,6 +146,6 @@ export class ExplorerView {
 
     return (flow.childNodeIds
       ?.map((id) => getNodeById(id))
-      .filter((cn) => !!cn && cn.type === 'note') ?? []) as DoNode[]
+      .filter((cn) => !!cn && cn.type !== 'text') ?? []) as DoNode[]
   }
 }
