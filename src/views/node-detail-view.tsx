@@ -1,14 +1,15 @@
-import { ChangeEvent, useCallback, useMemo } from 'react'
+import { ChangeEvent, useCallback } from 'react'
 
 import { Effect } from 'effect'
 import { observer } from 'mobx-react'
 import { useParams } from 'react-router-dom'
 
 import { FlTextareaAutoSize } from '@/components/fl-textarea-auto-size.tsx'
-import { LexicalEditor } from '@/components/lexical/lexical-editor.tsx'
+import { Switch } from '@/components/switch.tsx'
 import { useDebounce } from '@/hooks/use-debounce.ts'
 import { DoNode } from '@/store/node/do-node.ts'
 import { useStore } from '@/store/useStore.ts'
+import { NoteNodeDetailView } from '@/views/node-detail-view/note-node-detail-view.tsx'
 
 export const NodeDetailViewParamsWrap = observer(() => {
   const store = useStore()
@@ -41,32 +42,6 @@ export const NodeDetailView = observer(({ node }: { node: DoNode }) => {
   )
   const handleChangeTitle = useDebounce(changeTitle, 300)
 
-  const handleChangeContent = useCallback(
-    (v: string) => {
-      Effect.runPromise(
-        node.store.updateNode({
-          nodeId: node.id,
-          changedNode: {
-            content: v,
-          },
-        }),
-      ).catch((ex) => store.showError(ex))
-    },
-    [node.id, node.store, store],
-  )
-
-  const initialEditorState = useMemo(() => {
-    if (!node || node.snapshot.type !== 'note') {
-      return null
-    }
-
-    return node.snapshot.content ?? null
-  }, [node])
-
-  if (node.type !== 'note') {
-    return <div>{node.type} 은 내용 편집을 지원하지 않습니다.</div>
-  }
-
   return (
     <main className={'h-screen w-full overflow-y-auto'}>
       <div
@@ -84,11 +59,20 @@ export const NodeDetailView = observer(({ node }: { node: DoNode }) => {
             onChange={handleChangeTitle}
           />
         </header>
-        <LexicalEditor
-          showTreeView={false}
-          initialEditorState={initialEditorState}
-          onChange={handleChangeContent}
-        />
+        <Switch is={node.type}>
+          <Switch.Case is={'note'}>
+            <NoteNodeDetailView node={node} />
+          </Switch.Case>
+          <Switch.Case is={'kanban'}>
+            <NoteNodeDetailView node={node} />
+          </Switch.Case>
+          <Switch.Case is={'table'}>
+            <NoteNodeDetailView node={node} />
+          </Switch.Case>
+          <Switch.Default>
+            지원되지 않는 타입입니다. type : {node.type}
+          </Switch.Default>
+        </Switch>
       </div>
     </main>
   )
