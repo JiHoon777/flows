@@ -1,6 +1,6 @@
-import { useCallback, useState } from 'react'
+import { ReactNode, useCallback, useState } from 'react'
 
-import { IKanbanColumn, IKanbanData } from './kanban.type'
+import { IKanbanCard, IKanbanColumn, IKanbanData } from './kanban.type'
 import {
   closestCorners,
   DndContext,
@@ -19,24 +19,22 @@ import {
   SortableContext,
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable'
+import { nanoid } from 'nanoid'
 
-import { Column } from '@/components/kanban/column.tsx'
-import { Task } from '@/components/kanban/task.tsx'
+import { KanbanCard } from '@/components/kanban/kanban-card.tsx'
+import { KanbanColumn } from '@/components/kanban/kanban-column.tsx'
+import { useDidUpdate } from '@/hooks/use-did-update.ts'
 
-export const KanbanBoard = () => {
-  const [kanbanData, setKanbanData] = useState<IKanbanData>({
-    columns: [
-      { id: 'todo', title: 'Todo', cardIds: ['task1', 'task2'] },
-      { id: 'doing', title: 'Work in progress', cardIds: ['task3'] },
-      { id: 'done', title: 'Done', cardIds: ['task4'] },
-    ],
-    cards: {
-      task1: { id: 'task1', content: 'Task 1' },
-      task2: { id: 'task2', content: 'Task 2' },
-      task3: { id: 'task3', content: 'Task 3' },
-      task4: { id: 'task4', content: 'Task 4' },
-    },
-  })
+export const KanbanBoard = ({
+  data,
+  onChange,
+  renderCard,
+}: {
+  data: IKanbanData
+  onChange: (changed: IKanbanData) => void
+  renderCard?: (data: IKanbanCard) => ReactNode
+}) => {
+  const [kanbanData, setKanbanData] = useState<IKanbanData>(data)
 
   const [activeId, setActiveId] = useState<string | null>(null)
 
@@ -126,6 +124,20 @@ export const KanbanBoard = () => {
     setActiveId(null)
   }, [])
 
+  const addNewColumn = useCallback(() => {
+    setKanbanData((prev) => ({
+      ...prev,
+      columns: [
+        ...prev.columns,
+        { id: nanoid(), title: 'New Column', cardIds: [] },
+      ],
+    }))
+  }, [])
+
+  useDidUpdate(() => {
+    onChange(kanbanData)
+  }, [kanbanData])
+
   return (
     <DndContext
       sensors={sensors}
@@ -140,21 +152,32 @@ export const KanbanBoard = () => {
           strategy={horizontalListSortingStrategy}
         >
           {kanbanData.columns.map((column) => (
-            <Column
+            <KanbanColumn
               key={column.id}
               column={column}
               cards={column.cardIds.map((id) => kanbanData.cards[id])}
+              renderCard={renderCard}
             />
           ))}
         </SortableContext>
+        <div
+          className="ml-4 flex min-w-[280px] cursor-pointer items-center justify-center rounded-lg bg-background shadow-lg"
+          onClick={addNewColumn}
+        >
+          <span onClick={addNewColumn}>+ Add column</span>
+        </div>
       </div>
 
       <DragOverlay>
         {activeId ? (
           kanbanData.cards[activeId] ? (
-            <Task card={kanbanData.cards[activeId]} isDragging />
+            <KanbanCard
+              card={kanbanData.cards[activeId]}
+              isDragging
+              renderCard={renderCard}
+            />
           ) : (
-            <Column
+            <KanbanColumn
               column={
                 kanbanData.columns.find(
                   (col) => col.id === activeId,
@@ -165,6 +188,7 @@ export const KanbanBoard = () => {
                   .find((col) => col.id === activeId)
                   ?.cardIds.map((id) => kanbanData.cards[id]) || []
               }
+              renderCard={renderCard}
             />
           )
         ) : null}

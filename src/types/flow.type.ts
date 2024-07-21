@@ -1,6 +1,7 @@
 //
 // Flow Node
 //
+import { IKanbanData } from '@/components/kanban/kanban.type.ts'
 import { IEditableItemBase, IReactFlowNodeBase } from '@/types/base.type.ts'
 
 //
@@ -12,4 +13,6 @@ export interface IFlow extends IEditableItemBase, IReactFlowNodeBase {
 
   childNodeIds?: string[]
   childFlowIds?: string[]
+
+  kanbanData?: IKanbanData
 }

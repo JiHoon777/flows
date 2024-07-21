@@ -1,3 +1,5 @@
+import { ReactNode } from 'react'
+
 import { IKanbanCard } from './kanban.type'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
@@ -5,9 +7,10 @@ import { CSS } from '@dnd-kit/utilities'
 interface TaskProps {
   card: IKanbanCard
   isDragging?: boolean
+  renderCard?: (data: IKanbanCard) => ReactNode
 }
 
-export function Task({ card, isDragging }: TaskProps) {
+export function KanbanCard({ card, isDragging, renderCard }: TaskProps) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({
       id: card.id,
@@ -31,10 +34,7 @@ export function Task({ card, isDragging }: TaskProps) {
       {...listeners}
       className="mb-2 cursor-move rounded-md bg-white p-4 shadow-sm"
     >
-      {card.content}
-      {card.nodeReference && (
-        <div className="text-sm text-gray-500">Ref: {card.nodeReference}</div>
-      )}
+      {renderCard ? renderCard(card) : card.content}
     </div>
   )
 }

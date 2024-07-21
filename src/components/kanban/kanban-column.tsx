@@ -1,3 +1,5 @@
+import { ReactNode } from 'react'
+
 import { IKanbanCard, IKanbanColumn } from './kanban.type'
 import {
   SortableContext,
@@ -6,14 +8,15 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
-import { Task } from '@/components/kanban/task.tsx'
+import { KanbanCard } from '@/components/kanban/kanban-card.tsx'
 
 interface ColumnProps {
   column: IKanbanColumn
   cards: IKanbanCard[]
+  renderCard?: (data: IKanbanCard) => ReactNode
 }
 
-export function Column({ column, cards }: ColumnProps) {
+export function KanbanColumn({ column, cards, renderCard }: ColumnProps) {
   const {
     attributes,
     listeners,
@@ -38,7 +41,7 @@ export function Column({ column, cards }: ColumnProps) {
     <div
       ref={setNodeRef}
       style={style}
-      className={`mr-4 w-80 rounded-lg bg-gray-100 p-4 shadow-md ${isDragging ? 'opacity-50' : ''}`}
+      className={`mr-4 w-80 shrink-0 rounded-lg bg-gray-100 p-4 shadow-md ${isDragging ? 'opacity-50' : ''}`}
     >
       <h2 className="mb-4 cursor-move font-bold" {...attributes} {...listeners}>
         {column.title}
@@ -48,7 +51,7 @@ export function Column({ column, cards }: ColumnProps) {
         strategy={verticalListSortingStrategy}
       >
         {cards.map((card) => (
-          <Task key={card.id} card={card} />
+          <KanbanCard key={card.id} card={card} renderCard={renderCard} />
         ))}
       </SortableContext>
     </div>

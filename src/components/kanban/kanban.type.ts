@@ -6,8 +6,8 @@ export interface IKanbanColumn {
 
 export interface IKanbanCard {
   id: string
-  content: string
-  nodeReference?: string // Reference to an external node
+  content?: string
+  referenceId?: string // Reference to an external node
 }
 
 export interface IKanbanData {

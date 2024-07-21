@@ -31,7 +31,7 @@ export const FlowDetailViewParamsWrap = observer(() => {
 })
 
 const FlowDetailView = observer(({ flow }: { flow: DoFlow }) => {
-  const [viewType, setViewType] = useState<'reactFlow' | 'kanban'>('reactFlow')
+  const [viewType, setViewType] = useState<'reactFlow' | 'kanban'>('kanban')
 
   return (
     <div className={'relative h-screen w-full'}>
