@@ -8,7 +8,7 @@ import { DoNode } from '@/store/node/do-node.ts'
 import { useStore } from '@/store/useStore.ts'
 import { INoteNode } from '@/types/note-node.type.ts'
 
-export const NoteNodeDetailView = observer(({ node }: { node: DoNode }) => {
+export const NoteNodeView = observer(({ node }: { node: DoNode }) => {
   const store = useStore()
   const noteSnapshot = node.snapshot as INoteNode
 

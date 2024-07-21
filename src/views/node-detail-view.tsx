@@ -9,9 +9,9 @@ import { Switch } from '@/components/switch.tsx'
 import { useDebounce } from '@/hooks/use-debounce.ts'
 import { DoNode } from '@/store/node/do-node.ts'
 import { useStore } from '@/store/useStore.ts'
-import { KanbanNodeDetailView } from '@/views/node-detail-view/kanban-node-detail-view.tsx'
-import { NoteNodeDetailView } from '@/views/node-detail-view/note-node-detail-view.tsx'
-import { TableNodeDetailView } from '@/views/node-detail-view/table-node-detail-view.tsx'
+import { KanbanNodeView } from '@/views/node-detail-view/kanban-node-view.tsx'
+import { NoteNodeView } from '@/views/node-detail-view/note-node-view.tsx'
+import { TableNodeView } from '@/views/node-detail-view/table-node-view.tsx'
 
 export const NodeDetailViewParamsWrap = observer(() => {
   const store = useStore()
@@ -64,13 +64,13 @@ export const NodeDetailView = observer(({ node }: { node: DoNode }) => {
         </header>
         <Switch is={node.type}>
           <Switch.Case is={'note'}>
-            <NoteNodeDetailView node={node} />
+            <NoteNodeView node={node} />
           </Switch.Case>
           <Switch.Case is={'kanban'}>
-            <KanbanNodeDetailView node={node} />
+            <KanbanNodeView node={node} />
           </Switch.Case>
           <Switch.Case is={'table'}>
-            <TableNodeDetailView node={node} />
+            <TableNodeView node={node} />
           </Switch.Case>
           <Switch.Default>
             지원되지 않는 타입입니다. type : {node.type}

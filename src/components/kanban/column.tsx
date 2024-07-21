@@ -1,3 +1,4 @@
+import { IKanbanCard, IKanbanColumn } from './kanban.type'
 import {
   SortableContext,
   useSortable,
@@ -5,15 +6,14 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
-import { ColumnType, TaskType } from '@/components/kanban/kanban.type.ts'
 import { Task } from '@/components/kanban/task.tsx'
 
 interface ColumnProps {
-  column: ColumnType
-  tasks: TaskType[]
+  column: IKanbanColumn
+  cards: IKanbanCard[]
 }
 
-export function Column({ column, tasks }: ColumnProps) {
+export function Column({ column, cards }: ColumnProps) {
   const {
     attributes,
     listeners,
@@ -44,11 +44,11 @@ export function Column({ column, tasks }: ColumnProps) {
         {column.title}
       </h2>
       <SortableContext
-        items={tasks.map((task) => task.id)}
+        items={cards.map((card) => card.id)}
         strategy={verticalListSortingStrategy}
       >
-        {tasks.map((task) => (
-          <Task key={task.id} task={task} />
+        {cards.map((card) => (
+          <Task key={card.id} card={card} />
         ))}
       </SortableContext>
     </div>

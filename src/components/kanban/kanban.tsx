@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 
+import { IKanbanColumn, IKanbanData } from './kanban.type'
 import {
   closestCorners,
   DndContext,
@@ -20,23 +21,22 @@ import {
 } from '@dnd-kit/sortable'
 
 import { Column } from '@/components/kanban/column.tsx'
-import { ColumnType, TaskType } from '@/components/kanban/kanban.type.ts'
 import { Task } from '@/components/kanban/task.tsx'
 
-// Main KanbanBoard Component
-export function KanbanBoard() {
-  const [columns, setColumns] = useState<ColumnType[]>([
-    { id: 'todo', title: 'Todo' },
-    { id: 'doing', title: 'Work in progress' },
-    { id: 'done', title: 'Done' },
-  ])
-
-  const [tasks, setTasks] = useState<TaskType[]>([
-    { id: 'task1', columnId: 'todo', content: 'Task 1' },
-    { id: 'task2', columnId: 'todo', content: 'Task 2' },
-    { id: 'task3', columnId: 'doing', content: 'Task 3' },
-    { id: 'task4', columnId: 'done', content: 'Task 4' },
-  ])
+export const KanbanBoard = () => {
+  const [kanbanData, setKanbanData] = useState<IKanbanData>({
+    columns: [
+      { id: 'todo', title: 'Todo', cardIds: ['task1', 'task2'] },
+      { id: 'doing', title: 'Work in progress', cardIds: ['task3'] },
+      { id: 'done', title: 'Done', cardIds: ['task4'] },
+    ],
+    cards: {
+      task1: { id: 'task1', content: 'Task 1' },
+      task2: { id: 'task2', content: 'Task 2' },
+      task3: { id: 'task3', content: 'Task 3' },
+      task4: { id: 'task4', content: 'Task 4' },
+    },
+  })
 
   const [activeId, setActiveId] = useState<string | null>(null)
 
@@ -60,37 +60,45 @@ export function KanbanBoard() {
 
     if (activeId === overId) return
 
-    const isActiveATask = active.data.current?.type === 'Task'
-    const isOverATask = over.data.current?.type === 'Task'
-
-    if (!isActiveATask) return
-
-    // Dropping a Task over another Task
-    if (isActiveATask && isOverATask) {
-      setTasks((tasks) => {
-        const activeIndex = tasks.findIndex((t) => t.id === activeId)
-        const overIndex = tasks.findIndex((t) => t.id === overId)
-
-        if (tasks[activeIndex].columnId != tasks[overIndex].columnId) {
-          tasks[activeIndex].columnId = tasks[overIndex].columnId
-          return arrayMove(tasks, activeIndex, overIndex - 1)
-        }
-
-        return arrayMove(tasks, activeIndex, overIndex)
-      })
-    }
-
+    const isActiveACard = active.data.current?.type === 'Card'
+    const isOverACard = over.data.current?.type === 'Card'
     const isOverAColumn = over.data.current?.type === 'Column'
 
-    // Dropping a Task over a column
-    if (isActiveATask && isOverAColumn) {
-      setTasks((tasks) => {
-        const activeIndex = tasks.findIndex((t) => t.id === activeId)
+    if (!isActiveACard) return
 
-        tasks[activeIndex].columnId = overId
-        return arrayMove(tasks, activeIndex, activeIndex)
-      })
-    }
+    setKanbanData((prev) => {
+      const newData = { ...prev }
+
+      // Find the source and destination columns
+      const sourceColumn = newData.columns.find((col) =>
+        col.cardIds.includes(activeId),
+      )!
+      const destColumn = isOverACard
+        ? newData.columns.find((col) => col.cardIds.includes(overId))!
+        : newData.columns.find((col) => col.id === overId)!
+
+      if (sourceColumn.id === destColumn.id) {
+        // Moving within the same column
+        sourceColumn.cardIds = arrayMove(
+          sourceColumn.cardIds,
+          sourceColumn.cardIds.indexOf(activeId),
+          sourceColumn.cardIds.indexOf(overId),
+        )
+      } else {
+        // Moving to a different column
+        sourceColumn.cardIds = sourceColumn.cardIds.filter(
+          (id) => id !== activeId,
+        )
+        if (isOverACard) {
+          const overIndex = destColumn.cardIds.indexOf(overId)
+          destColumn.cardIds.splice(overIndex, 0, activeId)
+        } else if (isOverAColumn) {
+          destColumn.cardIds.push(activeId)
+        }
+      }
+
+      return newData
+    })
   }, [])
 
   const handleDragEnd = useCallback((event: DragEndEvent) => {
@@ -105,12 +113,13 @@ export function KanbanBoard() {
     const isActiveAColumn = active.data.current?.type === 'Column'
 
     if (isActiveAColumn) {
-      setColumns((columns) => {
-        const activeColumnIndex = columns.findIndex(
-          (col) => col.id === activeId,
-        )
-        const overColumnIndex = columns.findIndex((col) => col.id === overId)
-        return arrayMove(columns, activeColumnIndex, overColumnIndex)
+      setKanbanData((prev) => {
+        const oldIndex = prev.columns.findIndex((col) => col.id === activeId)
+        const newIndex = prev.columns.findIndex((col) => col.id === overId)
+        return {
+          ...prev,
+          columns: arrayMove(prev.columns, oldIndex, newIndex),
+        }
       })
     }
 
@@ -127,14 +136,14 @@ export function KanbanBoard() {
     >
       <div className="flex p-4">
         <SortableContext
-          items={columns.map((col) => col.id)}
+          items={kanbanData.columns.map((col) => col.id)}
           strategy={horizontalListSortingStrategy}
         >
-          {columns.map((column) => (
+          {kanbanData.columns.map((column) => (
             <Column
               key={column.id}
               column={column}
-              tasks={tasks.filter((task) => task.columnId === column.id)}
+              cards={column.cardIds.map((id) => kanbanData.cards[id])}
             />
           ))}
         </SortableContext>
@@ -142,15 +151,20 @@ export function KanbanBoard() {
 
       <DragOverlay>
         {activeId ? (
-          tasks.find((task) => task.id === activeId) ? (
-            <Task
-              task={tasks.find((task) => task.id === activeId) as TaskType}
-              isDragging
-            />
+          kanbanData.cards[activeId] ? (
+            <Task card={kanbanData.cards[activeId]} isDragging />
           ) : (
             <Column
-              column={columns.find((col) => col.id === activeId) as ColumnType}
-              tasks={tasks.filter((task) => task.columnId === activeId)}
+              column={
+                kanbanData.columns.find(
+                  (col) => col.id === activeId,
+                ) as IKanbanColumn
+              }
+              cards={
+                kanbanData.columns
+                  .find((col) => col.id === activeId)
+                  ?.cardIds.map((id) => kanbanData.cards[id]) || []
+              }
             />
           )
         ) : null}

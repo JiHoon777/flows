@@ -1,11 +1,16 @@
-// Types
-export interface ColumnType {
+export interface IKanbanColumn {
   id: string
   title: string
+  cardIds: string[]
 }
 
-export interface TaskType {
+export interface IKanbanCard {
   id: string
-  columnId: string
   content: string
+  nodeReference?: string // Reference to an external node
+}
+
+export interface IKanbanData {
+  columns: IKanbanColumn[]
+  cards: { [key: string]: IKanbanCard }
 }
