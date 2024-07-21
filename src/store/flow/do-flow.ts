@@ -6,7 +6,7 @@ import { DoFlowStore } from '@/store/flow/do-flow-store.ts'
 import { FlowDrawer } from '@/store/flow/flow-drawer.ts'
 import { DoNode } from '@/store/node/do-node.ts'
 import { assignIf } from '@/store/utils/store.utils.ts'
-import { Flow } from '@/types/flow.type.ts'
+import { IFlow } from '@/types/flow.type.ts'
 import { NodeTypes } from '@/types/types.ts'
 import { customMerge } from '@/utils/custom-merge.ts'
 
@@ -19,9 +19,9 @@ export class DoFlow {
   childFlowIds: string[] | null = null
   childNodeIds: string[] | null = null
 
-  snapshot!: Flow
+  snapshot!: IFlow
 
-  constructor(store: DoFlowStore, data: Flow) {
+  constructor(store: DoFlowStore, data: IFlow) {
     this.store = store
     this.drawer = new FlowDrawer(this)
 
@@ -40,7 +40,7 @@ export class DoFlow {
     return this.snapshot.flowId
   }
 
-  merge(changedData: Partial<Flow>) {
+  merge(changedData: Partial<IFlow>) {
     this.snapshot = customMerge(this.snapshot, changedData)
 
     if (typeof changedData.created_at === 'string') {
@@ -69,7 +69,7 @@ export class DoFlow {
   //
   // api
   //
-  createChildFlow(flow: Flow): Effect.Effect<DoFlow, AppError> {
+  createChildFlow(flow: IFlow): Effect.Effect<DoFlow, AppError> {
     return pipe(
       this.store.createFlow({ flow }),
       Effect.flatMap((createdFlow) =>

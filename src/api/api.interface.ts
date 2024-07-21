@@ -1,21 +1,21 @@
 import { Effect } from 'effect'
 
 import { AppError } from '@/api/error.ts'
-import { Flow } from '@/types/flow.type.ts'
+import { IFlow } from '@/types/flow.type.ts'
 import { NodeTypes } from '@/types/types.ts'
 
 interface IApiCommon {
   //
   // CRUD Flow
   //
-  createFlow(data: Flow): Effect.Effect<void, AppError>
-  getFlow(flowId: string): Effect.Effect<Flow, AppError>
+  createFlow(data: IFlow): Effect.Effect<void, AppError>
+  getFlow(flowId: string): Effect.Effect<IFlow, AppError>
   updateFlow(
-    data: Partial<Flow> & Pick<Flow, 'flowId'>,
+    data: Partial<IFlow> & Pick<IFlow, 'flowId'>,
   ): Effect.Effect<void, AppError, never>
   deleteFlow(flowId: string): Effect.Effect<void, AppError>
 
-  getAllFlows(): Effect.Effect<Flow[], AppError>
+  getAllFlows(): Effect.Effect<IFlow[], AppError>
 
   //
   // CRUD Node

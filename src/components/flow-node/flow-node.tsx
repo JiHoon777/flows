@@ -5,7 +5,6 @@ import { NodeWrap } from '@/components/flow-node/node-wrap'
 import { For } from '@/components/for.tsx'
 import { Card, CardHeader, CardTitle } from '@/components/ui/card.tsx'
 import { useStore } from '@/store/useStore.ts'
-import { FlowNodeData } from '@/types/flow.type.ts'
 import { cn } from '@/utils/cn.ts'
 
 const cns = {
@@ -15,7 +14,7 @@ const cns = {
   card: cn('w-[10rem]'),
 }
 
-export const FlowNode = observer((props: NodeProps<FlowNodeData>) => {
+export const FlowNode = observer((props: NodeProps) => {
   const { id } = props
   const store = useStore()
   const flow = store.flowStore.getFlowById(id)

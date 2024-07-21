@@ -12,8 +12,8 @@ import {
 } from 'reactflow'
 
 import { DoFlow } from '@/store/flow/do-flow.ts'
-import { NodeType, ReactFlowNodeTarget } from '@/types/base.type.ts'
-import { Flow } from '@/types/flow.type.ts'
+import { IReactFlowNodeTarget, NodeType } from '@/types/base.type.ts'
+import { IFlow } from '@/types/flow.type.ts'
 import { NodeTypes } from '@/types/types.ts'
 
 export class FlowDrawer {
@@ -173,7 +173,7 @@ export class FlowDrawer {
   }
   updateEdge(
     edgeId: string,
-    updatingEdgeData: Partial<Omit<ReactFlowNodeTarget, 'id'>>,
+    updatingEdgeData: Partial<Omit<IReactFlowNodeTarget, 'id'>>,
   ) {
     const updatingEdge = this.edges.find((edge) => edge.id === edgeId)
 
@@ -525,10 +525,10 @@ export class FlowDrawer {
    *
    * 존재하는 Flow, Node Data 로 react flow 를 그리기 위해 사용한다.
    *
-   * @param {Flow | NodeTypes} origin - 원본 데이터
+   * @param {IFlow | NodeTypes} origin - 원본 데이터
    * @returns {Object} - 변환된 Node 와 Edge 객체
    */
-  static convertToReactFlowNodeEdgeFromOrigin(origin: Flow | NodeTypes): {
+  static convertToReactFlowNodeEdgeFromOrigin(origin: IFlow | NodeTypes): {
     node: Node
     edges: Edge[]
   } {
@@ -574,7 +574,7 @@ export class FlowDrawer {
    */
   static initializeChildNodes(
     ids: string[],
-    getItem: (id: string) => Flow | NodeTypes | undefined,
+    getItem: (id: string) => IFlow | NodeTypes | undefined,
     creatingNodes: Node[],
     creatingEdges: Edge[],
   ) {
@@ -626,7 +626,7 @@ export class FlowDrawer {
     flowId: string
     parentFlowId: string
     position: XYPosition
-  }): Flow {
+  }): IFlow {
     return {
       flowId,
       created_at: new Date(),

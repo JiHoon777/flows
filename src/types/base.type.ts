@@ -1,4 +1,4 @@
-export interface EditableItemBase {
+export interface IEditableItemBase {
   created_at: Date
   updated_at: Date
   isTrashed?: boolean
@@ -7,13 +7,13 @@ export interface EditableItemBase {
 /**
  * Edge Data
  **/
-export interface ReactFlowNodeTarget {
+export interface IReactFlowNodeTarget {
   id: string
   label?: string
 }
 
-export interface ReactFlowNodeBase {
-  targets?: ReactFlowNodeTarget[]
+export interface IReactFlowNodeBase {
+  targets?: IReactFlowNodeTarget[]
   parentFlowId?: string | null
 
   position?: {
@@ -29,7 +29,7 @@ export interface ReactFlowNodeBase {
 export type NodeType = 'text' | 'note' | 'table' | 'kanban'
 export type ReactFlowNodeType = NodeType | 'flow'
 
-export interface NodeBase extends EditableItemBase, ReactFlowNodeBase {
+export interface INodeBase extends IEditableItemBase, IReactFlowNodeBase {
   nodeId: string
   type: NodeType
 }

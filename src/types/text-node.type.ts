@@ -1,9 +1,9 @@
 //
 // Card Node
 //
-import { NodeBase } from '@/types/base.type.ts'
+import { INodeBase } from '@/types/base.type.ts'
 
-export interface TextNode extends NodeBase {
+export interface ITextNode extends INodeBase {
   type: 'text'
   title: string
 }

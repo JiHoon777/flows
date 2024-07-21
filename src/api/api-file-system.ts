@@ -10,7 +10,7 @@ import { Effect, pipe } from 'effect'
 
 import { IApiFileSystem } from '@/api/api.interface.ts'
 import { FileSystemError, handleFileSystemError } from '@/api/error.ts'
-import { Flow } from '@/types/flow.type.ts'
+import { IFlow } from '@/types/flow.type.ts'
 import { NodeTypes } from '@/types/types.ts'
 
 const FLOW_DIR = `flows/flow`
@@ -57,18 +57,18 @@ export class ApiFileSystem implements IApiFileSystem {
   //
   // CRUD Flow
   //
-  createFlow(data: Flow): Effect.Effect<void, FileSystemError> {
+  createFlow(data: IFlow): Effect.Effect<void, FileSystemError> {
     return this.updateFlow(data)
   }
-  getFlow(flowId: string): Effect.Effect<Flow, FileSystemError> {
+  getFlow(flowId: string): Effect.Effect<IFlow, FileSystemError> {
     const filePath = `${FLOW_DIR}/${flowId}.json`
 
     return pipe(
-      this.readJsonFile<Flow>(filePath),
+      this.readJsonFile<IFlow>(filePath),
       Effect.catchAll(handleFileSystemError),
     )
   }
-  updateFlow(data: Partial<Flow> & Pick<Flow, 'flowId'>) {
+  updateFlow(data: Partial<IFlow> & Pick<IFlow, 'flowId'>) {
     const filePath = `${FLOW_DIR}/${data.flowId}.json`
 
     return pipe(
@@ -140,7 +140,7 @@ export class ApiFileSystem implements IApiFileSystem {
     )
   }
 
-  getAllFlows(): Effect.Effect<Flow[], FileSystemError> {
+  getAllFlows(): Effect.Effect<IFlow[], FileSystemError> {
     return pipe(
       Effect.tryPromise(() =>
         readDir(FLOW_DIR, { dir: BaseDirectory.Document }),
@@ -149,7 +149,7 @@ export class ApiFileSystem implements IApiFileSystem {
         files.filter((entry) => entry.name !== '.DS_Store'),
       ),
       Effect.flatMap((files) =>
-        Effect.all(files.map((file) => this.readJsonFile<Flow>(file.path))),
+        Effect.all(files.map((file) => this.readJsonFile<IFlow>(file.path))),
       ),
       Effect.catchAll(handleFileSystemError),
     )

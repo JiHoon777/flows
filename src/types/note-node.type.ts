@@ -1,9 +1,9 @@
 //
 // Note Node
 //
-import { NodeBase } from '@/types/base.type.ts'
+import { INodeBase } from '@/types/base.type.ts'
 
-export interface NoteNode extends NodeBase {
+export interface INoteNode extends INodeBase {
   type: 'note'
   title: string
   content?: string

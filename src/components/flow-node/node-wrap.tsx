@@ -17,17 +17,23 @@ import { useGetNodeDrawer } from '@/components/flow-node/useGetNodeDrawer.ts'
 import { Menu, MenuModel, MenuRef } from '@/components/menu/menu.tsx'
 import { useOverlay } from '@/contexts/overlay/use-overlay.tsx'
 import { useDebounce } from '@/hooks/use-debounce.ts'
+import { DoFlow } from '@/store/flow/do-flow.ts'
+import { DoNode } from '@/store/node/do-node.ts'
 import { useStore } from '@/store/useStore.ts'
-import { NodeType } from '@/types/base.type.ts'
+import { ReactFlowNodeType } from '@/types/base.type.ts'
 import { cn } from '@/utils/cn'
 
-type Props = PropsWithChildren & NodeProps & { type: NodeType | 'flow' }
+type Props = PropsWithChildren & NodeProps & { type: ReactFlowNodeType }
 
 export const NodeWrap = observer(
-  ({ children, selected, id, type, dragging, data }: Props) => {
+  ({ children, selected, id, type, dragging }: Props) => {
     const store = useStore()
     const { open } = useOverlay()
     const drawer = useGetNodeDrawer(id, type)
+    const origin: DoFlow | DoNode | undefined =
+      type === 'flow'
+        ? store.flowStore.getFlowById(id)
+        : store.nodeStore.getNodeById(id)
 
     const contextMenuRef = useRef<MenuRef | null>(null)
 
@@ -110,7 +116,7 @@ export const NodeWrap = observer(
         <NodeContent
           selected={selected}
           dragging={dragging}
-          title={data.title}
+          title={origin?.title}
           onChangeTitle={onChangeTitle}
         >
           {children}

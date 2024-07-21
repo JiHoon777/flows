@@ -32,9 +32,7 @@ export const NodeDetailView = observer(({ node }: { node: DoNode }) => {
         node.store.updateNode({
           nodeId: node.id,
           changedNode: {
-            data: {
-              title: e.target.value,
-            },
+            title: e.target.value,
           },
         }),
       ).catch((ex) => store.showError(ex))
@@ -49,9 +47,7 @@ export const NodeDetailView = observer(({ node }: { node: DoNode }) => {
         node.store.updateNode({
           nodeId: node.id,
           changedNode: {
-            data: {
-              content: v,
-            },
+            content: v,
           },
         }),
       ).catch((ex) => store.showError(ex))
@@ -64,7 +60,7 @@ export const NodeDetailView = observer(({ node }: { node: DoNode }) => {
       return null
     }
 
-    return node.snapshot.data.content ?? null
+    return node.snapshot.content ?? null
   }, [node])
 
   if (node.type !== 'note') {

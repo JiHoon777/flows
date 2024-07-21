@@ -5,7 +5,7 @@ import { action, makeObservable, observable, runInAction } from 'mobx'
 import { AppError, ClientError } from '@/api/error.ts'
 import { DoFlow } from '@/store/flow/do-flow.ts'
 import { RootStore } from '@/store/root-store.ts'
-import { Flow } from '@/types/flow.type.ts'
+import { IFlow } from '@/types/flow.type.ts'
 
 export class DoFlowStore {
   rootStore: RootStore
@@ -31,7 +31,7 @@ export class DoFlowStore {
   //
   // action
   //
-  merge(data: Flow) {
+  merge(data: IFlow) {
     const existing = this.flowsMap[data.flowId]
 
     if (!existing) {
@@ -46,7 +46,11 @@ export class DoFlowStore {
   // api
   //
 
-  createFlow({ flow }: { flow: Flow }): Effect.Effect<DoFlow, AppError, never> {
+  createFlow({
+    flow,
+  }: {
+    flow: IFlow
+  }): Effect.Effect<DoFlow, AppError, never> {
     const createdFlow = this.merge(flow)
 
     return pipe(
@@ -70,7 +74,7 @@ export class DoFlowStore {
     changedFlow,
   }: {
     flowId: string
-    changedFlow: Partial<Flow>
+    changedFlow: Partial<IFlow>
   }): Effect.Effect<DoFlow, AppError, never> {
     const existing = this.flowsMap[flowId]
 

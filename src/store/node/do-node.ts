@@ -3,7 +3,7 @@ import { action, makeObservable, observable } from 'mobx'
 import { DoNodeStore } from '@/store/node/do-node-store.ts'
 import { assignIf } from '@/store/utils/store.utils.ts'
 import { NodeType } from '@/types/base.type.ts'
-import { NodeTypes, ReactFlowNodeDataTypes } from '@/types/types.ts'
+import { NodeTypes } from '@/types/types.ts'
 import { customMerge } from '@/utils/custom-merge.ts'
 
 export class DoNode {
@@ -11,6 +11,7 @@ export class DoNode {
 
   // UI 렌더링 용이 아닌, 기존 인터페이스의 최신 데이터를 가지고 있는다.
   snapshot!: NodeTypes
+
   type!: NodeType
   title!: string
   parentFlowId: string | null = null
@@ -32,11 +33,7 @@ export class DoNode {
     return this.snapshot.nodeId
   }
 
-  merge(
-    changedData: Partial<Omit<NodeTypes, 'data'>> & {
-      data?: Partial<ReactFlowNodeDataTypes>
-    },
-  ) {
+  merge(changedData: Partial<NodeTypes>) {
     this.snapshot = customMerge(this.snapshot, changedData)
 
     if (typeof changedData.created_at === 'string') {
@@ -52,10 +49,8 @@ export class DoNode {
     assignIf(changedData, 'parentFlowId', (parentFlowId) => {
       this.parentFlowId = parentFlowId
     })
-    assignIf(changedData, 'data', (cd) => {
-      assignIf(cd, 'title', (title) => {
-        this.title = title
-      })
+    assignIf(changedData, 'title', (title) => {
+      this.title = title
     })
 
     return this

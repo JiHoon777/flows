@@ -63,9 +63,7 @@ export class ExplorerView {
           created_at: new Date(),
           updated_at: new Date(),
           childNodeIds: [],
-          data: {
-            title: 'Untitled',
-          },
+          title: 'Untitled',
         },
       }),
     ).catch((ex) => this.rootStore.showError(ex))

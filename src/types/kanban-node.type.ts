@@ -1,6 +1,6 @@
-import { NodeBase } from '@/types/base.type.ts'
+import { INodeBase } from '@/types/base.type.ts'
 
-export interface KanbanNode extends NodeBase {
+export interface IKanbanNode extends INodeBase {
   type: 'kanban'
   title: string
 }
