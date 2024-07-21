@@ -17,105 +17,11 @@ import {
   horizontalListSortingStrategy,
   SortableContext,
   sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
 
-// Types
-interface ColumnType {
-  id: string
-  title: string
-}
-
-interface TaskType {
-  id: string
-  columnId: string
-  content: string
-}
-
-// Task Component
-interface TaskProps {
-  task: TaskType
-  isDragging?: boolean
-}
-
-function Task({ task, isDragging }: TaskProps) {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({
-      id: task.id,
-      data: {
-        type: 'Task',
-        task,
-      },
-    })
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-  }
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      className="mb-2 cursor-move rounded-md bg-white p-4 shadow-sm"
-    >
-      {task.content}
-    </div>
-  )
-}
-
-// Column Component
-interface ColumnProps {
-  column: ColumnType
-  tasks: TaskType[]
-}
-
-function Column({ column, tasks }: ColumnProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
-    id: column.id,
-    data: {
-      type: 'Column',
-      column,
-    },
-  })
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  }
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={`mr-4 w-80 rounded-lg bg-gray-100 p-4 shadow-md ${isDragging ? 'opacity-50' : ''}`}
-    >
-      <h2 className="mb-4 cursor-move font-bold" {...attributes} {...listeners}>
-        {column.title}
-      </h2>
-      <SortableContext
-        items={tasks.map((task) => task.id)}
-        strategy={verticalListSortingStrategy}
-      >
-        {tasks.map((task) => (
-          <Task key={task.id} task={task} />
-        ))}
-      </SortableContext>
-    </div>
-  )
-}
+import { Column } from '@/components/kanban/column.tsx'
+import { ColumnType, TaskType } from '@/components/kanban/kanban.type.ts'
+import { Task } from '@/components/kanban/task.tsx'
 
 // Main KanbanBoard Component
 export function KanbanBoard() {
