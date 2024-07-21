@@ -3,7 +3,7 @@ import { action, makeObservable, observable } from 'mobx'
 import { DoNodeStore } from '@/store/node/do-node-store.ts'
 import { assignIf } from '@/store/utils/store.utils.ts'
 import { NodeType } from '@/types/base.type.ts'
-import { NodeDataTypes, NodeTypes } from '@/types/types.ts'
+import { NodeTypes, ReactFlowNodeDataTypes } from '@/types/types.ts'
 import { customMerge } from '@/utils/custom-merge.ts'
 
 export class DoNode {
@@ -34,7 +34,7 @@ export class DoNode {
 
   merge(
     changedData: Partial<Omit<NodeTypes, 'data'>> & {
-      data?: Partial<NodeDataTypes>
+      data?: Partial<ReactFlowNodeDataTypes>
     },
   ) {
     this.snapshot = customMerge(this.snapshot, changedData)

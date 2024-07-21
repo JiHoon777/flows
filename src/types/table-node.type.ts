@@ -1,7 +1,6 @@
-import { CommonNodeData, NodeBase } from '@/types/base.type.ts'
+import { NodeBase } from '@/types/base.type.ts'
 
-export interface TableNodeData extends CommonNodeData {}
-
-export interface TableNode extends NodeBase<TableNodeData> {
+export interface TableNode extends NodeBase {
   type: 'table'
+  title: string
 }

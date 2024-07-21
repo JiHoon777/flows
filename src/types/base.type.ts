@@ -29,17 +29,7 @@ export interface ReactFlowNodeBase {
 export type NodeType = 'text' | 'note' | 'table' | 'kanban'
 export type ReactFlowNodeType = NodeType | 'flow'
 
-export interface NodeBase<DATA_TYPE>
-  extends EditableItemBase,
-    ReactFlowNodeBase {
-  data: DATA_TYPE
+export interface NodeBase extends EditableItemBase, ReactFlowNodeBase {
   nodeId: string
   type: NodeType
-}
-
-//
-// Common Node Data
-//
-export interface CommonNodeData {
-  title: string
 }

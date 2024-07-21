@@ -1,7 +1,6 @@
-import { CommonNodeData, NodeBase } from '@/types/base.type.ts'
+import { NodeBase } from '@/types/base.type.ts'
 
-export interface KanbanNodeData extends CommonNodeData {}
-
-export interface KanbanNode extends NodeBase<KanbanNodeData> {
+export interface KanbanNode extends NodeBase {
   type: 'kanban'
+  title: string
 }

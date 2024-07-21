@@ -6,7 +6,7 @@ import { AppError } from '@/api/error.ts'
 import { DoNode } from '@/store/node/do-node.ts'
 import { RootStore } from '@/store/root-store.ts'
 import { Flow } from '@/types/flow.type.ts'
-import { NodeDataTypes, NodeTypes } from '@/types/types.ts'
+import { NodeTypes, ReactFlowNodeDataTypes } from '@/types/types.ts'
 
 export class DoNodeStore {
   rootStore: RootStore
@@ -71,7 +71,7 @@ export class DoNodeStore {
   }: {
     nodeId: string
     changedNode: Partial<Omit<Flow, 'data'>> & {
-      data?: Partial<NodeDataTypes>
+      data?: Partial<ReactFlowNodeDataTypes>
     }
   }): Effect.Effect<DoNode, AppError> {
     const existing = this.nodesMap[nodeId]

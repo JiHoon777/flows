@@ -24,12 +24,12 @@ export const FlowNode = observer((props: NodeProps<FlowNodeData>) => {
     <NodeWrap {...props} type={'flow'}>
       <div className={cns.container}>
         <p className={cns.desc}>
-          Cards: {(flow.childNodeIds ?? []).length}, Flow:{' '}
-          {(flow.childFlowIds ?? []).length}
+          Cards: {(flow?.childNodeIds ?? []).length}, Flow:{' '}
+          {(flow?.childFlowIds ?? []).length}
         </p>
         <div className={cns.content}>
           <For
-            each={flow.childNodeIds ?? []}
+            each={flow?.childNodeIds ?? []}
             map={(nodeId) => store.nodeStore.getNodeById(nodeId)}
           >
             {(node) => (

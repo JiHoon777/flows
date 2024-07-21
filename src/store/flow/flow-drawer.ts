@@ -13,8 +13,8 @@ import {
 
 import { DoFlow } from '@/store/flow/do-flow.ts'
 import { NodeType, ReactFlowNodeTarget } from '@/types/base.type.ts'
-import { Flow, FlowNodeData } from '@/types/flow.type.ts'
-import { NodeDataTypes, NodeTypes } from '@/types/types.ts'
+import { Flow } from '@/types/flow.type.ts'
+import { NodeTypes } from '@/types/types.ts'
 
 export class FlowDrawer {
   flow: DoFlow
@@ -317,7 +317,6 @@ export class FlowDrawer {
     const flow = FlowDrawer.createFlowNodeByReactFlowNode({
       flowId: reactFlowNode.id,
       parentFlowId: this.flow.id,
-      data: reactFlowNode.data as FlowNodeData,
       position,
     })
 
@@ -350,7 +349,6 @@ export class FlowDrawer {
       nodeId: reactFlowNode.id,
       type: nodeType,
       parentFlowId: this.flow.id,
-      data: reactFlowNode.data,
       position,
     })
 
@@ -385,7 +383,7 @@ export class FlowDrawer {
         this.flow.store.updateFlow({
           flowId: id,
           changedFlow: {
-            data: { title },
+            title,
           },
         }),
       ).catch(this.rootStore.showError)
@@ -394,7 +392,7 @@ export class FlowDrawer {
         this.rootStore.nodeStore.updateNode({
           nodeId: id,
           changedNode: {
-            data: { title },
+            title,
           },
         }),
       ).catch(this.rootStore.showError)
@@ -537,12 +535,12 @@ export class FlowDrawer {
     const node: Node = {
       id: 'flowId' in origin ? origin.flowId : origin.nodeId,
       type: 'flowId' in origin ? 'flow' : origin.type,
-      data: origin.data,
       position: origin.position ?? { x: 0, y: 0 },
       style: {
         width: origin.style?.width ?? DEFAULT_NODE_MIN_WIDTH,
         height: origin.style?.height ?? DEFAULT_NODE_MIN_HEIGHT,
       },
+      data: undefined,
     }
     const edges: Edge[] = []
 
@@ -623,19 +621,17 @@ export class FlowDrawer {
   static createFlowNodeByReactFlowNode({
     flowId,
     parentFlowId,
-    data,
     position,
   }: {
     flowId: string
     parentFlowId: string
-    data: FlowNodeData
     position: XYPosition
   }): Flow {
     return {
       flowId,
       created_at: new Date(),
       updated_at: new Date(),
-      data,
+      title: 'Untitled',
       position,
       parentFlowId,
       childNodeIds: [],
@@ -654,21 +650,19 @@ export class FlowDrawer {
     nodeId,
     type,
     parentFlowId,
-    data,
     position,
   }: {
     nodeId: string
     type: NodeType
     parentFlowId: string
-    data: NodeDataTypes
     position: XYPosition
   }): NodeTypes {
     return {
       nodeId,
+      title: 'Untitled',
       type,
       created_at: new Date(),
       updated_at: new Date(),
-      data,
       position,
       parentFlowId,
       style: {

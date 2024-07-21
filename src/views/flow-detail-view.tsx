@@ -56,30 +56,28 @@ const edgeTypes: EdgeTypes = {
 }
 
 export const FlowDetailViewParamsWrap = observer(() => {
+  const store = useStore()
   const { flowId } = useParams<{ flowId: string }>()
 
-  if (!flowId) {
-    throw new Error(`flowId 가 존재하지 않습니다.`)
+  const flow = store.flowStore.getFlowById(flowId ?? '-1')
+
+  if (!flow) {
+    return null
   }
 
-  return <FlowDetailView flowId={flowId} />
-})
-
-export const FlowDetailView = observer(({ flowId }: { flowId: string }) => {
   return (
     <ReactFlowProvider>
-      <FlowDetailView_ flowId={flowId} />
+      <FlowDetailView_ flow={flow} />
     </ReactFlowProvider>
   )
 })
 
-const FlowDetailView_ = observer(({ flowId }: { flowId: string }) => {
+const FlowDetailView_ = observer(({ flow }: { flow: DoFlow }) => {
   const appStore = useStore()
   const store = useStoreApi()
   const navigate = useNavigate()
   const { screenToFlowPosition } = useReactFlow()
   const connectingNodeId = useRef<string | null>(null)
-  const flow = appStore.flowStore.getFlowById(flowId) as DoFlow | undefined
   const drawer = flow?.drawer
   const [hasSelectedNode, setHasSelectedNode] = useState(false)
   const contextMenuRef = useRef<MenuRef | null>(null)

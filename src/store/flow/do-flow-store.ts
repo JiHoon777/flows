@@ -5,7 +5,7 @@ import { action, makeObservable, observable, runInAction } from 'mobx'
 import { AppError, ClientError } from '@/api/error.ts'
 import { DoFlow } from '@/store/flow/do-flow.ts'
 import { RootStore } from '@/store/root-store.ts'
-import { Flow, FlowNodeData } from '@/types/flow.type.ts'
+import { Flow } from '@/types/flow.type.ts'
 
 export class DoFlowStore {
   rootStore: RootStore
@@ -70,9 +70,7 @@ export class DoFlowStore {
     changedFlow,
   }: {
     flowId: string
-    changedFlow: Partial<Omit<Flow, 'data'>> & {
-      data?: Partial<FlowNodeData>
-    }
+    changedFlow: Partial<Flow>
   }): Effect.Effect<DoFlow, AppError, never> {
     const existing = this.flowsMap[flowId]
 

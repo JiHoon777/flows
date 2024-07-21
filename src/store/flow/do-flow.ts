@@ -6,7 +6,7 @@ import { DoFlowStore } from '@/store/flow/do-flow-store.ts'
 import { FlowDrawer } from '@/store/flow/flow-drawer.ts'
 import { DoNode } from '@/store/node/do-node.ts'
 import { assignIf } from '@/store/utils/store.utils.ts'
-import { Flow, FlowNodeData } from '@/types/flow.type.ts'
+import { Flow } from '@/types/flow.type.ts'
 import { NodeTypes } from '@/types/types.ts'
 import { customMerge } from '@/utils/custom-merge.ts'
 
@@ -40,11 +40,7 @@ export class DoFlow {
     return this.snapshot.flowId
   }
 
-  merge(
-    changedData: Partial<Omit<Flow, 'data'>> & {
-      data?: Partial<FlowNodeData>
-    },
-  ) {
+  merge(changedData: Partial<Flow>) {
     this.snapshot = customMerge(this.snapshot, changedData)
 
     if (typeof changedData.created_at === 'string') {
@@ -54,6 +50,9 @@ export class DoFlow {
       this.snapshot.updated_at = new Date(changedData.updated_at)
     }
 
+    assignIf(changedData, 'title', (title) => {
+      this.title = title
+    })
     assignIf(changedData, 'parentFlowId', (parentFlowId) => {
       this.parentFlowId = parentFlowId
     })
@@ -62,11 +61,6 @@ export class DoFlow {
     })
     assignIf(changedData, 'childNodeIds', (childNodeIds) => {
       this.childNodeIds = childNodeIds
-    })
-    assignIf(changedData, 'data', (data) => {
-      assignIf(data, 'title', (title) => {
-        this.title = title
-      })
     })
 
     return this
