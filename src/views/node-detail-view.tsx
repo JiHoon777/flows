@@ -5,13 +5,10 @@ import { observer } from 'mobx-react'
 import { useParams } from 'react-router-dom'
 
 import { FlTextareaAutoSize } from '@/components/fl-textarea-auto-size.tsx'
-import { Switch } from '@/components/switch.tsx'
 import { useDebounce } from '@/hooks/use-debounce.ts'
 import { DoNode } from '@/store/node/do-node.ts'
 import { useStore } from '@/store/useStore.ts'
-import { KanbanNodeView } from '@/views/node-detail-view/kanban-node-view.tsx'
 import { NoteNodeView } from '@/views/node-detail-view/note-node-view.tsx'
-import { TableNodeView } from '@/views/node-detail-view/table-node-view.tsx'
 
 export const NodeDetailViewParamsWrap = observer(() => {
   const store = useStore()
@@ -44,7 +41,6 @@ export const NodeDetailView = observer(({ node }: { node: DoNode }) => {
   )
   const handleChangeTitle = useDebounce(changeTitle, 300)
 
-  console.log(node.type)
   return (
     <main className={'h-screen w-full overflow-y-auto'}>
       <div
@@ -62,20 +58,7 @@ export const NodeDetailView = observer(({ node }: { node: DoNode }) => {
             onChange={handleChangeTitle}
           />
         </header>
-        <Switch is={node.type}>
-          <Switch.Case is={'note'}>
-            <NoteNodeView node={node} />
-          </Switch.Case>
-          <Switch.Case is={'kanban'}>
-            <KanbanNodeView node={node} />
-          </Switch.Case>
-          <Switch.Case is={'table'}>
-            <TableNodeView node={node} />
-          </Switch.Case>
-          <Switch.Default>
-            지원되지 않는 타입입니다. type : {node.type}
-          </Switch.Default>
-        </Switch>
+        <NoteNodeView node={node} />
       </div>
     </main>
   )
