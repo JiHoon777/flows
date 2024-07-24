@@ -185,30 +185,28 @@ export const useDraggableBlockMenu = (
     hideTargetLine(targetLineRef.current)
   }
 
-  const height = draggableBlockElem?.clientHeight ?? undefined
+  // const height = draggableBlockElem?.clientHeight ?? undefined
   return (
     <Portal containerEl={anchorElem}>
-      <div style={{ height }}>
-        <div
+      <div
+        className={cn(
+          'absolute left-0 top-0 cursor-grab rounded opacity-0 will-change-transform',
+          'hover:bg-[#efefef] active:cursor-grabbing',
+        )}
+        ref={menuRef}
+        draggable={true}
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
+      >
+        <GripVertical
           className={cn(
-            'rounded cursor-grab opacity-0 absolute left-0 top-0 will-change-transform',
-            'active:cursor-grabbing hover:bg-[#efefef]',
+            'pointer-events-none !h-5 !w-5 opacity-30',
+            !isEditable && 'hidden',
           )}
-          ref={menuRef}
-          draggable={true}
-          onDragStart={onDragStart}
-          onDragEnd={onDragEnd}
-        >
-          <GripVertical
-            className={cn(
-              '!w-5 !h-5 opacity-30 pointer-events-none',
-              !isEditable && 'hidden',
-            )}
-          />
-        </div>
+        />
       </div>
       <div
-        className="pointer-events-none bg-[deepskyblue] h-0.5 absolute left-0 top-0 opacity-0 will-change-transform"
+        className="pointer-events-none absolute left-0 top-0 h-0.5 bg-[deepskyblue] opacity-0 will-change-transform"
         ref={targetLineRef}
       />
     </Portal>

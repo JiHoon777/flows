@@ -42,7 +42,7 @@ export const NodeDetailView = observer(({ node }: { node: DoNode }) => {
   const handleChangeTitle = useDebounce(changeTitle, 300)
 
   return (
-    <main className={'h-screen w-full overflow-y-auto'}>
+    <main className={'h-screen w-full overflow-y-auto scrollbar-hide'}>
       <div
         className={
           'mx-auto mb-6 mt-10 flex w-full max-w-[1024px] flex-col gap-3'

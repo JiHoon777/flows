@@ -118,13 +118,13 @@ const LexicalEditor_ = observer(
               <div ref={onRef}>
                 <ContentEditable
                   className={
-                    'w-full min-h-[90vh] border-none outline-none px-7 py-3'
+                    'min-h-[90vh] w-full border-none px-7 py-3 outline-none'
                   }
                 />
               </div>
             }
             placeholder={
-              <div className={'absolute top-0 left-0'}>Enter some text...</div>
+              <div className={'absolute left-0 top-0'}>Enter some text...</div>
             }
             ErrorBoundary={LexicalErrorBoundary}
           />
