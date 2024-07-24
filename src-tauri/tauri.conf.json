@@ -78,7 +78,9 @@
         "resizable": true,
         "title": "flows",
         "width": 800,
-        "fileDropEnabled": false
+        "fileDropEnabled": false,
+        "hiddenTitle": true,
+        "titleBarStyle": "Overlay"
       }
     ]
   }
