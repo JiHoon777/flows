@@ -11,7 +11,9 @@ export const Explorer = observer(() => {
 
   const explorerList = store.explorerView.explorerList
   return (
-    <div className={'flex w-full flex-col gap-2 p-4'}>
+    <div className={'flex w-full flex-col gap-2'}>
+      {/* System Header Area */}
+      <div className={'ml-20 h-7'}></div>
       <ExplorerToolbar />
       <section className={'flex w-full flex-col gap-1.5'}>
         {explorerList.map((flow) =>

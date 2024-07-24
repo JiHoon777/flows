@@ -6,7 +6,7 @@ import {
   useState,
 } from 'react'
 
-import { Map, NotebookPen, Table, Type } from 'lucide-react'
+import { Map, NotebookPen, Type } from 'lucide-react'
 import { observer } from 'mobx-react'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -191,24 +191,6 @@ export const FlowReactFlowView = observer(({ flow }: { flow: DoFlow }) => {
           position: screenToFlowPosition({ x, y }),
         }),
     },
-    {
-      leftIcon: <Table className={'h-4 w-4'} />,
-      label: 'Create Table',
-      command: ({ contextMenuPosition: { x, y } }) =>
-        drawer?.addNode({
-          nodeType: 'table',
-          position: screenToFlowPosition({ x, y }),
-        }),
-    },
-    // {
-    //   leftIcon: <Kanban className={'h-4 w-4'} />,
-    //   label: 'Create Kanban',
-    //   command: ({ contextMenuPosition: { x, y } }) =>
-    //     drawer?.addNode({
-    //       nodeType: 'kanban',
-    //       position: screenToFlowPosition({ x, y }),
-    //     }),
-    // },
   ]
 
   if (!drawer?.loaded) {

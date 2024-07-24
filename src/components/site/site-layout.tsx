@@ -16,7 +16,7 @@ export const SiteLayout = () => {
           direction={'horizontal'}
           className={'h-screen w-full'}
         >
-          <ResizablePanel className={'h-full'} minSize={1} defaultSize={15}>
+          <ResizablePanel className={'h-full'} minSize={10} defaultSize={15}>
             <Explorer />
           </ResizablePanel>
           <ResizableHandle withHandle />
