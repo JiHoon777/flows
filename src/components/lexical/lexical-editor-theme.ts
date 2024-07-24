@@ -105,7 +105,7 @@ export const lexicalEditorTheme: EditorThemeClasses = {
   tableSelection: 'PlaygroundEditorTheme__tableSelection',
   text: {
     bold: 'font-bold',
-    code: 'bg-[rgb(240,242,245)] py-px px-1 text-[0.94rem]',
+    code: 'bg-[rgb(240,242,245)] py-px px-1 text-[0.94rem] text-red-500 rounded',
     italic: 'italic',
     strikethrough: 'line-through decoration-wavy',
     subscript: 'text-sm align-sub',
