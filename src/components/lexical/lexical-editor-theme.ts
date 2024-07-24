@@ -7,9 +7,9 @@ export const lexicalEditorTheme: EditorThemeClasses = {
   blockCursor: 'PlaygroundEditorTheme__blockCursor',
   characterLimit: 'PlaygroundEditorTheme__characterLimit',
   code: cn(
-    'relative mx-0 my-2 block overflow-x-auto bg-[rgb(240,242,245)] py-2 pl-[52px] pr-2 text-sm',
-    'before:absolute before:left-0 before:top-0 before:bg-[#eee] before:content-[attr(data-gutter)]',
-    'before:min-w[25px] before:whitespace-pre-wrap before:border-r before:border-[#ccc] before:p-2 before:text-right before:text-[#777]',
+    'relative mx-0 my-2 block overflow-x-auto rounded border border-border bg-background py-2 pl-[52px] pr-2 text-sm text-foreground',
+    'before:absolute before:left-0 before:top-0 before:bg-background before:content-[attr(data-gutter)]',
+    'before:min-w[25px] before:whitespace-pre-wrap before:border-r before:border-border before:p-2 before:text-right before:text-foreground',
   ),
   codeHighlight: {
     atrule: 'text-[#07a]',
