@@ -42,7 +42,6 @@ import { INSERT_COLLAPSIBLE_COMMAND } from '@/components/lexical/plugins/collaps
 import { ComponentPickerMenuItem } from '@/components/lexical/plugins/component-picker-menu-plugin/component-picker-menu-item.tsx'
 import { ComponentPickerOption } from '@/components/lexical/plugins/component-picker-menu-plugin/component-picker-option.ts'
 import { INSERT_EXCALIDRAW_COMMAND } from '@/components/lexical/plugins/excalidraw-plugin.tsx'
-import { cn } from '@/utils/cn.ts'
 
 export const ComponentPickerMenuPlugin = () => {
   const [editor] = useLexicalComposerContext()
@@ -101,7 +100,7 @@ export const ComponentPickerMenuPlugin = () => {
                 <div>
                   <ul
                     className={
-                      'flex flex-col gap-2 w-[17.5rem] bg-background shadow-lg rounded-xl p-4 h-[300px] overflow-y-auto'
+                      'flex h-[300px] w-[17.5rem] flex-col gap-2 overflow-y-auto rounded-xl bg-background p-4 shadow-lg'
                     }
                   >
                     {options.map((option, i: number) => (
@@ -130,7 +129,7 @@ export const ComponentPickerMenuPlugin = () => {
   )
 }
 
-const baseClassName = 'text-foreground'
+const baseClassName = 'text-foreground w-4 h-4'
 
 function getBaseOptions(editor: LexicalEditor) {
   return [
@@ -215,7 +214,7 @@ function getBaseOptions(editor: LexicalEditor) {
         }),
     }),
     new ComponentPickerOption('Divider', {
-      icon: <DividerHorizontalIcon className={cn(baseClassName, 'w-6 h-6')} />,
+      icon: <DividerHorizontalIcon className={baseClassName} />,
       keywords: ['horizontal rule', 'divider', 'hr'],
       onSelect: () =>
         editor.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, undefined),
