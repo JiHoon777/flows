@@ -7,9 +7,9 @@ export const lexicalEditorTheme: EditorThemeClasses = {
   blockCursor: 'PlaygroundEditorTheme__blockCursor',
   characterLimit: 'PlaygroundEditorTheme__characterLimit',
   code: cn(
-    'bg-[rgb(240,242,245)] block py-2 pr-2 pl-[52px] text-sm mx-0 my-2 overflow-x-auto relative ',
-    'before:content-[attr(data-gutter)] before:absolute before:bg-[#eee] before:left-0 before:top-0 ',
-    'before:border-r before:border-[#ccc] before:p-2 before:text-[#777] before:whitespace-pre-wrap before:text-right before:min-w[25px]',
+    'relative mx-0 my-2 block overflow-x-auto bg-[rgb(240,242,245)] py-2 pl-[52px] pr-2 text-sm',
+    'before:absolute before:left-0 before:top-0 before:bg-[#eee] before:content-[attr(data-gutter)]',
+    'before:min-w[25px] before:whitespace-pre-wrap before:border-r before:border-[#ccc] before:p-2 before:text-right before:text-[#777]',
   ),
   codeHighlight: {
     atrule: 'text-[#07a]',
@@ -50,12 +50,12 @@ export const lexicalEditorTheme: EditorThemeClasses = {
   hashtag:
     'bg-[rgba(88,144,255,0.15)] border-b border-[rgba(88, 144, 255, 0.3)]',
   heading: {
-    h1: 'text-6xl text-foreground font-bold my-6',
-    h2: 'text-5xl text-foreground font-bold my-5',
-    h3: 'text-4xl text-foreground font-bold my-4',
-    h4: 'text-3xl text-foreground font-bold my-3',
-    h5: 'text-2xl text-foreground font-bold my-2',
-    h6: 'text-1xl text-foreground font-bold my-1',
+    h1: 'text-4xl text-foreground font-bold my-6',
+    h2: 'text-3xl text-foreground font-bold my-5',
+    h3: 'text-2xl text-foreground font-bold my-4',
+    h4: 'text-xl text-foreground font-bold my-3',
+    h5: 'text-lg text-foreground font-bold my-2',
+    h6: 'text-base text-foreground font-bold my-1',
   },
   hr: 'PlaygroundEditorTheme__hr',
   image: 'editor-image',
