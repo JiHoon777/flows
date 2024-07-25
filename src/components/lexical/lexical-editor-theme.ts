@@ -88,7 +88,7 @@ export const lexicalEditorTheme: EditorThemeClasses = {
   markOverlap: 'PlaygroundEditorTheme__markOverlap',
   paragraph: 'm-0 relative',
   quote:
-    'm-0 ml-5 mb-2.5 text-[15px] text-[rgb(101, 103, 107)] border-[rgb(206,208,212)] border-left-[4px] pl-4',
+    'm-0 ml-5 mb-2.5 text-[15px] text-[rgb(101, 103, 107)] border-border border-l-[4px] pl-4',
   rtl: 'text-right',
   table: 'PlaygroundEditorTheme__table',
   tableCell: 'PlaygroundEditorTheme__tableCell',
