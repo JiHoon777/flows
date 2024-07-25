@@ -24,7 +24,6 @@
     height: 16px;
     top: 3px;
     left: 0;
-    cursor: pointer !important;
     display: block;
     background-size: cover;
     position: absolute;
@@ -68,6 +67,10 @@
     height: 6px;
     transform: rotate(45deg);
     border-width: 0 2px 2px 0;
+  }
+
+  .EditorTheme__nestedListItem:before {
+    display: none;
   }
 
   //

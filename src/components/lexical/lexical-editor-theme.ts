@@ -70,7 +70,8 @@ export const lexicalEditorTheme: EditorThemeClasses = {
     listitemChecked: 'EditorTheme__listItemChecked',
     listitemUnchecked: 'EditorTheme__listItemUnChecked',
     nested: {
-      listitem: 'list-none before:hidden after:hidden',
+      listitem:
+        'EditorTheme__nestedListItem list-none before:hidden after:hidden',
     },
     olDepth: [
       'p-0 m-0 list-outside',
