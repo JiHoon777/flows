@@ -3,6 +3,7 @@ import { lazy, Suspense } from 'react'
 import { observer } from 'mobx-react'
 import { Route, Routes } from 'react-router-dom'
 
+import { RegisterGlobalHotkeys } from '@/components/hotkey/RegisterGlobalHotkeys.tsx'
 import { BookLoading } from '@/components/loading/book-loading.tsx'
 
 const SiteLayout = lazy(() =>
@@ -23,14 +24,17 @@ const NodeDetailView = lazy(() =>
 
 export const AppRoutes = observer(() => {
   return (
-    <Suspense fallback={<BookLoading />}>
-      <Routes>
-        <Route path={'/'} element={<SiteLayout />}>
-          <Route index element={null} />
-          <Route path={'flows/:flowId'} element={<FlowDetailView />} />
-          <Route path={'nodes/:nodeId'} element={<NodeDetailView />} />
-        </Route>
-      </Routes>
-    </Suspense>
+    <>
+      <RegisterGlobalHotkeys />
+      <Suspense fallback={<BookLoading />}>
+        <Routes>
+          <Route path={'/'} element={<SiteLayout />}>
+            <Route index element={null} />
+            <Route path={'flows/:flowId'} element={<FlowDetailView />} />
+            <Route path={'nodes/:nodeId'} element={<NodeDetailView />} />
+          </Route>
+        </Routes>
+      </Suspense>
+    </>
   )
 })

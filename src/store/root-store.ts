@@ -13,6 +13,8 @@ const isPrimitive = (value: any) =>
   value === null || (typeof value !== 'object' && typeof value !== 'function')
 
 export class RootStore {
+  private fontSizeStep: number = 1
+
   appLoaded: boolean = false
   failAppLoaded: boolean = false
 
@@ -50,6 +52,16 @@ export class RootStore {
     console.error(
       `errorMessage: ${errorMessage},\n\n errorOrigin: ${errorOrigin}`,
     )
+  }
+
+  changeFontSize(increase: boolean) {
+    const currentFontSize = parseInt(
+      getComputedStyle(document.documentElement).fontSize,
+    )
+    const newFontSize = increase
+      ? currentFontSize + this.fontSizeStep
+      : currentFontSize - this.fontSizeStep
+    document.documentElement.style.fontSize = `${newFontSize}px`
   }
 
   /**
