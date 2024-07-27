@@ -120,6 +120,8 @@ const LexicalEditor_ = observer(
                   className={
                     'min-h-[90vh] w-full border-none px-7 py-3 outline-none'
                   }
+                  autoCapitalize={'off'}
+                  autoCorrect={'off'}
                 />
               </div>
             }
