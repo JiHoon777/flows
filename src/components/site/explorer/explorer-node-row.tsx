@@ -51,7 +51,6 @@ export const ExplorerNodeRow = observer(({ node }: { node: DoNode }) => {
       onContextMenu={(e) => contextMenuRef.current?.show(e)}
     >
       <span className={'max-w-full truncate text-sm'}>{node.title}</span>
-      {isViewing && <span className={'absolute -right-4'}>👀</span>}
       <Menu ref={contextMenuRef} model={contextMenuModel} />
     </motion.div>
   )

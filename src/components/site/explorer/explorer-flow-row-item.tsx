@@ -139,7 +139,6 @@ export const ExplorerFlowRowItem = observer(
         >
           {flow.title ?? '-'}
         </span>
-        {isViewing && <span className={'absolute -right-4'}>👀</span>}
         <Menu ref={contextMenuRef} model={contextmenuModel} />
       </div>
     )
