@@ -55,6 +55,14 @@ module.exports = {
         },
       },
     ],
+    '@typescript-eslint/consistent-type-imports': [
+      'error',
+      {
+        prefer: 'type-imports',
+        disallowTypeAnnotations: false,
+      },
+    ],
+    'import/no-duplicates': 'off',
     'import/newline-after-import': ['warn', { count: 1 }],
     'import/no-unresolved': 'off',
     'jsx-a11y/anchor-is-valid': 'warn',
@@ -67,5 +75,9 @@ module.exports = {
     'jsx-a11y/role-supports-aria-props': 'off',
     'react/prop-types': 'off',
     'jsx-a11y/no-noninteractive-tabindex': 'off',
+    '@typescript-eslint/no-unused-vars': 'off',
+    '@typescript-eslint/ban-ts-comment': 'off',
+    '@typescript-eslint/no-this-alias': 'off',
+    'no-constant-condition': 'off',
   },
 }
