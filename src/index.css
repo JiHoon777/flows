@@ -1,4 +1,5 @@
 @import url('lexical.scss');
+@import url('https://cdn.rawgit.com/moonspam/NanumSquare/master/nanumsquare.css');
 
 @tailwind base;
 @tailwind components;
@@ -76,6 +77,10 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+body {
+  font-family: 'nanumsquare', sans-serif;
 }
 
 /**
