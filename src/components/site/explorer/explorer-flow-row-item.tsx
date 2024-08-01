@@ -90,9 +90,8 @@ export const ExplorerFlowRowItem = observer(
       {
         label: 'Rename ...',
         command: () => {
-          setIsNameEditing(true)
-
           setTimeout(() => {
+            setIsNameEditing(true)
             inputRef.current?.focus()
           }, 300)
         },
@@ -124,21 +123,24 @@ export const ExplorerFlowRowItem = observer(
           />
         </motion.div>
 
-        <Input
-          ref={inputRef}
-          defaultValue={flow.title}
-          className={cn('h-5 pl-1', !isNameEditing && 'hidden')}
-          onChange={handleChangeName}
-          onKeyDown={handleKeyDown}
-        />
-        <span
-          className={cn(
-            'max-w-full truncate text-sm',
-            isNameEditing && 'hidden',
-          )}
-        >
-          {flow.title ?? '-'}
-        </span>
+        {isNameEditing ? (
+          <Input
+            ref={inputRef}
+            defaultValue={flow.title}
+            className={cn('h-5 pl-1')}
+            onChange={handleChangeName}
+            onKeyDown={handleKeyDown}
+          />
+        ) : (
+          <span
+            className={cn(
+              'max-w-full truncate text-sm',
+              isNameEditing && 'hidden',
+            )}
+          >
+            {flow.title ?? '-'}
+          </span>
+        )}
         <Menu ref={contextMenuRef} model={contextmenuModel} />
       </div>
     )
