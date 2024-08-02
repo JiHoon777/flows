@@ -372,6 +372,36 @@ export class ElementNode extends LexicalNode {
   isShadowRoot(): boolean {
     return false
   }
+  setFormat(type: ElementFormatType): this {
+    const self = this.getWritable()
+    self.__format = type !== '' ? ELEMENT_TYPE_TO_FORMAT[type] : 0
+    return this
+  }
+  setIndent(indentLevel: number): this {
+    const self = this.getWritable()
+    self.__indent = indentLevel
+    return this
+  }
+  setDirection(direction: 'ltr' | 'rtl' | null): this {
+    const self = this.getWritable()
+    self.__dir = direction
+    return self
+  }
+  setStyle(style: string): this {
+    const self = this.getWritable()
+    self.__style = style || ''
+    return this
+  }
+  exportJSON(): SerializedElementNode {
+    return {
+      children: [],
+      direction: this.getDirection(),
+      format: this.getFormatType(),
+      indent: this.getIndent(),
+      type: 'element',
+      version: 1,
+    }
+  }
 }
 
 export function $isElementNode(

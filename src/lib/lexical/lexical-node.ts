@@ -1,8 +1,6 @@
 import type { EditorState } from '@/lib/lexical/lexical-editor-state.ts'
-import type {
-  EditorConfig,
-  LexicalEditor,
-} from '@/lib/lexical/lexical-editor.ts'
+import type { LexicalEditor } from '@/lib/lexical/lexical-editor.ts'
+import type { EditorConfig } from './lexical-editor.type'
 import type {
   BaseSelection,
   RangeSelection,

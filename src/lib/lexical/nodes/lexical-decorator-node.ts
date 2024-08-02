@@ -1,7 +1,9 @@
-import { LexicalEditor } from '@/lib/lexical/lexical-editor.ts'
-import { LexicalNode, NodeKey } from '@/lib/lexical/lexical-node.ts'
-import { KlassConstructor } from '@/lib/lexical/lexical-type.ts'
-import { ElementNode } from '@/lib/lexical/nodes/lexical-element-node.ts'
+import type { LexicalEditor } from '@/lib/lexical/lexical-editor.ts'
+import type { NodeKey } from '@/lib/lexical/lexical-node.ts'
+import type { KlassConstructor } from '@/lib/lexical/lexical-type.ts'
+import type { ElementNode } from '@/lib/lexical/nodes/lexical-element-node.ts'
+
+import { LexicalNode } from '@/lib/lexical/lexical-node.ts'
 import invariant from '@/utils/invariant.ts'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

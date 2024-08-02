@@ -1,5 +1,9 @@
+import type { Spread } from './lexical-type'
 import type { EditorState } from '@/lib/lexical/lexical-editor-state.ts'
-import type { IntentionallyMarkedAsDirtyElement } from '@/lib/lexical/lexical-editor.ts'
+import type {
+  EditorThemeClasses,
+  IntentionallyMarkedAsDirtyElement,
+} from './lexical-editor.type'
 import type {
   LexicalNode,
   NodeKey,
@@ -9,6 +13,7 @@ import type {
   BaseSelection,
   PointType,
 } from '@/lib/lexical/lexical-selection.ts'
+import type { ElementNode } from '@/lib/lexical/nodes/lexical-element-node.ts'
 import type { RootNode } from '@/lib/lexical/nodes/lexical-root-node.ts'
 
 import { HAS_DIRTY_NODES } from '@/lib/lexical/lexical-constants.ts'
@@ -26,15 +31,12 @@ import {
   isCurrentlyReadOnlyMode,
 } from '@/lib/lexical/lexical-updates.ts'
 import { $isDecoratorNode } from '@/lib/lexical/nodes/lexical-decorator-node.ts'
-import {
-  $isElementNode,
-  ElementNode,
-} from '@/lib/lexical/nodes/lexical-element-node.ts'
+import { $isElementNode } from '@/lib/lexical/nodes/lexical-element-node.ts'
 import { $isParagraphNode } from '@/lib/lexical/nodes/lexical-paragraph-node.ts'
 import { $isRootNode } from '@/lib/lexical/nodes/lexical-root-node.ts'
 import { $isTextNode } from '@/lib/lexical/nodes/lexical-text-node.ts'
 import invariant from '@/utils/invariant.ts'
-import { Spread } from './lexical-type'
+import { normalizeClassNames } from '@/utils/normalize-class-name'
 
 export const emptyFunction = () => {
   return
@@ -450,4 +452,42 @@ export function $isRootOrShadowRoot(
   node: null | LexicalNode,
 ): node is RootNode | ShadowRootNode {
   return $isRootNode(node) || ($isElementNode(node) && node.isShadowRoot())
+}
+
+/**
+ *
+ * @param node - the Dom Node to check
+ * @returns if the Dom Node is a block node
+ */
+export function isBlockDomNode(node: Node) {
+  const blockNodes = new RegExp(
+    /^(address|article|aside|blockquote|canvas|dd|div|dl|dt|fieldset|figcaption|figure|footer|form|h1|h2|h3|h4|h5|h6|header|hr|li|main|nav|noscript|ol|p|pre|section|table|td|tfoot|ul|video)$/,
+    'i',
+  )
+
+  return node.nodeName.match(blockNodes) !== null
+}
+
+export function getCachedClassNameArray(
+  classNamesTheme: EditorThemeClasses,
+  classNameThemeType: string,
+): Array<string> {
+  if (classNamesTheme.__lexicalClassNameCache === undefined) {
+    classNamesTheme.__lexicalClassNameCache = {}
+  }
+
+  const classNamesCache = classNamesTheme.__lexicalClassNameCache
+  const cachedClassNames = classNamesCache[classNameThemeType]
+  if (cachedClassNames !== undefined) {
+    return cachedClassNames
+  }
+
+  const classNames = classNamesTheme[classNameThemeType]
+  if (typeof classNames === 'string') {
+    const classNamesArr = normalizeClassNames(classNames)
+    classNamesCache[classNameThemeType] = classNamesArr
+    return classNamesArr
+  }
+
+  return classNames
 }
