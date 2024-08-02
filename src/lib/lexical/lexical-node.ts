@@ -1,4 +1,3 @@
-import { HAS_DIRTY_NODES } from '@/lib/lexical/lexical-constants.ts'
 import type { EditorState } from '@/lib/lexical/lexical-editor-state.ts'
 import type {
   EditorConfig,
@@ -8,12 +7,18 @@ import type {
   BaseSelection,
   RangeSelection,
 } from '@/lib/lexical/lexical-selection.ts'
+import type { Klass, KlassConstructor } from '@/lib/lexical/lexical-type.ts'
+import type { DecoratorNode } from '@/lib/lexical/nodes/lexical-decorator-node.ts'
+import type { ElementNode } from '@/lib/lexical/nodes/lexical-element-node.ts'
+
+import { HAS_DIRTY_NODES } from '@/lib/lexical/lexical-constants.ts'
 import {
   $getSelection,
+  $isNodeSelection,
   $isRangeSelection,
   $updateElementSelectionOnCreateDeleteNode,
+  moveSelectionPointToSibling,
 } from '@/lib/lexical/lexical-selection.ts'
-import type { Klass, KlassConstructor } from '@/lib/lexical/lexical-type.ts'
 import {
   errorOnInfiniteTransforms,
   errorOnReadOnly,
@@ -24,6 +29,7 @@ import {
   $cloneWithProperties,
   $getCompositionKey,
   $isRootOrShadowRoot,
+  $maybeMoveChildrenSelectionToParent,
   $moveSelectionPointToEnd,
   $setCompositionKey,
   $setSelection,
@@ -33,11 +39,10 @@ import {
   internalMarkNodeAsDirty,
   removeFromParent,
 } from '@/lib/lexical/lexical-utils.ts'
-import type { DecoratorNode } from '@/lib/lexical/nodes/lexical-decorator-node.ts'
 import { $isDecoratorNode } from '@/lib/lexical/nodes/lexical-decorator-node.ts'
-import type { ElementNode } from '@/lib/lexical/nodes/lexical-element-node.ts'
 import { $isElementNode } from '@/lib/lexical/nodes/lexical-element-node.ts'
 import { $createParagraphNode } from '@/lib/lexical/nodes/lexical-paragraph-node.ts'
+import { $isRootNode } from '@/lib/lexical/nodes/lexical-root-node.ts'
 import { $isTextNode } from '@/lib/lexical/nodes/lexical-text-node.ts'
 import invariant from '@/utils/invariant.ts'
 
@@ -81,6 +86,20 @@ export type DOMExportOutput = {
   element: HTMLElement | Text | null
 }
 
+/**
+ * 주어진 키로 노드를 가져오는 함수
+ *
+ * @param key - 찾고자 하는 노드의 키
+ * @param _editorState - 에디터 상태 (선택적)
+ * @returns 찾은 노드 또는 null
+ *
+ * @description
+ * 이 함수는 주어진 키를 사용하여 에디터 상태에서 특정 노드를 검색합니다.
+ * 주요 동작:
+ * 1. 활성 에디터 상태 확인
+ * 2. 노드맵에서 키로 노드 검색
+ * 3. 노드가 없으면 null 반환, 있으면 해당 노드 반환
+ */
 export function $getNodeByKey<T extends LexicalNode>(
   key: NodeKey,
   _editorState?: EditorState,
@@ -94,6 +113,22 @@ export function $getNodeByKey<T extends LexicalNode>(
   return node
 }
 
+/**
+ * 노드에 키를 설정하는 함수
+ *
+ * @param node - 키를 설정할 노드
+ * @param existingKey - 기존 키 (있는 경우)
+ *
+ * @description
+ * 이 함수는 주어진 노드에 키를 설정합니다. 새 키를 생성하거나 기존 키를 사용합니다.
+ * 주요 동작:
+ * 1. 기존 키가 있으면 검증 후 설정
+ * 2. 읽기 전용 모드 및 무한 변환 체크
+ * 3. 새 키 생성 및 노드맵에 설정
+ * 4. 엘리먼트 노드와 리프 노드 구분하여 더티 플래그 설정
+ * 5. 클론 불필요 표시 및 더티 타입 설정
+ * 6. 노드에 키 할당
+ */
 export function $setNodeKey(
   node: LexicalNode,
   existingKey: NodeKey | null | undefined,
@@ -123,12 +158,91 @@ export function $setNodeKey(
   node.__key = key
 }
 
+/**
+ * 노드를 제거하는 함수
+ *
+ * @param nodeToRemove - 제거할 노드
+ * @param restoreSelection - 선택 영역 복원 여부
+ * @param preserveEmptyParent - 빈 부모 노드 보존 여부 (선택적)
+ *
+ * @description
+ * 이 함수는 Lexical 에디터에서 특정 노드를 제거하고, 필요에 따라 선택 영역을 조정합니다.
+ * 주요 동작:
+ * 1. 읽기 전용 모드 체크
+ * 2. 부모 노드 확인
+ * 3. 자식 노드들의 선택 영역을 부모로 이동 (필요시)
+ * 4. 범위 선택(RangeSelection)일 경우 선택 포인트 조정
+ * 5. 노드 선택(NodeSelection)일 경우 이전 노드 선택
+ * 6. 노드 제거 및 선택 영역 업데이트
+ * 7. 빈 부모 노드 처리 (옵션에 따라)
+ * 8. 루트 노드가 비었을 경우 끝 선택
+ */
 export function $removeNode(
   nodeToRemove: LexicalNode,
   restoreSelection: boolean,
   preserveEmptyParent?: boolean,
 ): void {
   errorOnReadOnly()
+  const key = nodeToRemove.__key
+  const parent = nodeToRemove.getParent()
+
+  if (parent === null) {
+    return
+  }
+
+  const selection = $maybeMoveChildrenSelectionToParent(nodeToRemove)
+  let selectionMoved = false
+  if ($isRangeSelection(selection) && restoreSelection) {
+    const anchor = selection.anchor
+    const focus = selection.focus
+    if (anchor.key === key) {
+      moveSelectionPointToSibling(
+        anchor,
+        nodeToRemove,
+        parent,
+        nodeToRemove.getPreviousSibling(),
+        nodeToRemove.getNextSibling(),
+      )
+      selectionMoved = true
+    }
+    if (focus.key === key) {
+      moveSelectionPointToSibling(
+        focus,
+        nodeToRemove,
+        parent,
+        nodeToRemove.getPreviousSibling(),
+        nodeToRemove.getNextSibling(),
+      )
+      selectionMoved = true
+    }
+  } else if (
+    $isNodeSelection(selection) &&
+    restoreSelection &&
+    nodeToRemove.isSelected()
+  ) {
+    nodeToRemove.selectPrevious()
+  }
+
+  if ($isRangeSelection(selection) && restoreSelection && !selectionMoved) {
+    // Doing this is O(n) so lets avoid it unless we need to do it
+    const index = nodeToRemove.getIndexWithinParent()
+    removeFromParent(nodeToRemove)
+    $updateElementSelectionOnCreateDeleteNode(selection, parent, index, -1)
+  } else {
+    removeFromParent(nodeToRemove)
+  }
+
+  if (
+    !preserveEmptyParent &&
+    !$isRootOrShadowRoot(parent) &&
+    !parent.canBeEmpty() &&
+    parent.isEmpty()
+  ) {
+    $removeNode(parent, restoreSelection)
+  }
+  if (restoreSelection && $isRootNode(parent) && parent.isEmpty()) {
+    parent.selectEnd()
+  }
 }
 
 export class LexicalNode {

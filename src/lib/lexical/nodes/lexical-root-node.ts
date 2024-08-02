@@ -1,15 +1,16 @@
-import { NO_DIRTY_NODES } from '@/lib/lexical/lexical-constants.ts'
 import type {
   LexicalNode,
   SerializedLexicalNode,
 } from '@/lib/lexical/lexical-node.ts'
+import type { SerializedElementNode } from '@/lib/lexical/nodes/lexical-element-node.ts'
+
+import { NO_DIRTY_NODES } from '@/lib/lexical/lexical-constants.ts'
 import {
   getActiveEditor,
   isCurrentlyReadOnlyMode,
 } from '@/lib/lexical/lexical-updates.ts'
 import { $getRoot } from '@/lib/lexical/lexical-utils.ts'
 import { $isDecoratorNode } from '@/lib/lexical/nodes/lexical-decorator-node.ts'
-import type { SerializedElementNode } from '@/lib/lexical/nodes/lexical-element-node.ts'
 import {
   $isElementNode,
   ElementNode,

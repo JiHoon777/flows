@@ -1,4 +1,7 @@
 import type { LexicalNode, NodeKey } from '@/lib/lexical/lexical-node.ts'
+import type { ElementNode } from '@/lib/lexical/nodes/lexical-element-node.ts'
+import type { TextNode } from '@/lib/lexical/nodes/lexical-text-node.ts'
+
 import { $getNodeByKey } from '@/lib/lexical/lexical-node.ts'
 import {
   getActiveEditorState,
@@ -8,9 +11,7 @@ import {
   $getCompositionKey,
   $setCompositionKey,
 } from '@/lib/lexical/lexical-utils.ts'
-import type { ElementNode } from '@/lib/lexical/nodes/lexical-element-node.ts'
 import { $isElementNode } from '@/lib/lexical/nodes/lexical-element-node.ts'
-import type { TextNode } from '@/lib/lexical/nodes/lexical-text-node.ts'
 import { $isTextNode } from '@/lib/lexical/nodes/lexical-text-node.ts'
 import invariant from '@/utils/invariant.ts'
 
@@ -161,6 +162,22 @@ export interface BaseSelection {
 export function $getSelection(): null | BaseSelection {
   const editorState = getActiveEditorState()
   return editorState._selection
+}
+
+export class NodeSelection implements BaseSelection {
+  _nodes: Set<NodeKey>
+  _cachedNodes: Array<LexicalNode> | null
+  dirty: boolean
+
+  constructor(objects: Set<NodeKey>) {
+    this._cachedNodes = null
+    this._nodes = objects
+    this.dirty = false
+  }
+}
+
+export function $isNodeSelection(x: unknown): x is NodeSelection {
+  return x instanceof NodeSelection
 }
 
 export class RangeSelection implements BaseSelection {
@@ -395,5 +412,65 @@ function $updateSelectionResolveTextNodes(selection: RangeSelection): void {
       }
       focus.set(child.__key, newOffset, 'text')
     }
+  }
+}
+
+/**
+ * 선택 포인트를 형제 노드로 이동시키는 함수
+ *
+ * @param point - 이동시킬 선택 포인트
+ * @param node - 현재 노드
+ * @param parent - 부모 노드
+ * @param prevSibling - 이전 형제 노드
+ * @param nextSibling - 다음 형제 노드
+ *
+ * @description
+ * 이 함수는 주어진 선택 포인트를 적절한 형제 노드로 이동시킵니다.
+ * 주요 동작:
+ * 1. 이전 형제 노드가 있으면 그 노드의 끝으로 포인트를 이동
+ * 2. 이전 형제 노드가 없고 다음 형제 노드가 있으면 그 노드의 시작으로 포인트를 이동
+ * 3. 형제 노드가 없으면 부모 노드 내에서 적절한 위치로 포인트를 이동
+ *
+ * 텍스트 노드와 엘리먼트 노드를 구분하여 처리하며,
+ * 각 경우에 맞는 오프셋과 타입을 설정합니다.
+ */
+export function moveSelectionPointToSibling(
+  point: PointType,
+  node: LexicalNode,
+  parent: ElementNode,
+  prevSibling: LexicalNode | null,
+  nextSibling: LexicalNode | null,
+): void {
+  let siblingKey = null
+  let offset = 0
+  let type: 'text' | 'element' | null = null
+  if (prevSibling !== null) {
+    siblingKey = prevSibling.__key
+    if ($isTextNode(prevSibling)) {
+      offset = prevSibling.getTextContentSize()
+      type = 'text'
+    } else if ($isElementNode(prevSibling)) {
+      offset = prevSibling.getChildrenSize()
+      type = 'element'
+    }
+  } else {
+    if (nextSibling !== null) {
+      siblingKey = nextSibling.__key
+      if ($isTextNode(nextSibling)) {
+        type = 'text'
+      } else if ($isElementNode(nextSibling)) {
+        type = 'element'
+      }
+    }
+  }
+  if (siblingKey !== null && type !== null) {
+    point.set(siblingKey, offset, type)
+  } else {
+    offset = node.getIndexWithinParent()
+    if (offset === -1) {
+      // Move selection to end of parent
+      offset = parent.getChildrenSize()
+    }
+    point.set(parent.__key, offset, 'element')
   }
 }

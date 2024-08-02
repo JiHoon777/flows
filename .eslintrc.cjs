@@ -38,7 +38,15 @@ module.exports = {
       'error',
       {
         groups: [
-          ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
+          [
+            'type',
+            'builtin',
+            'external',
+            'internal',
+            'parent',
+            'sibling',
+            'index',
+          ],
         ],
         pathGroups: [
           {
@@ -47,7 +55,7 @@ module.exports = {
             position: 'before',
           },
         ],
-        pathGroupsExcludedImportTypes: ['react'],
+        pathGroupsExcludedImportTypes: ['react', 'type'],
         'newlines-between': 'always',
         alphabetize: {
           order: 'asc',

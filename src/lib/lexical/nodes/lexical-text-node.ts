@@ -26,6 +26,8 @@ export type TextDetailType = 'directionless' | 'unmergable'
 
 export type TextModeType = 'normal' | 'token' | 'segmented'
 
-export function $isTextNode(node: LexicalNode | null | undefined) {
+export function $isTextNode(
+  node: LexicalNode | null | undefined,
+): node is TextNode {
   return node instanceof TextNode
 }

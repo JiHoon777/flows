@@ -1,4 +1,3 @@
-import { HAS_DIRTY_NODES } from '@/lib/lexical/lexical-constants.ts'
 import type { EditorState } from '@/lib/lexical/lexical-editor-state.ts'
 import type { IntentionallyMarkedAsDirtyElement } from '@/lib/lexical/lexical-editor.ts'
 import type {
@@ -6,10 +5,17 @@ import type {
   NodeKey,
   NodeMap,
 } from '@/lib/lexical/lexical-node.ts'
-import { $getNodeByKey } from '@/lib/lexical/lexical-node.ts'
 import type {
   BaseSelection,
   PointType,
+} from '@/lib/lexical/lexical-selection.ts'
+import type { RootNode } from '@/lib/lexical/nodes/lexical-root-node.ts'
+
+import { HAS_DIRTY_NODES } from '@/lib/lexical/lexical-constants.ts'
+import { $getNodeByKey } from '@/lib/lexical/lexical-node.ts'
+import {
+  $getSelection,
+  $isRangeSelection,
 } from '@/lib/lexical/lexical-selection.ts'
 import {
   errorOnInfiniteTransforms,
@@ -20,12 +26,15 @@ import {
   isCurrentlyReadOnlyMode,
 } from '@/lib/lexical/lexical-updates.ts'
 import { $isDecoratorNode } from '@/lib/lexical/nodes/lexical-decorator-node.ts'
-import { $isElementNode } from '@/lib/lexical/nodes/lexical-element-node.ts'
+import {
+  $isElementNode,
+  ElementNode,
+} from '@/lib/lexical/nodes/lexical-element-node.ts'
 import { $isParagraphNode } from '@/lib/lexical/nodes/lexical-paragraph-node.ts'
-import type { RootNode } from '@/lib/lexical/nodes/lexical-root-node.ts'
 import { $isRootNode } from '@/lib/lexical/nodes/lexical-root-node.ts'
 import { $isTextNode } from '@/lib/lexical/nodes/lexical-text-node.ts'
 import invariant from '@/utils/invariant.ts'
+import { Spread } from './lexical-type'
 
 export const emptyFunction = () => {
   return
@@ -384,7 +393,61 @@ export function $applyNodeReplacement<N extends LexicalNode>(
   return node as N
 }
 
-// Todo
-export function $isRootOrShadowRoot(node: null | LexicalNode) {
-  return true
+/**
+ * 주어진 자식 노드가 목표 노드의 자손인지 확인합니다.
+ *
+ * @param child - 자손 관계를 확인할 자식 노드
+ * @param targetNode - 조상인지 확인할 목표 노드
+ * @returns {boolean} child 가 targetNode 의 자손이면 true, 그렇지 않으면 false
+ */
+export function $hasAncestor(
+  child: LexicalNode,
+  targetNode: LexicalNode,
+): boolean {
+  let parent = child.getParent()
+  while (parent !== null) {
+    if (parent.is(targetNode)) {
+      return true
+    }
+    parent = parent.getParent()
+  }
+  return false
+}
+
+/**
+ * 자식 노드의 선택을 부모 노드로 이동시킵니다(필요한 경우에만).
+ *
+ * @param parentNode - 선택을 이동시킬 대상이 되는 부모 노드
+ * @returns {BaseSelection | null} 업데이트된 선택 객체 또는 null
+ */
+export function $maybeMoveChildrenSelectionToParent(
+  parentNode: LexicalNode,
+): BaseSelection | null {
+  const selection = $getSelection()
+  if (!$isRangeSelection(selection) || !$isElementNode(parentNode)) {
+    return selection
+  }
+  const { anchor, focus } = selection
+  const anchorNode = anchor.getNode()
+  const focusNode = focus.getNode()
+  if ($hasAncestor(anchorNode, parentNode)) {
+    anchor.set(parentNode.__key, 0, 'element')
+  }
+  if ($hasAncestor(focusNode, parentNode)) {
+    focus.set(parentNode.__key, 0, 'element')
+  }
+  return selection
+}
+
+const ShadowRootNodeBrand: unique symbol = Symbol.for(
+  '@lexical/ShadowRootNodeBrand',
+)
+type ShadowRootNode = Spread<
+  { isShadowRoot(): true; [ShadowRootNodeBrand]: never },
+  ElementNode
+>
+export function $isRootOrShadowRoot(
+  node: null | LexicalNode,
+): node is RootNode | ShadowRootNode {
+  return $isRootNode(node) || ($isElementNode(node) && node.isShadowRoot())
 }

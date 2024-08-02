@@ -1,28 +1,29 @@
+import type {
+  NodeKey,
+  SerializedLexicalNode,
+} from '@/lib/lexical/lexical-node.ts'
+import type {
+  PointType,
+  RangeSelection,
+} from '@/lib/lexical/lexical-selection.ts'
+import type { KlassConstructor, Spread } from '@/lib/lexical/lexical-type.ts'
+import type { TextNode } from '@/lib/lexical/nodes/lexical-text-node.ts'
+
 import {
   DOUBLE_LINE_BREAK,
   ELEMENT_FORMAT_TO_TYPE,
   ELEMENT_TYPE_TO_FORMAT,
 } from '@/lib/lexical/lexical-constants.ts'
-import type {
-  NodeKey,
-  SerializedLexicalNode,
-} from '@/lib/lexical/lexical-node.ts'
 import { $getNodeByKey, LexicalNode } from '@/lib/lexical/lexical-node.ts'
-import type {
-  PointType,
-  RangeSelection,
-} from '@/lib/lexical/lexical-selection.ts'
 import {
   $getSelection,
   $internalMakeRangeSelection,
   $isRangeSelection,
 } from '@/lib/lexical/lexical-selection.ts'
-import type { KlassConstructor, Spread } from '@/lib/lexical/lexical-type.ts'
 import {
   errorOnReadOnly,
   getActiveEditor,
 } from '@/lib/lexical/lexical-updates.ts'
-import type { TextNode } from '@/lib/lexical/nodes/lexical-text-node.ts'
 import { $isTextNode } from '@/lib/lexical/nodes/lexical-text-node.ts'
 import invariant from '@/utils/invariant.ts'
 
@@ -368,9 +369,14 @@ export class ElementNode extends LexicalNode {
   canBeEmpty(): boolean {
     return true
   }
+  isShadowRoot(): boolean {
+    return false
+  }
 }
 
-export function $isElementNode(node: LexicalNode | null | undefined) {
+export function $isElementNode(
+  node: LexicalNode | null | undefined,
+): node is ElementNode {
   return node instanceof ElementNode
 }
 
