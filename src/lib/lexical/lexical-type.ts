@@ -1,4 +1,4 @@
-import { LexicalNode } from '@/lib/lexical/lexical-node.ts'
+import type { LexicalNode } from '@/lib/lexical/lexical-node.ts'
 
 export type Spread<T1, T2> = Omit<T2, keyof T1> & T1
 

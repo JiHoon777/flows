@@ -1,6 +1,15 @@
-import { NodeMap } from '@/lib/lexical/lexical-node.ts'
-import { BaseSelection } from '@/lib/lexical/lexical-selection.ts'
+import type { SerializedRootNode } from './nodes/lexical-root-node'
+import type {
+  NodeMap,
+  SerializedLexicalNode,
+} from '@/lib/lexical/lexical-node.ts'
+import type { BaseSelection } from '@/lib/lexical/lexical-selection.ts'
 
+export interface SerializedEditorState<
+  T extends SerializedLexicalNode = SerializedLexicalNode,
+> {
+  root: SerializedRootNode<T>
+}
 export class EditorState {
   _nodeMap: NodeMap
   _selection: null | BaseSelection
