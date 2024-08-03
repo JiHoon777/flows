@@ -51,6 +51,7 @@ export type TextNodeThemeClasses = {
 export type TextNodeThemeClassesKeys = keyof TextNodeThemeClasses
 
 export type EditorThemeClasses = {
+  blockCursor?: EditorThemeClassName
   root?: EditorThemeClassName
   paragraph?: EditorThemeClassName
   indent?: EditorThemeClassName

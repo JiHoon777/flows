@@ -3,11 +3,13 @@ import type { EditorState } from '@/lib/lexical/lexical-editor-state.ts'
 import type { LexicalEditor } from '@/lib/lexical/lexical-editor.ts'
 import type {
   CommandPayloadType,
+  EditorConfig,
   EditorThemeClasses,
   IntentionallyMarkedAsDirtyElement,
   MutatedNodes,
   MutationListeners,
   NodeMutation,
+  RegisteredNode,
   RegisteredNodes,
   TextNodeThemeClasses,
 } from '@/lib/lexical/lexical-editor.type.ts'
@@ -1542,6 +1544,158 @@ export function $getAncestor<NodeType extends LexicalNode = LexicalNode>(
   }
   return predicate(parent) ? parent : null
 }
+/**
+ * 주어진 편집기에서 특정 노드 타입에 대한 등록된 노드를 반환합니다.
+ * 만약 등록된 노드가 없다면 예외를 발생시킵니다.
+ *
+ * @param editor - 노드를 검색할 LexicalEditor입니다.
+ * @param nodeType - 검색할 노드 타입의 문자열입니다.
+ * @returns 등록된 노드 객체입니다.
+ * @throws 등록된 노드가 없는 경우 예외를 발생시킵니다.
+ */
+export function getRegisteredNodeOrThrow(
+  editor: LexicalEditor,
+  nodeType: string,
+): RegisteredNode {
+  const registeredNode = editor._nodes.get(nodeType)
+  if (registeredNode === undefined) {
+    invariant(false, 'registeredNode: Type %s not found', nodeType)
+  }
+  return registeredNode
+}
+/**
+ * 블록 커서 요소를 생성합니다.
+ *
+ * 이 함수는 주어진 편집기 설정에 따라 블록 커서에 필요한 테마를 적용한 `HTMLDivElement`를 생성합니다.
+ * 생성된 요소는 `contentEditable` 속성이 `false`로 설정되고, 데이터 속성 `data-lexical-cursor`가 추가됩니다.
+ *
+ * @param editorConfig - 편집기 설정을 포함하는 `EditorConfig` 객체.
+ *
+ * @returns HTMLDivElement - 생성된 블록 커서 요소.
+ */
+function createBlockCursorElement(editorConfig: EditorConfig): HTMLDivElement {
+  const theme = editorConfig.theme
+  const element = document.createElement('div')
+  element.contentEditable = 'false'
+  element.setAttribute('data-lexical-cursor', 'true')
+  let blockCursorTheme = theme.blockCursor
+  if (blockCursorTheme !== undefined) {
+    if (typeof blockCursorTheme === 'string') {
+      const classNamesArr = normalizeClassNames(blockCursorTheme)
+      // @ts-expect-error: intentional
+      blockCursorTheme = theme.blockCursor = classNamesArr
+    }
+    if (blockCursorTheme !== undefined) {
+      element.classList.add(...blockCursorTheme)
+    }
+  }
+  return element
+}
+/**
+ * 특정 노드가 블록 커서가 필요한지 여부를 결정합니다.
+ *
+ * 블록 커서는 데코레이터 노드이거나 비어 있을 수 없는 요소 노드이며, 인라인 노드가 아닌 경우에 필요합니다.
+ *
+ * @param node - 검사할 LexicalNode 객체. `null`일 수도 있습니다.
+ *
+ * @returns boolean - 노드가 블록 커서가 필요한지 여부를 나타냅니다.
+ */
+function needsBlockCursor(node: null | LexicalNode): boolean {
+  return (
+    ($isDecoratorNode(node) || ($isElementNode(node) && !node.canBeEmpty())) &&
+    !node.isInline()
+  )
+}
+/**
+ * DOM 블록 커서 요소를 업데이트합니다.
+ * 선택된 영역의 상태에 따라 블록 커서를 추가하거나 제거합니다.
+ *
+ * @param editor - 현재의 LexicalEditor 인스턴스.
+ * @param rootElement - 에디터의 루트 HTML 요소.
+ * @param nextSelection - 다음 선택 상태. 블록 커서를 업데이트하는 데 사용됩니다.
+ *
+ * @returns void
+ */
+export function updateDOMBlockCursorElement(
+  editor: LexicalEditor,
+  rootElement: HTMLElement,
+  nextSelection: null | BaseSelection,
+): void {
+  let blockCursorElement = editor._blockCursorElement
+
+  if (
+    $isRangeSelection(nextSelection) &&
+    nextSelection.isCollapsed() &&
+    nextSelection.anchor.type === 'element' &&
+    rootElement.contains(document.activeElement)
+  ) {
+    const anchor = nextSelection.anchor
+    const elementNode = anchor.getNode()
+    const offset = anchor.offset
+    const elementNodeSize = elementNode.getChildrenSize()
+    let isBlockCursor = false
+    let insertBeforeElement: null | HTMLElement = null
+
+    // 커서가 요소의 끝에 위치한 경우
+    if (offset === elementNodeSize) {
+      const child = elementNode.getChildAtIndex(offset - 1)
+      if (needsBlockCursor(child)) {
+        isBlockCursor = true
+      }
+      // 커서가 요소의 중간에 위치한 경우
+    } else {
+      const child = elementNode.getChildAtIndex(offset)
+      if (needsBlockCursor(child)) {
+        const sibling = (child as LexicalNode).getPreviousSibling()
+        if (sibling === null || needsBlockCursor(sibling)) {
+          isBlockCursor = true
+          insertBeforeElement = editor.getElementByKey(
+            (child as LexicalNode).__key,
+          )
+        }
+      }
+    }
+    if (isBlockCursor) {
+      const elementDOM = editor.getElementByKey(
+        elementNode.__key,
+      ) as HTMLElement
+      // 블록 커서 요소가 존재하지 않으면 생성합니다.
+      if (blockCursorElement === null) {
+        editor._blockCursorElement = blockCursorElement =
+          createBlockCursorElement(editor._config)
+      }
+      rootElement.style.caretColor = 'transparent'
+      if (insertBeforeElement === null) {
+        elementDOM.appendChild(blockCursorElement)
+      } else {
+        elementDOM.insertBefore(blockCursorElement, insertBeforeElement)
+      }
+      return
+    }
+  }
+  // Remove cursor
+  if (blockCursorElement !== null) {
+    removeDOMBlockCursorElement(blockCursorElement, editor, rootElement)
+  }
+}
+
+/**
+ * 주어진 에디터 상태에서 텍스트 콘텐츠를 가져오는 함수입니다.
+ *
+ * @param editorState - 에디터의 상태를 나타내는 `EditorState` 객체입니다.
+ * @returns 현재 에디터 상태의 텍스트 콘텐츠를 문자열로 반환합니다.
+ */
+export function getEditorStateTextContent(editorState: EditorState): string {
+  return editorState.read(() => $getRoot().getTextContent())
+}
+
+export const scheduleMicroTask: (fn: () => void) => void =
+  typeof queueMicrotask === 'function'
+    ? queueMicrotask
+    : (fn) => {
+        // No window prefix intended (#1400)
+        Promise.resolve().then(fn)
+      }
 
 //
 // about events
