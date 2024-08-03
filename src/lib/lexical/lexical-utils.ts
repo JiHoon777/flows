@@ -1,37 +1,40 @@
+import type { LexicalCommand } from '@/lib/lexical/lexical-commands.ts'
+import type { EditorState } from '@/lib/lexical/lexical-editor-state.ts'
+import type { LexicalEditor } from '@/lib/lexical/lexical-editor.ts'
 import type {
   CommandPayloadType,
   EditorThemeClasses,
   IntentionallyMarkedAsDirtyElement,
-  LexicalCommand,
   TextNodeThemeClasses,
-} from './lexical-editor.type'
-import type { Spread } from './lexical-type'
-import type { TextFormatType } from './nodes/lexical-text-node.type'
-import type { EditorState } from '@/lib/lexical/lexical-editor-state.ts'
-import type { LexicalEditor } from '@/lib/lexical/lexical-editor.ts'
+} from '@/lib/lexical/lexical-editor.type.ts'
 import type {
   LexicalNode,
   NodeKey,
   NodeMap,
 } from '@/lib/lexical/lexical-node.ts'
-import { $getNodeByKey } from '@/lib/lexical/lexical-node.ts'
 import type {
   BaseSelection,
   PointType,
+  RangeSelection,
 } from '@/lib/lexical/lexical-selection.ts'
+import type { Spread } from '@/lib/lexical/lexical-type.ts'
+import type { ElementNode } from '@/lib/lexical/nodes/lexical-element-node.ts'
+import type { RootNode } from '@/lib/lexical/nodes/lexical-root-node.ts'
+import type { TextNode } from '@/lib/lexical/nodes/lexical-text-node.ts'
+import type { TextFormatType } from '@/lib/lexical/nodes/lexical-text-node.type.ts'
+
+import {
+  COMPOSITION_SUFFIX,
+  DOM_TEXT_TYPE,
+  HAS_DIRTY_NODES,
+  TEXT_TYPE_TO_FORMAT,
+} from '@/lib/lexical/lexical-constants.ts'
+import { $getNodeByKey } from '@/lib/lexical/lexical-node.ts'
+import { $getPreviousSelection } from '@/lib/lexical/lexical-selection.ts'
 import {
   $getSelection,
   $isRangeSelection,
 } from '@/lib/lexical/lexical-selection.ts'
-import type { ElementNode } from '@/lib/lexical/nodes/lexical-element-node.ts'
-import { $isElementNode } from '@/lib/lexical/nodes/lexical-element-node.ts'
-import type { RootNode } from '@/lib/lexical/nodes/lexical-root-node.ts'
-import { $isRootNode } from '@/lib/lexical/nodes/lexical-root-node.ts'
-
-import {
-  HAS_DIRTY_NODES,
-  TEXT_TYPE_TO_FORMAT,
-} from '@/lib/lexical/lexical-constants.ts'
 import {
   errorOnInfiniteTransforms,
   errorOnReadOnly,
@@ -43,11 +46,21 @@ import {
   updateEditor,
 } from '@/lib/lexical/lexical-updates.ts'
 import { $isDecoratorNode } from '@/lib/lexical/nodes/lexical-decorator-node.ts'
+import { $isElementNode } from '@/lib/lexical/nodes/lexical-element-node.ts'
 import { $isParagraphNode } from '@/lib/lexical/nodes/lexical-paragraph-node.ts'
+import { $isRootNode } from '@/lib/lexical/nodes/lexical-root-node.ts'
+import { $createTextNode } from '@/lib/lexical/nodes/lexical-text-node.ts'
 import { $isTextNode } from '@/lib/lexical/nodes/lexical-text-node.ts'
+import { CAN_USE_DOM } from '@/utils/can-use-dom.ts'
+import {
+  IS_APPLE,
+  IS_APPLE_WEBKIT,
+  IS_IOS,
+  IS_SAFARI,
+} from '@/utils/environment.ts'
 import invariant from '@/utils/invariant.ts'
 import { normalizeClassNames } from '@/utils/normalize-class-name'
-import { CAN_USE_DOM } from '@/utils/can-use-dom.ts'
+import { $flushRootMutations } from '@/lib/lexical/lexical-mutations.ts'
 
 export const emptyFunction = () => {
   return
@@ -778,4 +791,728 @@ export function markAllNodesAsDirty(editor: LexicalEditor, type: string): void {
         }
       : undefined,
   )
+}
+/**
+ * 문자열에 음절(Grapheme)이 포함되어 있는지 확인합니다.
+ *
+ * @param str - 확인할 문자열입니다.
+ * @returns 문자열에 음절이 포함되어 있으면 true를 반환하고, 그렇지 않으면 false를 반환합니다.
+ */
+export function doesContainGrapheme(str: string): boolean {
+  return /[\uD800-\uDBFF][\uDC00-\uDFFF]/g.test(str)
+}
+
+export function $isTokenOrSegmented(node: TextNode): boolean {
+  return node.isToken() || node.isSegmented()
+}
+
+/**
+ * 주어진 DOM 노드가 텍스트 노드인지 확인합니다.
+ *
+ * @param node - 검사할 DOM 노드
+ * @returns 노드가 텍스트 노드이면 true, 아니면 false
+ *
+ * @description
+ * 이 함수는 타입 가드로도 작동하여,
+ * true를 반환할 경우 TypeScript는 해당 노드를 Text 타입으로 좁힙니다.
+ */
+function isDOMNodeLexicalTextNode(node: Node): node is Text {
+  return node.nodeType === DOM_TEXT_TYPE
+}
+/**
+ * 주어진 요소 내에서 첫 번째 텍스트 노드를 찾아 반환합니다.
+ *
+ * @param element - 검색을 시작할 DOM 요소 또는 노드
+ * @returns 찾은 텍스트 노드, 없으면 null
+ *
+ * @description
+ * 이 함수는 주어진 요소부터 시작하여 깊이 우선 탐색으로
+ * 첫 번째 텍스트 노드를 찾습니다. 요소 자체가 텍스트 노드이거나
+ * 자식 요소 중 텍스트 노드가 있으면 그 노드를 반환합니다.
+ */
+export function getDOMTextNode(element: Node | null): Text | null {
+  let node = element
+  while (node != null) {
+    if (isDOMNodeLexicalTextNode(node)) {
+      return node
+    }
+    node = node.firstChild
+  }
+  return null
+}
+/**
+ * 주어진 텍스트 노드의 이전 형제 노드가 텍스트 삽입을 허용하지 않는지 확인합니다.
+ *
+ * @param node - 검사 대상 텍스트 노드
+ * @returns 이전 형제 노드가 텍스트 삽입을 허용하지 않으면 true, 그렇지 않으면 false
+ *
+ * @description
+ * 이 함수는 주어진 텍스트 노드의 이전 형제 노드를 검사하여
+ * 해당 노드 뒤에 텍스트를 삽입할 수 있는지 여부를 판단합니다.
+ * 이는 텍스트 편집 시 노드 경계에서의 동작을 결정하는 데 중요합니다.
+ */
+function $previousSiblingDoesNotAcceptText(node: TextNode): boolean {
+  const previousSibling = node.getPreviousSibling()
+
+  return (
+    ($isTextNode(previousSibling) ||
+      ($isElementNode(previousSibling) && previousSibling.isInline())) &&
+    !previousSibling.canInsertTextAfter()
+  )
+}
+/**
+ * 텍스트 노드의 경계에서 텍스트 삽입 위치를 결정하는 함수입니다.
+ *
+ * @param selection - 현재 선택 영역
+ * @param node - 검사 대상 텍스트 노드
+ * @returns 텍스트를 노드 앞이나 뒤에 삽입해야 하면 true, 아니면 false
+ *
+ * @description
+ * 이 함수는 $shouldPreventDefaultAndInsertText와 연계되어 작동하며,
+ * 텍스트 노드 경계의 쓰기 가능 여부를 판단합니다. 예를 들어, LinkNode의 경우
+ * 경계에 직접 쓰기가 불가능하므로 이전/다음 형제 노드를 사용해야 합니다.
+ */
+export function $shouldInsertTextAfterOrBeforeTextNode(
+  selection: RangeSelection,
+  node: TextNode,
+): boolean {
+  // 노드가 분할된 경우 항상 true 반환
+  if (node.isSegmented()) {
+    return true
+  }
+  // 선택 영역이 접혀있지 않은 경우(범위 선택) false 반환
+  if (!selection.isCollapsed()) {
+    return false
+  }
+  const offset = selection.anchor.offset
+  const parent = node.getParentOrThrow()
+  const isToken = node.isToken()
+  // 선택 위치가 노드의 시작점인 경우
+  if (offset === 0) {
+    return (
+      // 노드 앞에 텍스트 삽입이 불가능하거나
+      !node.canInsertTextBefore() ||
+      // 부모 노드 앞에 텍스트 삽입이 불가능하고 현재 노드가 조합 중이 아니거나
+      (!parent.canInsertTextBefore() && !node.isComposing()) ||
+      isToken ||
+      // 이전 형제 노드가 텍스트를 받아들이지 않는 경우
+      $previousSiblingDoesNotAcceptText(node)
+    )
+    // 선택 위치가 노드의 끝점인 경우
+  } else if (offset === node.getTextContentSize()) {
+    return (
+      // 노드 뒤에 텍스트 삽입이 불가능하거나
+      !node.canInsertTextAfter() ||
+      // 부모 노드 뒤에 텍스트 삽입이 불가능하고 현재 노드가 조합 중이 아니거나
+      (!parent.canInsertTextAfter() && !node.isComposing()) ||
+      isToken
+    )
+    // 선택 위치가 노드의 중간인 경우
+  } else {
+    return false
+  }
+}
+/**
+ * 주어진 선택이 특정 Lexical 에디터 내에 있는지 확인하는 함수입니다.
+ *
+ * @param editor - 확인할 Lexical 에디터 인스턴스
+ * @param anchorDOM - 선택의 시작점(anchor) DOM 노드
+ * @param focusDOM - 선택의 끝점(focus) DOM 노드
+ * @returns 선택이 에디터 내에 있으면 true, 그렇지 않으면 false
+ *
+ * @description
+ * 이 함수는 DOM 선택이 주어진 Lexical 에디터의 범위 내에 있는지 확인합니다.
+ * 여러 조건을 검사하여 선택의 유효성을 판단합니다.
+ */
+export function isSelectionWithinEditor(
+  editor: LexicalEditor,
+  anchorDOM: null | Node,
+  focusDOM: null | Node,
+): boolean {
+  const rootElement = editor.getRootElement()
+  try {
+    return (
+      rootElement !== null &&
+      // 선택의 시작점이 루트 요소 내에 있는지 확인
+      rootElement.contains(anchorDOM) &&
+      // 선택의 끝점이 루트 요소 내에 있는지 확인
+      rootElement.contains(focusDOM) &&
+      // Ignore if selection is within nested editor
+      // 선택의 시작점이 존재하는지 확인
+      anchorDOM !== null &&
+      // 선택이 데코레이터 입력 요소 내에 갇혀있지 않은지 확인
+      !isSelectionCapturedInDecoratorInput(anchorDOM as Node) &&
+      // 선택의 시작점이 현재 에디터에 속하는지 확인
+      getNearestEditorFromDOMNode(anchorDOM) === editor
+    )
+  } catch (error) {
+    return false
+  }
+}
+/**
+ * 선택이 데코레이터 노드의 입력 요소 내에 갇혀 있는지 확인하는 함수입니다.
+ *
+ * @param anchorDOM - 선택의 시작점 DOM 노드
+ * @returns 선택이 데코레이터 입력 요소 내에 갇혀 있으면 true, 그렇지 않으면 false
+ *
+ * @description
+ * 이 함수는 현재 선택이 Lexical 에디터의 데코레이터 노드 내부의
+ * 입력 요소(예: INPUT, TEXTAREA)에 위치하는지 확인합니다.
+ * 이는 특정 편집 동작을 제어하거나 선택 처리를 최적화하는 데 사용됩니다.
+ */
+export function isSelectionCapturedInDecoratorInput(anchorDOM: Node): boolean {
+  const activeElement = document.activeElement as HTMLElement
+
+  if (activeElement === null) {
+    return false
+  }
+  const nodeName = activeElement.nodeName
+
+  // anchorDOM과 가장 가까운 Lexical 노드가 데코레이터 노드인지 확인
+  return (
+    $isDecoratorNode($getNearestNodeFromDOMNode(anchorDOM)) &&
+    (nodeName === 'INPUT' ||
+      nodeName === 'TEXTAREA' ||
+      (activeElement.contentEditable === 'true' &&
+        // Lexical 에디터가 아닌 경우 (내부 필드 확인)
+        // @ts-ignore internal field
+        activeElement.__lexicalEditor == null))
+  )
+}
+/**
+ * 주어진 DOM 노드에서 시작하여 가장 가까운 Lexical 노드를 찾는 함수입니다.
+ *
+ * @param startingDOM - 검색을 시작할 DOM 노드
+ * @param editorState - (선택적) 사용할 에디터 상태
+ * @returns 가장 가까운 Lexical 노드 또는 null
+ *
+ * @description
+ * 이 함수는 주어진 DOM 노드에서 시작하여 DOM 트리를 위로 탐색하면서
+ * 가장 가까운 Lexical 노드를 찾습니다. Lexical 노드를 찾지 못하면 null을 반환합니다.
+ */
+export function $getNearestNodeFromDOMNode(
+  startingDOM: Node,
+  editorState?: EditorState,
+): LexicalNode | null {
+  let dom: Node | null = startingDOM
+  while (dom != null) {
+    const node = $getNodeFromDOMNode(dom, editorState)
+    if (node !== null) {
+      return node
+    }
+    dom = getParentElement(dom)
+  }
+  return null
+}
+/**
+ * 주어진 DOM 노드에 대응하는 Lexical 노드를 찾는 함수입니다.
+ *
+ * @param dom - 검색할 DOM 노드
+ * @param editorState - (선택적) 사용할 에디터 상태
+ * @returns 대응하는 Lexical 노드 또는 null
+ *
+ * @description
+ * 이 함수는 DOM 노드에 저장된 Lexical 키를 사용하여
+ * 해당 노드에 대응하는 Lexical 노드를 찾습니다.
+ * DOM 노드에 Lexical 키가 없으면 null을 반환합니다.
+ */
+export function $getNodeFromDOMNode(
+  dom: Node,
+  editorState?: EditorState,
+): LexicalNode | null {
+  const editor = getActiveEditor()
+  // @ts-ignore We intentionally add this to the Node.
+  const key = dom[`__lexicalKey_${editor._key}`]
+  if (key !== undefined) {
+    return $getNodeByKey(key, editorState)
+  }
+  return null
+}
+/**
+ * 주어진 DOM 노드가 데코레이터 노드 내부에 있는지 확인하는 함수입니다.
+ *
+ * @param node - 검사할 DOM 노드
+ * @returns 노드가 데코레이터 내부에 있으면 true, 그렇지 않으면 false
+ *
+ * @description
+ * 이 함수는 주어진 DOM 노드에서 시작하여 가장 가까운 Lexical 노드를 찾고,
+ * 그 노드가 데코레이터 노드인지 확인합니다. 이는 선택이 데코레이터 내부에
+ * '갇혀' 있는지 판단하는 데 사용됩니다.
+ */
+export function $isSelectionCapturedInDecorator(node: Node): boolean {
+  return $isDecoratorNode($getNearestNodeFromDOMNode(node))
+}
+
+export function isFirefoxClipboardEvents(editor: LexicalEditor): boolean {
+  const event = getWindow(editor).event
+  const inputType = event && (event as InputEvent).inputType
+  return (
+    inputType === 'insertFromPaste' ||
+    inputType === 'insertFromPasteAsQuotation'
+  )
+}
+export function getAnchorTextFromDOM(anchorNode: Node): null | string {
+  if (anchorNode.nodeType === DOM_TEXT_TYPE) {
+    return anchorNode.nodeValue
+  }
+  return null
+}
+/**
+ * DOM의 선택된 텍스트를 기반으로 Lexical 에디터의 상태를 업데이트하는 함수입니다.
+ *
+ * @param isCompositionEnd - 컴포지션 종료 여부
+ * @param editor - Lexical 에디터 인스턴스
+ * @param data - 선택적 데이터 문자열 (주로 컴포지션 데이터)
+ *
+ * @description
+ * 이 함수는 DOM의 현재 선택 상태를 읽어 Lexical의 텍스트 노드를 업데이트합니다.
+ * 주로 IME 컴포지션이나 복잡한 입력 시나리오에서 사용됩니다.
+ */
+export function $updateSelectedTextFromDOM(
+  isCompositionEnd: boolean,
+  editor: LexicalEditor,
+  data?: string,
+): void {
+  // Update the text content with the latest composition text
+  const domSelection = getDOMSelection(editor._window)
+  if (domSelection === null) {
+    return
+  }
+  const anchorNode = domSelection.anchorNode
+  let { anchorOffset, focusOffset } = domSelection
+  if (anchorNode !== null) {
+    let textContent = getAnchorTextFromDOM(anchorNode)
+    const node = $getNearestNodeFromDOMNode(anchorNode)
+    if (textContent !== null && $isTextNode(node)) {
+      // Data is intentionally truthy, as we check for boolean, null and empty string.
+      if (textContent === COMPOSITION_SUFFIX && data) {
+        const offset = data.length
+        textContent = data
+        anchorOffset = offset
+        focusOffset = offset
+      }
+
+      if (textContent !== null) {
+        $updateTextNodeFromDOMContent(
+          node,
+          textContent,
+          anchorOffset,
+          focusOffset,
+          isCompositionEnd,
+        )
+      }
+    }
+  }
+}
+/**
+ * DOM 내용을 기반으로 Lexical 텍스트 노드를 업데이트하는 함수입니다.
+ *
+ * @param textNode - 업데이트할 Lexical 텍스트 노드
+ * @param textContent - DOM에서 가져온 새 텍스트 내용
+ * @param anchorOffset - 선택 시작 오프셋
+ * @param focusOffset - 선택 끝 오프셋
+ * @param compositionEnd - 컴포지션 종료 여부
+ *
+ * @description
+ * 이 함수는 DOM의 변경사항을 Lexical 텍스트 노드에 반영합니다.
+ * 컴포지션, 토큰, 삽입 제한 등 다양한 상황을 고려하여 텍스트를 업데이트합니다.
+ */
+export function $updateTextNodeFromDOMContent(
+  textNode: TextNode,
+  textContent: string,
+  anchorOffset: null | number,
+  focusOffset: null | number,
+  compositionEnd: boolean,
+): void {
+  let node = textNode
+
+  // 노드가 연결되어 있고, 컴포지션이 끝났거나 노드가 dirty하지 않은 경우에만 처리
+  if (node.isAttached() && (compositionEnd || !node.isDirty())) {
+    const isComposing = node.isComposing()
+    let normalizedTextContent = textContent
+
+    // 컴포지션 접미사 처리
+    if (
+      (isComposing || compositionEnd) &&
+      textContent[textContent.length - 1] === COMPOSITION_SUFFIX
+    ) {
+      normalizedTextContent = textContent.slice(0, -1)
+    }
+    const prevTextContent = node.getTextContent()
+
+    // 텍스트 내용이 변경되었거나 컴포지션이 끝난 경우
+    if (compositionEnd || normalizedTextContent !== prevTextContent) {
+      if (normalizedTextContent === '') {
+        $setCompositionKey(null)
+        if (!IS_SAFARI && !IS_IOS && !IS_APPLE_WEBKIT) {
+          // For composition (mainly Android), we have to remove the node on a later update
+          const editor = getActiveEditor()
+          setTimeout(() => {
+            editor.update(() => {
+              if (node.isAttached()) {
+                node.remove()
+              }
+            })
+          }, 20)
+        } else {
+          node.remove()
+        }
+        return
+      }
+      const parent = node.getParent()
+      const prevSelection = $getPreviousSelection()
+      const prevTextContentSize = node.getTextContentSize()
+      const compositionKey = $getCompositionKey()
+      const nodeKey = node.getKey()
+
+      if (
+        node.isToken() ||
+        (compositionKey !== null &&
+          nodeKey === compositionKey &&
+          !isComposing) ||
+        // Check if character was added at the start or boundaries when not insertable, and we need
+        // to clear this input from occurring as that action wasn't permitted.
+        ($isRangeSelection(prevSelection) &&
+          ((parent !== null &&
+            !parent.canInsertTextBefore() &&
+            prevSelection.anchor.offset === 0) ||
+            (prevSelection.anchor.key === textNode.__key &&
+              prevSelection.anchor.offset === 0 &&
+              !node.canInsertTextBefore() &&
+              !isComposing) ||
+            (prevSelection.focus.key === textNode.__key &&
+              prevSelection.focus.offset === prevTextContentSize &&
+              !node.canInsertTextAfter() &&
+              !isComposing)))
+      ) {
+        node.markDirty()
+        return
+      }
+      const selection = $getSelection()
+
+      if (
+        !$isRangeSelection(selection) ||
+        anchorOffset === null ||
+        focusOffset === null
+      ) {
+        node.setTextContent(normalizedTextContent)
+        return
+      }
+      selection.setTextNodeRange(node, anchorOffset, node, focusOffset)
+
+      if (node.isSegmented()) {
+        const originalTextContent = node.getTextContent()
+        const replacement = $createTextNode(originalTextContent)
+        node.replace(replacement)
+        node = replacement
+      }
+      node.setTextContent(normalizedTextContent)
+    }
+  }
+}
+/**
+ * 모든 변이를 플러시합니다.
+ * 현재 활성화된 에디터의 루트 변이를 플러시합니다.
+ */
+export function $flushMutations(): void {
+  errorOnReadOnly()
+  const editor = getActiveEditor()
+  $flushRootMutations(editor)
+}
+
+export function cloneDecorators(
+  editor: LexicalEditor,
+): Record<NodeKey, unknown> {
+  const currentDecorators = editor._decorators
+  const pendingDecorators = Object.assign({}, currentDecorators)
+  editor._pendingDecorators = pendingDecorators
+  return pendingDecorators
+}
+
+//
+// about events
+//
+
+export function isTab(
+  key: string,
+  altKey: boolean,
+  ctrlKey: boolean,
+  metaKey: boolean,
+): boolean {
+  return key === 'Tab' && !altKey && !ctrlKey && !metaKey
+}
+
+export function isBold(
+  key: string,
+  altKey: boolean,
+  metaKey: boolean,
+  ctrlKey: boolean,
+): boolean {
+  return key.toLowerCase() === 'b' && !altKey && controlOrMeta(metaKey, ctrlKey)
+}
+
+export function isItalic(
+  key: string,
+  altKey: boolean,
+  metaKey: boolean,
+  ctrlKey: boolean,
+): boolean {
+  return key.toLowerCase() === 'i' && !altKey && controlOrMeta(metaKey, ctrlKey)
+}
+
+export function isUnderline(
+  key: string,
+  altKey: boolean,
+  metaKey: boolean,
+  ctrlKey: boolean,
+): boolean {
+  return key.toLowerCase() === 'u' && !altKey && controlOrMeta(metaKey, ctrlKey)
+}
+
+export function isParagraph(key: string, shiftKey: boolean): boolean {
+  return isReturn(key) && !shiftKey
+}
+
+export function isLineBreak(key: string, shiftKey: boolean): boolean {
+  return isReturn(key) && shiftKey
+}
+
+// Inserts a new line after the selection
+
+export function isOpenLineBreak(key: string, ctrlKey: boolean): boolean {
+  // 79 = KeyO
+  return IS_APPLE && ctrlKey && key.toLowerCase() === 'o'
+}
+
+export function isDeleteWordBackward(
+  key: string,
+  altKey: boolean,
+  ctrlKey: boolean,
+): boolean {
+  return isBackspace(key) && (IS_APPLE ? altKey : ctrlKey)
+}
+
+export function isDeleteWordForward(
+  key: string,
+  altKey: boolean,
+  ctrlKey: boolean,
+): boolean {
+  return isDelete(key) && (IS_APPLE ? altKey : ctrlKey)
+}
+
+export function isDeleteLineBackward(key: string, metaKey: boolean): boolean {
+  return IS_APPLE && metaKey && isBackspace(key)
+}
+
+export function isDeleteLineForward(key: string, metaKey: boolean): boolean {
+  return IS_APPLE && metaKey && isDelete(key)
+}
+
+export function isDeleteBackward(
+  key: string,
+  altKey: boolean,
+  metaKey: boolean,
+  ctrlKey: boolean,
+): boolean {
+  if (IS_APPLE) {
+    if (altKey || metaKey) {
+      return false
+    }
+    return isBackspace(key) || (key.toLowerCase() === 'h' && ctrlKey)
+  }
+  if (ctrlKey || altKey || metaKey) {
+    return false
+  }
+  return isBackspace(key)
+}
+
+export function isDeleteForward(
+  key: string,
+  ctrlKey: boolean,
+  shiftKey: boolean,
+  altKey: boolean,
+  metaKey: boolean,
+): boolean {
+  if (IS_APPLE) {
+    if (shiftKey || altKey || metaKey) {
+      return false
+    }
+    return isDelete(key) || (key.toLowerCase() === 'd' && ctrlKey)
+  }
+  if (ctrlKey || altKey || metaKey) {
+    return false
+  }
+  return isDelete(key)
+}
+
+export function isUndo(
+  key: string,
+  shiftKey: boolean,
+  metaKey: boolean,
+  ctrlKey: boolean,
+): boolean {
+  return (
+    key.toLowerCase() === 'z' && !shiftKey && controlOrMeta(metaKey, ctrlKey)
+  )
+}
+
+export function isRedo(
+  key: string,
+  shiftKey: boolean,
+  metaKey: boolean,
+  ctrlKey: boolean,
+): boolean {
+  if (IS_APPLE) {
+    return key.toLowerCase() === 'z' && metaKey && shiftKey
+  }
+  return (
+    (key.toLowerCase() === 'y' && ctrlKey) ||
+    (key.toLowerCase() === 'z' && ctrlKey && shiftKey)
+  )
+}
+
+export function isCopy(
+  key: string,
+  shiftKey: boolean,
+  metaKey: boolean,
+  ctrlKey: boolean,
+): boolean {
+  if (shiftKey) {
+    return false
+  }
+  if (key.toLowerCase() === 'c') {
+    return IS_APPLE ? metaKey : ctrlKey
+  }
+
+  return false
+}
+
+export function isCut(
+  key: string,
+  shiftKey: boolean,
+  metaKey: boolean,
+  ctrlKey: boolean,
+): boolean {
+  if (shiftKey) {
+    return false
+  }
+  if (key.toLowerCase() === 'x') {
+    return IS_APPLE ? metaKey : ctrlKey
+  }
+
+  return false
+}
+
+function isArrowLeft(key: string): boolean {
+  return key === 'ArrowLeft'
+}
+
+function isArrowRight(key: string): boolean {
+  return key === 'ArrowRight'
+}
+
+function isArrowUp(key: string): boolean {
+  return key === 'ArrowUp'
+}
+
+function isArrowDown(key: string): boolean {
+  return key === 'ArrowDown'
+}
+
+export function isMoveBackward(
+  key: string,
+  ctrlKey: boolean,
+  altKey: boolean,
+  metaKey: boolean,
+): boolean {
+  return isArrowLeft(key) && !ctrlKey && !metaKey && !altKey
+}
+
+export function isMoveToStart(
+  key: string,
+  ctrlKey: boolean,
+  shiftKey: boolean,
+  altKey: boolean,
+  metaKey: boolean,
+): boolean {
+  return isArrowLeft(key) && !altKey && !shiftKey && (ctrlKey || metaKey)
+}
+
+export function isMoveForward(
+  key: string,
+  ctrlKey: boolean,
+  altKey: boolean,
+  metaKey: boolean,
+): boolean {
+  return isArrowRight(key) && !ctrlKey && !metaKey && !altKey
+}
+
+export function isMoveToEnd(
+  key: string,
+  ctrlKey: boolean,
+  shiftKey: boolean,
+  altKey: boolean,
+  metaKey: boolean,
+): boolean {
+  return isArrowRight(key) && !altKey && !shiftKey && (ctrlKey || metaKey)
+}
+
+export function isMoveUp(
+  key: string,
+  ctrlKey: boolean,
+  metaKey: boolean,
+): boolean {
+  return isArrowUp(key) && !ctrlKey && !metaKey
+}
+
+export function isMoveDown(
+  key: string,
+  ctrlKey: boolean,
+  metaKey: boolean,
+): boolean {
+  return isArrowDown(key) && !ctrlKey && !metaKey
+}
+
+export function isModifier(
+  ctrlKey: boolean,
+  shiftKey: boolean,
+  altKey: boolean,
+  metaKey: boolean,
+): boolean {
+  return ctrlKey || shiftKey || altKey || metaKey
+}
+
+export function isSpace(key: string): boolean {
+  return key === ' '
+}
+
+export function controlOrMeta(metaKey: boolean, ctrlKey: boolean): boolean {
+  if (IS_APPLE) {
+    return metaKey
+  }
+  return ctrlKey
+}
+
+export function isReturn(key: string): boolean {
+  return key === 'Enter'
+}
+
+export function isBackspace(key: string): boolean {
+  return key === 'Backspace'
+}
+
+export function isEscape(key: string): boolean {
+  return key === 'Escape'
+}
+
+export function isDelete(key: string): boolean {
+  return key === 'Delete'
+}
+
+export function isSelectAll(
+  key: string,
+  metaKey: boolean,
+  ctrlKey: boolean,
+): boolean {
+  return key.toLowerCase() === 'a' && controlOrMeta(metaKey, ctrlKey)
 }

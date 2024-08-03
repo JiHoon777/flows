@@ -3,6 +3,7 @@ import type { BaseSelection } from './lexical-selection'
 import type { ElementFormatType } from './nodes/lexical-element-node'
 import type { TextFormatType } from './nodes/lexical-text-node.type'
 
+// @ts-ignore
 export type LexicalCommand<TPayload> = {
   type?: string
 }

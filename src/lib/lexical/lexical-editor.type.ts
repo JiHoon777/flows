@@ -1,5 +1,6 @@
 import type { LexicalEditor } from './lexical-editor'
 import type { EditorState, SerializedEditorState } from './lexical-editor-state'
+import type { LexicalCommand } from '@/lib/lexical/lexical-commands.ts'
 import type {
   DOMConversion,
   DOMConversionMap,
@@ -162,11 +163,6 @@ export type CommandListener<P> = (payload: P, editor: LexicalEditor) => boolean
 export type EditableListener = (editable: boolean) => void
 
 export type CommandListenerPriority = 0 | 1 | 2 | 3 | 4
-
-// @ts-ignore
-export type LexicalCommand<TPayload> = {
-  type?: string
-}
 
 /**
  * Type helper for extracting the payload type from a command.
