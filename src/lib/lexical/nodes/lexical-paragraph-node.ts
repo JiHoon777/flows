@@ -1,4 +1,5 @@
-import { $isTextNode, type TextFormatType } from './lexical-text-node'
+import { $isTextNode } from './lexical-text-node'
+import type { TextFormatType } from './lexical-text-node.type'
 import { TEXT_TYPE_TO_FORMAT } from '../lexical-constants'
 import type { LexicalEditor } from '../lexical-editor'
 import type { EditorConfig } from '../lexical-editor.type'

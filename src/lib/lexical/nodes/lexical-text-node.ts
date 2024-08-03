@@ -32,7 +32,6 @@ import {
 import type { LexicalEditor } from '../lexical-editor'
 import type { EditorConfig, TextNodeThemeClasses } from '../lexical-editor.type'
 import type { KlassConstructor } from '../lexical-type'
-
 import {
   $applyNodeReplacement,
   $getCompositionKey,
