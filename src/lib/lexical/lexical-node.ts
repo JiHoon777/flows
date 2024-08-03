@@ -1,7 +1,8 @@
 import type { EditorState } from '@/lib/lexical/lexical-editor-state.ts'
 import type { LexicalEditor } from '@/lib/lexical/lexical-editor.ts'
 import type { EditorConfig } from '@/lib/lexical/lexical-editor.type.ts'
-import type {
+import {
+  $moveSelectionPointToEnd,
   BaseSelection,
   RangeSelection,
 } from '@/lib/lexical/lexical-selection.ts'
@@ -28,7 +29,6 @@ import {
   $getCompositionKey,
   $isRootOrShadowRoot,
   $maybeMoveChildrenSelectionToParent,
-  $moveSelectionPointToEnd,
   $setCompositionKey,
   $setSelection,
   errorOnInsertTextNodeOnRoot,

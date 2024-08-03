@@ -22,6 +22,7 @@ import type {
   RangeSelection,
 } from '@/lib/lexical/lexical-selection.ts'
 import type { Spread } from '@/lib/lexical/lexical-type.ts'
+import type { DecoratorNode } from '@/lib/lexical/nodes/lexical-decorator-node.ts'
 import type { ElementNode } from '@/lib/lexical/nodes/lexical-element-node.ts'
 import type { RootNode } from '@/lib/lexical/nodes/lexical-root-node.ts'
 import type { TextNode } from '@/lib/lexical/nodes/lexical-text-node.ts'
@@ -35,6 +36,7 @@ import {
   RTL_REGEX,
   TEXT_TYPE_TO_FORMAT,
 } from '@/lib/lexical/lexical-constants.ts'
+import { $flushRootMutations } from '@/lib/lexical/lexical-mutations.ts'
 import { $getNodeByKey } from '@/lib/lexical/lexical-node.ts'
 import { $getPreviousSelection } from '@/lib/lexical/lexical-selection.ts'
 import {
@@ -53,6 +55,7 @@ import {
 } from '@/lib/lexical/lexical-updates.ts'
 import { $isDecoratorNode } from '@/lib/lexical/nodes/lexical-decorator-node.ts'
 import { $isElementNode } from '@/lib/lexical/nodes/lexical-element-node.ts'
+import { $isLineBreakNode } from '@/lib/lexical/nodes/lexical-line-break-node.ts'
 import { $isParagraphNode } from '@/lib/lexical/nodes/lexical-paragraph-node.ts'
 import { $isRootNode } from '@/lib/lexical/nodes/lexical-root-node.ts'
 import { $createTextNode } from '@/lib/lexical/nodes/lexical-text-node.ts'
@@ -66,7 +69,6 @@ import {
 } from '@/utils/environment.ts'
 import invariant from '@/utils/invariant.ts'
 import { normalizeClassNames } from '@/utils/normalize-class-name'
-import { $flushRootMutations } from '@/lib/lexical/lexical-mutations.ts'
 
 export const emptyFunction = () => {
   return
@@ -351,61 +353,6 @@ export function $setSelection(selection: null | BaseSelection): void {
     selection.setCachedNodes(null)
   }
   editorState._selection = selection
-}
-
-/**
- * 주어진 노드에 대해 선택 포인트를 설정합니다.
- *
- * @param point - 설정할 선택 포인트
- * @param node - 선택 포인트를 설정할 대상 노드
- */
-function selectPointOnNode(point: PointType, node: LexicalNode): void {
-  let key = node.__key
-  let offset = point.offset
-  let type: 'element' | 'text' = 'element'
-  if ($isTextNode(node)) {
-    type = 'text'
-    const textContentLength = node.getTextContentSize()
-    if (offset > textContentLength) {
-      offset = textContentLength
-    }
-    // 노드가 TextNode 도 ElementNode 도 아닌 경우
-  } else if (!$isElementNode(node)) {
-    const nextSibling = node.getNextSibling()
-    if ($isTextNode(nextSibling)) {
-      key = nextSibling.__key
-      offset = 0
-      type = 'text'
-    } else {
-      const parentNode = node.getParent()
-      if (parentNode) {
-        key = parentNode.__key
-        offset = node.getIndexWithinParent() + 1
-      }
-    }
-  }
-  point.set(key, offset, type)
-}
-/**
- * 선택 포인트를 주어진 노드의 끝으로 이동시킵니다.
- *
- * @param point - 이동시킬 선택 포인트
- * @param node - 선택 포인트를 이동시킬 대상 노드
- */
-export function $moveSelectionPointToEnd(
-  point: PointType,
-  node: LexicalNode,
-): void {
-  if ($isElementNode(node)) {
-    const lastNode = node.getLastDescendant()
-    if ($isElementNode(lastNode) || $isTextNode(lastNode)) {
-      selectPointOnNode(point, lastNode)
-    } else {
-      selectPointOnNode(point, node)
-    }
-  } else {
-    selectPointOnNode(point, node)
-  }
 }
 
 /**
@@ -1320,6 +1267,280 @@ export function getTextDirection(text: string): 'ltr' | 'rtl' | null {
     return 'ltr'
   }
   return null
+}
+/**
+ * 주어진 DOM 요소에서 대응하는 LexicalNode를 반환합니다.
+ *
+ * @param {Node} dom - LexicalNode로 변환할 DOM 요소입니다.
+ * @returns {LexicalNode | null} 주어진 DOM 요소에 매핑되는 LexicalNode를 반환합니다. 매핑되는 노드가 없으면 null을 반환합니다.
+ *
+ * 함수 동작 설명:
+ * 1. 현재 활성화된 에디터 인스턴스를 가져옵니다.
+ * 2. 주어진 DOM 요소에서 노드 키를 추출합니다.
+ * 3. 노드 키가 null인 경우, 주어진 DOM 요소가 에디터의 루트 요소인지 확인하고, 루트 요소와 동일하면 'root' 키에 해당하는 노드를 반환합니다.
+ * 4. 노드 키가 유효한 경우, 해당 노드를 반환합니다.
+ */
+export function $getNodeFromDOM(dom: Node): null | LexicalNode {
+  const editor = getActiveEditor()
+  const nodeKey = getNodeKeyFromDOM(dom, editor)
+  if (nodeKey === null) {
+    const rootElement = editor.getRootElement()
+    if (dom === rootElement) {
+      return $getNodeByKey('root')
+    }
+    return null
+  }
+  return $getNodeByKey(nodeKey)
+}
+/**
+ * 주어진 DOM 요소에서 Lexical 노드 키를 반환합니다.
+ *
+ * @param {Node} dom - Lexical 노드 키를 추출할 DOM 요소입니다.
+ * @param {LexicalEditor} editor - 현재 활성화된 Lexical 에디터 인스턴스입니다.
+ * @returns {NodeKey | null} 주어진 DOM 요소에 매핑되는 Lexical 노드 키를 반환합니다. 매핑되는 키가 없으면 null을 반환합니다.
+ *
+ * 함수 동작 설명:
+ * 1. 주어진 DOM 요소를 시작으로 부모 요소를 순차적으로 탐색합니다.
+ * 2. 각 DOM 요소에 `__lexicalKey_${editor._key}` 속성이 존재하는지 확인하고, 존재하면 해당 키를 반환합니다.
+ * 3. 매핑되는 키를 찾지 못하면 null을 반환합니다.
+ */
+function getNodeKeyFromDOM(
+  // Note that node here refers to a DOM Node, not an Lexical Node
+  dom: Node,
+  editor: LexicalEditor,
+): NodeKey | null {
+  let node: Node | null = dom
+  while (node != null) {
+    // @ts-ignore We intentionally add this to the Node.
+    const key: NodeKey = node[`__lexicalKey_${editor._key}`]
+    if (key !== undefined) {
+      return key
+    }
+    node = getParentElement(node)
+  }
+  return null
+}
+/**
+ * 주어진 TextNode의 오프셋을 반환합니다.
+ *
+ * @param {TextNode} node - 오프셋을 계산할 텍스트 노드입니다.
+ * @param {boolean} moveSelectionToEnd - 선택 범위를 노드의 끝으로 이동할지 여부를 나타내는 플래그입니다.
+ * @returns {number} 텍스트 노드의 오프셋을 반환합니다.
+ *                  moveSelectionToEnd가 true인 경우 노드의 텍스트 길이를 반환하고,
+ *                  false인 경우 0을 반환합니다.
+ */
+export function getTextNodeOffset(
+  node: TextNode,
+  moveSelectionToEnd: boolean,
+): number {
+  return moveSelectionToEnd ? node.getTextContentSize() : 0
+}
+/**
+ * 이 함수는 라이브러리의 내부 사용을 위한 것입니다.
+ * 이 함수는 변경될 수 있으므로 사용하지 마십시오.
+ *
+ * 주어진 LexicalNode가 블록 요소인지 확인합니다.
+ *
+ * @param node - 확인할 LexicalNode입니다.
+ * @returns node가 ElementNode이거나 데코레이터 노드인 경우 true를 반환합니다.
+ */
+export function INTERNAL_$isBlock(
+  node: LexicalNode,
+): node is ElementNode | DecoratorNode<unknown> {
+  if ($isRootNode(node) || ($isDecoratorNode(node) && !node.isInline())) {
+    return true
+  }
+  if (!$isElementNode(node) || $isRootOrShadowRoot(node)) {
+    return false
+  }
+
+  const firstChild = node.getFirstChild()
+  const isLeafElement =
+    firstChild === null ||
+    $isLineBreakNode(firstChild) ||
+    $isTextNode(firstChild) ||
+    firstChild.isInline()
+
+  return !node.isInline() && node.canBeEmpty() !== false && isLeafElement
+}
+/**
+ * 선택된 영역이 보이지 않는 경우 스크롤하여 화면에 보이도록 합니다.
+ *
+ * @param editor - LexicalEditor 인스턴스입니다.
+ * @param selectionRect - 선택된 영역의 DOMRect 객체입니다.
+ * @param rootElement - 에디터의 루트 HTMLElement입니다.
+ */
+export function scrollIntoViewIfNeeded(
+  editor: LexicalEditor,
+  selectionRect: DOMRect,
+  rootElement: HTMLElement,
+): void {
+  const doc = rootElement.ownerDocument
+  const defaultView = doc.defaultView
+
+  if (defaultView === null) {
+    return
+  }
+  let { top: currentTop, bottom: currentBottom } = selectionRect
+  let targetTop = 0
+  let targetBottom = 0
+  let element: HTMLElement | null = rootElement
+
+  while (element !== null) {
+    const isBodyElement = element === doc.body
+    if (isBodyElement) {
+      targetTop = 0
+      targetBottom = getWindow(editor).innerHeight
+    } else {
+      const targetRect = element.getBoundingClientRect()
+      targetTop = targetRect.top
+      targetBottom = targetRect.bottom
+    }
+    let diff = 0
+
+    if (currentTop < targetTop) {
+      diff = -(targetTop - currentTop)
+    } else if (currentBottom > targetBottom) {
+      diff = currentBottom - targetBottom
+    }
+
+    if (diff !== 0) {
+      if (isBodyElement) {
+        // Only handles scrolling of Y axis
+        defaultView.scrollBy(0, diff)
+      } else {
+        const scrollTop = element.scrollTop
+        element.scrollTop += diff
+        const yOffset = element.scrollTop - scrollTop
+        currentTop -= yOffset
+        currentBottom -= yOffset
+      }
+    }
+    if (isBodyElement) {
+      break
+    }
+    element = getParentElement(element)
+  }
+}
+/**
+ * 주어진 엘리먼트 노드를 기준으로 역방향 또는 순방향으로 인접한 Lexical 노드를 해결합니다.
+ *
+ * @param element - 기준이 되는 엘리먼트 노드입니다.
+ * @param isBackward - 역방향으로 탐색할지 여부를 나타냅니다.
+ * @param focusOffset - 포커스 오프셋 값입니다.
+ * @returns 인접한 Lexical 노드 또는 null을 반환합니다.
+ */
+
+function resolveElement(
+  element: ElementNode,
+  isBackward: boolean,
+  focusOffset: number,
+): LexicalNode | null {
+  const parent = element.getParent()
+  let offset = focusOffset
+  let block = element
+  if (parent !== null) {
+    if (isBackward && focusOffset === 0) {
+      offset = block.getIndexWithinParent()
+      block = parent
+    } else if (!isBackward && focusOffset === block.getChildrenSize()) {
+      offset = block.getIndexWithinParent() + 1
+      block = parent
+    }
+  }
+  return block.getChildAtIndex(isBackward ? offset - 1 : offset)
+}
+/**
+ * 주어진 포인트에서 인접한 Lexical 노드를 반환합니다.
+ *
+ * @param focus - 기준이 되는 포인트입니다.
+ * @param isBackward - 역방향으로 탐색할지 여부를 나타냅니다.
+ * @returns 인접한 Lexical 노드 또는 null을 반환합니다.
+ */
+export function $getAdjacentNode(
+  focus: PointType,
+  isBackward: boolean,
+): null | LexicalNode {
+  const focusOffset = focus.offset
+  if (focus.type === 'element') {
+    const block = focus.getNode()
+    return resolveElement(block, isBackward, focusOffset)
+  } else {
+    const focusNode = focus.getNode()
+    if (
+      (isBackward && focusOffset === 0) ||
+      (!isBackward && focusOffset === focusNode.getTextContentSize())
+    ) {
+      const possibleNode = isBackward
+        ? focusNode.getPreviousSibling()
+        : focusNode.getNextSibling()
+      if (possibleNode === null) {
+        return resolveElement(
+          focusNode.getParentOrThrow(),
+          isBackward,
+          focusNode.getIndexWithinParent() + (isBackward ? 0 : 1),
+        )
+      }
+      return possibleNode
+    }
+  }
+  return null
+}
+/**
+ * 주어진 노드의 가장 가까운 루트 노드 또는 섀도우 루트 노드를 반환합니다.
+ *
+ * @param node - 시작하는 Lexical 노드입니다.
+ * @returns 가장 가까운 루트 노드 또는 섀도우 루트 노드를 반환합니다.
+ * @throws 부모 노드를 찾을 수 없으면 오류를 던집니다.
+ */
+export function $getNearestRootOrShadowRoot(
+  node: LexicalNode,
+): RootNode | ElementNode {
+  let parent = node.getParentOrThrow()
+  while (parent !== null) {
+    if ($isRootOrShadowRoot(parent)) {
+      return parent
+    }
+    parent = parent.getParentOrThrow()
+  }
+  return parent
+}
+/**
+ * 블록 커서 요소를 DOM에서 제거합니다.
+ *
+ * @param blockCursorElement - 제거할 블록 커서 요소입니다.
+ * @param editor - Lexical 편집기 인스턴스입니다.
+ * @param rootElement - 루트 요소입니다.
+ */
+export function removeDOMBlockCursorElement(
+  blockCursorElement: HTMLElement,
+  editor: LexicalEditor,
+  rootElement: HTMLElement,
+) {
+  rootElement.style.removeProperty('caret-color')
+  editor._blockCursorElement = null
+  const parentElement = blockCursorElement.parentElement
+  if (parentElement !== null) {
+    parentElement.removeChild(blockCursorElement)
+  }
+}
+/**
+ * 주어진 조건(predicate)을 만족하는 가장 가까운 조상 노드를 반환합니다.
+ *
+ * @template NodeType - 반환할 노드의 유형입니다.
+ * @param node - 시작 노드입니다.
+ * @param predicate - 조상 노드가 주어진 조건을 만족하는지 확인하는 함수입니다.
+ * @returns 조건을 만족하는 가장 가까운 조상 노드 또는 null입니다.
+ */
+export function $getAncestor<NodeType extends LexicalNode = LexicalNode>(
+  node: LexicalNode,
+  predicate: (ancestor: LexicalNode) => ancestor is NodeType,
+) {
+  let parent = node
+  while (parent !== null && parent.getParent() !== null && !predicate(parent)) {
+    parent = parent.getParentOrThrow()
+  }
+  return predicate(parent) ? parent : null
 }
 
 //
