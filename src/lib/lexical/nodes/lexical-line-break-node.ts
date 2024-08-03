@@ -1,12 +1,17 @@
-import { DOM_TEXT_TYPE } from '../lexical-constants'
 import type {
   DOMConversionMap,
   DOMConversionOutput,
   NodeKey,
-} from '../lexical-node'
-import { LexicalNode, type SerializedLexicalNode } from '../lexical-node'
-import type { KlassConstructor } from '../lexical-type'
-import { $applyNodeReplacement, isBlockDomNode } from '../lexical-utils'
+  SerializedLexicalNode,
+} from '@/lib/lexical/lexical-node.ts'
+import type { KlassConstructor } from '@/lib/lexical/lexical-type.ts'
+
+import { DOM_TEXT_TYPE } from '@/lib/lexical/lexical-constants.ts'
+import { LexicalNode } from '@/lib/lexical/lexical-node.ts'
+import {
+  $applyNodeReplacement,
+  isBlockDomNode,
+} from '@/lib/lexical/lexical-utils.ts'
 
 export type SerializedLineBreakNode = SerializedLexicalNode
 

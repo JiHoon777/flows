@@ -1,3 +1,4 @@
+import { $isRootOrShadowRoot, removeFromParent } from '../lexical-utils'
 import type {
   NodeKey,
   SerializedLexicalNode,
@@ -28,7 +29,6 @@ import {
 } from '@/lib/lexical/lexical-updates.ts'
 import { $isTextNode } from '@/lib/lexical/nodes/lexical-text-node.ts'
 import invariant from '@/utils/invariant.ts'
-import { $isRootOrShadowRoot, removeFromParent } from '../lexical-utils'
 
 export type ElementFormatType =
   | 'left'

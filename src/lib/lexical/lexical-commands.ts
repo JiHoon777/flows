@@ -1,7 +1,8 @@
-import type { LexicalNode } from './lexical-node'
-import type { BaseSelection } from './lexical-selection'
-import type { ElementFormatType } from './nodes/lexical-element-node'
-import type { TextFormatType } from './nodes/lexical-text-node.type'
+// @ts-ignore
+import type { LexicalNode } from '@/lib/lexical/lexical-node.ts'
+import type { BaseSelection } from '@/lib/lexical/lexical-selection.ts'
+import type { ElementFormatType } from '@/lib/lexical/nodes/lexical-element-node.ts'
+import type { TextFormatType } from '@/lib/lexical/nodes/lexical-text-node.type.ts'
 
 // @ts-ignore
 export type LexicalCommand<TPayload> = {

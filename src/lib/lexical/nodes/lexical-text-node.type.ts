@@ -1,5 +1,5 @@
-import type { SerializedLexicalNode } from '../lexical-node'
-import type { Spread } from '../lexical-type'
+import type { SerializedLexicalNode } from '@/lib/lexical/lexical-node.ts'
+import type { Spread } from '@/lib/lexical/lexical-type.ts'
 
 export type SerializedTextNode = Spread<
   {

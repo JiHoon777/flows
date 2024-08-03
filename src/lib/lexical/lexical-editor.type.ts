@@ -1,6 +1,9 @@
-import type { LexicalEditor } from './lexical-editor'
-import type { EditorState, SerializedEditorState } from './lexical-editor-state'
 import type { LexicalCommand } from '@/lib/lexical/lexical-commands.ts'
+import type { LexicalEditor } from '@/lib/lexical/lexical-editor'
+import type {
+  EditorState,
+  SerializedEditorState,
+} from '@/lib/lexical/lexical-editor-state'
 import type {
   DOMConversion,
   DOMConversionMap,

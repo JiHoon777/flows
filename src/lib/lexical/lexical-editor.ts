@@ -1,6 +1,8 @@
-import { FULL_RECONCILE, NO_DIRTY_NODES } from './lexical-constants'
-import type { EditorState, SerializedEditorState } from './lexical-editor-state'
-import { createEmptyEditorState } from './lexical-editor-state'
+import type { LexicalCommand } from '@/lib/lexical/lexical-commands.ts'
+import type {
+  EditorState,
+  SerializedEditorState,
+} from '@/lib/lexical/lexical-editor-state'
 import type {
   CommandListener,
   CommandListenerPriority,
@@ -15,7 +17,6 @@ import type {
   EditorUpdateOptions,
   ErrorHandler,
   IntentionallyMarkedAsDirtyElement,
-  LexicalCommand,
   Listeners,
   MutationListener,
   MutationListenerOptions,
@@ -27,11 +28,13 @@ import type {
   TextContentListener,
   Transform,
   UpdateListener,
-} from './lexical-editor.type'
+} from '@/lib/lexical/lexical-editor.type'
 import type { LexicalNode, NodeKey } from '@/lib/lexical/lexical-node.ts'
 import type { Klass, KlassConstructor } from '@/lib/lexical/lexical-type.ts'
 import { nanoid } from 'nanoid'
 
+import { FULL_RECONCILE, NO_DIRTY_NODES } from '@/lib/lexical/lexical-constants'
+import { createEmptyEditorState } from '@/lib/lexical/lexical-editor-state'
 import {
   addRootElementEvents,
   removeRootElementEvents,

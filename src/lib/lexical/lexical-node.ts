@@ -1,8 +1,7 @@
 import type { EditorState } from '@/lib/lexical/lexical-editor-state.ts'
 import type { LexicalEditor } from '@/lib/lexical/lexical-editor.ts'
 import type { EditorConfig } from '@/lib/lexical/lexical-editor.type.ts'
-import {
-  $moveSelectionPointToEnd,
+import type {
   BaseSelection,
   RangeSelection,
 } from '@/lib/lexical/lexical-selection.ts'
@@ -11,6 +10,7 @@ import type { DecoratorNode } from '@/lib/lexical/nodes/lexical-decorator-node.t
 import type { ElementNode } from '@/lib/lexical/nodes/lexical-element-node.ts'
 
 import { HAS_DIRTY_NODES } from '@/lib/lexical/lexical-constants.ts'
+import { $moveSelectionPointToEnd } from '@/lib/lexical/lexical-selection.ts'
 import {
   $getSelection,
   $isNodeSelection,

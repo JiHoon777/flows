@@ -1,10 +1,5 @@
-import { $isTextNode } from './lexical-text-node'
-import type { TextFormatType } from './lexical-text-node.type'
-import { TEXT_TYPE_TO_FORMAT } from '../lexical-constants'
-import type { LexicalEditor } from '../lexical-editor'
-import type { EditorConfig } from '../lexical-editor.type'
-import type { RangeSelection } from '../lexical-selection'
-import type { KlassConstructor, Spread } from '../lexical-type'
+import type { LexicalEditor } from '@/lib/lexical/lexical-editor.ts'
+import type { EditorConfig } from '@/lib/lexical/lexical-editor.type.ts'
 import type {
   DOMConversionMap,
   DOMConversionOutput,
@@ -12,15 +7,22 @@ import type {
   LexicalNode,
   NodeKey,
 } from '@/lib/lexical/lexical-node.ts'
-import type { SerializedElementNode } from '@/lib/lexical/nodes/lexical-element-node.ts'
-import type { ElementFormatType } from 'lexical'
-import { isHTMLElement } from 'lexical'
+import type { RangeSelection } from '@/lib/lexical/lexical-selection.ts'
+import type { KlassConstructor, Spread } from '@/lib/lexical/lexical-type.ts'
+import type {
+  ElementFormatType,
+  SerializedElementNode,
+} from '@/lib/lexical/nodes/lexical-element-node.ts'
+import type { TextFormatType } from '@/lib/lexical/nodes/lexical-text-node.type.ts'
 
+import { TEXT_TYPE_TO_FORMAT } from '@/lib/lexical/lexical-constants.ts'
 import {
   $applyNodeReplacement,
   getCachedClassNameArray,
+  isHTMLElement,
 } from '@/lib/lexical/lexical-utils.ts'
 import { ElementNode } from '@/lib/lexical/nodes/lexical-element-node.ts'
+import { $isTextNode } from '@/lib/lexical/nodes/lexical-text-node.ts'
 
 export type SerializedParagraphNode = Spread<
   { textFormat: number; textStyle: string },

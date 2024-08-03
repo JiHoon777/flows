@@ -1,12 +1,17 @@
-import { TextNode } from './lexical-text-node'
+import type {
+  DOMConversionMap,
+  LexicalNode,
+  NodeKey,
+} from '@/lib/lexical/lexical-node.ts'
 import type {
   SerializedTextNode,
   TextDetailType,
   TextModeType,
-} from './lexical-text-node.type'
-import { IS_UNMERGEABLE } from '../lexical-constants'
-import type { DOMConversionMap, LexicalNode, NodeKey } from '../lexical-node'
-import { $applyNodeReplacement } from '../lexical-utils'
+} from '@/lib/lexical/nodes/lexical-text-node.type.ts'
+
+import { IS_UNMERGEABLE } from '@/lib/lexical/lexical-constants.ts'
+import { $applyNodeReplacement } from '@/lib/lexical/lexical-utils.ts'
+import { TextNode } from '@/lib/lexical/nodes/lexical-text-node.ts'
 import invariant from '@/utils/invariant'
 
 export type SerializedTabNode = SerializedTextNode

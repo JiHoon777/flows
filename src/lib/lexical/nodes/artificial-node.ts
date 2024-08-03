@@ -1,7 +1,8 @@
-import { ElementNode } from './lexical-element-node'
-import type { EditorConfig } from '../lexical-editor.type'
-
 // TODO: Cleanup ArtificialNode__DO_NOT_USE #5966
+import type { EditorConfig } from '@/lib/lexical/lexical-editor.type.ts'
+
+import { ElementNode } from '@/lib/lexical/nodes/lexical-element-node.ts'
+
 export class ArtificialNode__DO_NOT_USE extends ElementNode {
   static getType(): string {
     return 'artificial'

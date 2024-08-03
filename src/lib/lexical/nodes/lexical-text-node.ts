@@ -1,12 +1,27 @@
-import type { ElementNode } from './lexical-element-node'
-import { $createLineBreakNode } from './lexical-line-break-node'
-import { $createTabNode } from './lexical-tab-node'
+import type { LexicalEditor } from '@/lib/lexical/lexical-editor.ts'
+import type {
+  EditorConfig,
+  TextNodeThemeClasses,
+} from '@/lib/lexical/lexical-editor.type.ts'
+import type {
+  DOMConversionMap,
+  DOMConversionOutput,
+  DOMExportOutput,
+  NodeKey,
+} from '@/lib/lexical/lexical-node.ts'
+import type {
+  BaseSelection,
+  RangeSelection,
+} from '@/lib/lexical/lexical-selection.ts'
+import type { KlassConstructor } from '@/lib/lexical/lexical-type.ts'
+import type { ElementNode } from '@/lib/lexical/nodes/lexical-element-node.ts'
 import type {
   SerializedTextNode,
   TextDetailType,
   TextFormatType,
   TextModeType,
-} from './lexical-text-node.type'
+} from '@/lib/lexical/nodes/lexical-text-node.type.ts'
+
 import {
   COMPOSITION_SUFFIX,
   DETAIL_TYPE_TO_DETAIL,
@@ -28,31 +43,7 @@ import {
   TEXT_MODE_TO_TYPE,
   TEXT_TYPE_TO_FORMAT,
   TEXT_TYPE_TO_MODE,
-} from '../lexical-constants'
-import type { LexicalEditor } from '../lexical-editor'
-import type { EditorConfig, TextNodeThemeClasses } from '../lexical-editor.type'
-import type { KlassConstructor } from '../lexical-type'
-import {
-  $applyNodeReplacement,
-  $getCompositionKey,
-  $setCompositionKey,
-  getCachedClassNameArray,
-  internalMarkSiblingsAsDirty,
-  isHTMLElement,
-  isInlineDomNode,
-  toggleTextFormatType,
-} from '../lexical-utils'
-import type {
-  DOMConversionMap,
-  DOMConversionOutput,
-  DOMExportOutput,
-  NodeKey,
-} from '@/lib/lexical/lexical-node.ts'
-import type {
-  BaseSelection,
-  RangeSelection,
-} from '@/lib/lexical/lexical-selection.ts'
-
+} from '@/lib/lexical/lexical-constants.ts'
 import { LexicalNode } from '@/lib/lexical/lexical-node.ts'
 import {
   $getSelection,
@@ -62,6 +53,18 @@ import {
   adjustPointOffsetForMergedSibling,
 } from '@/lib/lexical/lexical-selection.ts'
 import { errorOnReadOnly } from '@/lib/lexical/lexical-updates.ts'
+import {
+  $applyNodeReplacement,
+  $getCompositionKey,
+  $setCompositionKey,
+  getCachedClassNameArray,
+  internalMarkSiblingsAsDirty,
+  isHTMLElement,
+  isInlineDomNode,
+  toggleTextFormatType,
+} from '@/lib/lexical/lexical-utils.ts'
+import { $createLineBreakNode } from '@/lib/lexical/nodes/lexical-line-break-node.ts'
+import { $createTabNode } from '@/lib/lexical/nodes/lexical-tab-node.ts'
 import { IS_FIREFOX } from '@/utils/environment'
 import invariant from '@/utils/invariant'
 
