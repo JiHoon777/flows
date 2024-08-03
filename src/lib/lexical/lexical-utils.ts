@@ -1,9 +1,11 @@
-import type { Spread } from './lexical-type'
-import type { EditorState } from '@/lib/lexical/lexical-editor-state.ts'
 import type {
   EditorThemeClasses,
   IntentionallyMarkedAsDirtyElement,
+  TextNodeThemeClasses,
 } from './lexical-editor.type'
+import type { Spread } from './lexical-type'
+import type { TextFormatType } from './nodes/lexical-text-node.type'
+import type { EditorState } from '@/lib/lexical/lexical-editor-state.ts'
 import type {
   LexicalNode,
   NodeKey,
@@ -16,7 +18,10 @@ import type {
 import type { ElementNode } from '@/lib/lexical/nodes/lexical-element-node.ts'
 import type { RootNode } from '@/lib/lexical/nodes/lexical-root-node.ts'
 
-import { HAS_DIRTY_NODES } from '@/lib/lexical/lexical-constants.ts'
+import {
+  HAS_DIRTY_NODES,
+  TEXT_TYPE_TO_FORMAT,
+} from '@/lib/lexical/lexical-constants.ts'
 import { $getNodeByKey } from '@/lib/lexical/lexical-node.ts'
 import {
   $getSelection,
@@ -150,10 +155,27 @@ export function internalMarkParentElementsAsDirty(
 }
 
 /**
- * Never use this function directly! It will break
- * the cloning heuristic. Instead use node.getWritable().
+ * 노드를 "dirty"로 표시합니다. 이는 노드가 변경되었음을 나타냅니다.
  *
- * @param node - dirty 로 표시할 노드
+ * @param node - "dirty"로 표시할 LexicalNode
+ *
+ * @internal
+ * @warning 이 함수를 직접 사용하지 마세요! 클로닝 휴리스틱을 손상시킬 수 있습니다.
+ * 대신 node.getWritable()을 사용하세요.
+ *
+ * @description
+ * 이 함수는 노드와 그 부모 요소들을 "dirty"로 표시합니다. 이는 에디터에게
+ * 해당 노드들이 변경되었으며 업데이트가 필요함을 알립니다.
+ *
+ * 동작 과정:
+ * 1. 무한 변환 오류를 체크합니다.
+ * 2. 노드의 부모 요소들을 "dirty"로 표시합니다.
+ * 3. 에디터의 상태를 "dirty nodes 있음"으로 설정합니다.
+ * 4. 노드 유형에 따라 적절한 "dirty" 컬렉션에 추가합니다.
+ *
+ * @note
+ * - 이 함수는 내부 사용을 위한 것이며, 직접 호출하면 예기치 않은 동작이 발생할 수 있습니다.
+ * - TODO: 이 함수를 Element와 Leaf 노드를 위한 두 개의 전용 함수로 분리해야 합니다.
  */
 export function internalMarkNodeAsDirty(node: LexicalNode): void {
   errorOnInfiniteTransforms()
@@ -468,16 +490,16 @@ export function isBlockDomNode(node: Node) {
   return node.nodeName.match(blockNodes) !== null
 }
 
-export function getCachedClassNameArray(
-  classNamesTheme: EditorThemeClasses,
-  classNameThemeType: string,
-): Array<string> {
+export function getCachedClassNameArray<
+  T extends EditorThemeClasses | TextNodeThemeClasses,
+  K extends keyof T,
+>(classNamesTheme: T, classNameThemeType: K): Array<string> {
   if (classNamesTheme.__lexicalClassNameCache === undefined) {
     classNamesTheme.__lexicalClassNameCache = {}
   }
 
   const classNamesCache = classNamesTheme.__lexicalClassNameCache
-  const cachedClassNames = classNamesCache[classNameThemeType]
+  const cachedClassNames = classNamesCache[classNameThemeType as string]
   if (cachedClassNames !== undefined) {
     return cachedClassNames
   }
@@ -485,9 +507,103 @@ export function getCachedClassNameArray(
   const classNames = classNamesTheme[classNameThemeType]
   if (typeof classNames === 'string') {
     const classNamesArr = normalizeClassNames(classNames)
-    classNamesCache[classNameThemeType] = classNamesArr
+    classNamesCache[classNameThemeType as string] = classNamesArr
     return classNamesArr
   }
 
-  return classNames
+  return classNames as string[]
+}
+
+/**
+ * 텍스트 형식을 토글하는 함수
+ *
+ * @param format - 현재 형식을 나타내는 숫자
+ * @param type - 토글할 텍스트 형식 타입
+ * @param alignWithFormat - 정렬할 형식 (null이면 토글, 아니면 해당 형식과 정렬)
+ * @returns 새로운 형식을 나타내는 숫자
+ *
+ * @description
+ * 이 함수는 주어진 텍스트 형식을 토글하거나 특정 형식과 정렬합니다.
+ * 특별히 'subscript'와 'superscript' 형식은 상호 배타적으로 처리됩니다.
+ */
+export function toggleTextFormatType(
+  format: number,
+  type: TextFormatType,
+  alignWithFormat: null | number,
+): number {
+  const activeFormat = TEXT_TYPE_TO_FORMAT[type]
+
+  // alignWithFormat이 null이 아니고, 현재 형식과 정렬이 필요한 경우 변경 없이 반환
+  if (
+    alignWithFormat !== null &&
+    (format & activeFormat) === (alignWithFormat & activeFormat)
+  ) {
+    return format
+  }
+
+  // XOR 연산을 사용하여 형식을 토글합니다.
+  let newFormat = format ^ activeFormat
+
+  // 'subscript'와 'superscript' 형식의 상호 배타적 처리
+  if (type === 'subscript') {
+    // 'subscript'를 설정할 때 'superscript'를 제거
+    newFormat &= ~TEXT_TYPE_TO_FORMAT.superscript
+  } else if (type === 'superscript') {
+    // 'superscript'를 설정할 때 'subscript'를 제거
+    newFormat &= ~TEXT_TYPE_TO_FORMAT.subscript
+  }
+
+  return newFormat
+}
+
+/**
+ *
+ * @param node - the Dom Node to check
+ * @returns if the Dom Node is an inline node
+ */
+export function isInlineDomNode(node: Node) {
+  const inlineNodes = new RegExp(
+    /^(a|abbr|acronym|b|cite|code|del|em|i|ins|kbd|label|output|q|ruby|s|samp|span|strong|sub|sup|time|u|tt|var|#text)$/,
+    'i',
+  )
+  return node.nodeName.match(inlineNodes) !== null
+}
+
+/**
+ * @param x - The element being testing
+ * @returns Returns true if x is an HTML element, false otherwise.
+ */
+export function isHTMLElement(x: Node | EventTarget): x is HTMLElement {
+  // @ts-ignore-next-line - strict check on nodeType here should filter out non-Element EventTarget implementors
+  return x.nodeType === 1
+}
+
+/**
+ * 주어진 노드의 이전 및 다음 형제 노드를 "dirty"로 표시합니다.
+ *
+ * @param node - 형제 노드들을 "dirty"로 표시할 기준이 되는 LexicalNode
+ *
+ * @internal
+ * @description
+ * 이 함수는 주어진 노드의 직접적인 이전 및 다음 형제 노드를 찾아
+ * 각각을 "dirty"로 표시합니다. 이는 노드 주변의 컨텍스트가
+ * 변경되었을 수 있음을 나타냅니다.
+ *
+ * 동작 과정:
+ * 1. 노드의 이전 형제를 찾아 "dirty"로 표시합니다.
+ * 2. 노드의 다음 형제를 찾아 "dirty"로 표시합니다.
+ *
+ * @note
+ * - 이 함수는 내부 사용을 위한 것입니다.
+ * - 형제 노드가 없는 경우(null)에는 아무 동작도 수행하지 않습니다.
+ */
+export function internalMarkSiblingsAsDirty(node: LexicalNode) {
+  const previousNode = node.getPreviousSibling()
+  const nextNode = node.getNextSibling()
+  if (previousNode !== null) {
+    internalMarkNodeAsDirty(previousNode)
+  }
+  if (nextNode !== null) {
+    internalMarkNodeAsDirty(nextNode)
+  }
 }

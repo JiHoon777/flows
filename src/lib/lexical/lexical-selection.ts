@@ -211,6 +211,13 @@ export class RangeSelection implements BaseSelection {
   isBackward(): boolean {
     return this.focus.isBefore(this.anchor)
   }
+
+  setTextNodeRange(
+    anchorNode: TextNode,
+    anchorOffset: number,
+    focusNode: TextNode,
+    focusOffset: number,
+  ): void {}
 }
 
 export function $isRangeSelection(x: unknown): x is RangeSelection {
@@ -472,5 +479,57 @@ export function moveSelectionPointToSibling(
       offset = parent.getChildrenSize()
     }
     point.set(parent.__key, offset, 'element')
+  }
+}
+
+/**
+ * 텍스트 노드 병합 후 선택 포인트의 오프셋을 조정합니다.
+ *
+ * @param point - 조정할 선택 포인트 (PointType)
+ * @param isBefore - 병합 대상 노드가 현재 노드 이전에 있는지 여부
+ * @param key - 병합 결과 노드의 키
+ * @param target - 병합되는 대상 텍스트 노드
+ * @param textLength - 병합 전 현재 노드의 텍스트 길이
+ *
+ * @description
+ * 이 함수는 두 텍스트 노드가 병합될 때 선택 포인트의 위치를 적절히 조정합니다.
+ * 텍스트 선택과 요소 선택을 다르게 처리합니다:
+ *
+ * 1. 텍스트 선택의 경우:
+ *    - 선택 포인트의 키를 병합 결과 노드의 키로 업데이트합니다.
+ *    - 병합 대상이 현재 노드 이후에 있었다면, 오프셋에 현재 노드의 길이를 더합니다.
+ *
+ * 2. 요소 선택의 경우:
+ *    - 선택 포인트가 병합된 노드 이후를 가리키고 있었다면, 오프셋을 1 감소시킵니다.
+ *
+ * @example
+ * // 텍스트 선택의 경우
+ * const point = { type: 'text', key: 'target', offset: 3 };
+ * adjustPointOffsetForMergedSibling(point, false, 'merged', targetNode, 5);
+ * // 결과: point = { type: 'text', key: 'merged', offset: 8 }
+ *
+ * @example
+ * // 요소 선택의 경우
+ * const point = { type: 'element', key: 'parent', offset: 2 };
+ * adjustPointOffsetForMergedSibling(point, true, 'merged', targetNode, 5);
+ * // 결과: point = { type: 'element', key: 'parent', offset: 1 }
+ *
+ * @note
+ * 이 함수는 주로 텍스트 노드 병합 작업 중 내부적으로 사용됩니다.
+ */
+export function adjustPointOffsetForMergedSibling(
+  point: PointType,
+  isBefore: boolean,
+  key: NodeKey,
+  target: TextNode,
+  textLength: number,
+): void {
+  if (point.type === 'text') {
+    point.key = key
+    if (!isBefore) {
+      point.offset += textLength
+    }
+  } else if (point.offset > target.getIndexWithinParent()) {
+    point.offset -= 1
   }
 }

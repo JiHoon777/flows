@@ -1,10 +1,11 @@
 // DOM
-import { ElementFormatType } from '@/lib/lexical/nodes/lexical-element-node.ts'
-import {
+import type {
   TextDetailType,
   TextFormatType,
   TextModeType,
-} from '@/lib/lexical/nodes/lexical-text-node.ts'
+} from './nodes/lexical-text-node.type'
+import type { ElementFormatType } from '@/lib/lexical/nodes/lexical-element-node.ts'
+
 import {
   IS_APPLE_WEBKIT,
   IS_FIREFOX,

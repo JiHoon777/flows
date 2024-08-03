@@ -2,6 +2,7 @@ import { $isTextNode, type TextFormatType } from './lexical-text-node'
 import { TEXT_TYPE_TO_FORMAT } from '../lexical-constants'
 import type { LexicalEditor } from '../lexical-editor'
 import type { EditorConfig } from '../lexical-editor.type'
+import type { RangeSelection } from '../lexical-selection'
 import type { KlassConstructor, Spread } from '../lexical-type'
 import type {
   DOMConversionMap,
@@ -19,7 +20,6 @@ import {
   getCachedClassNameArray,
 } from '@/lib/lexical/lexical-utils.ts'
 import { ElementNode } from '@/lib/lexical/nodes/lexical-element-node.ts'
-import { RangeSelection } from '../lexical-selection'
 
 export type SerializedParagraphNode = Spread<
   { textFormat: number; textStyle: string },

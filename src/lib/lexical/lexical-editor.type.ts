@@ -1,3 +1,4 @@
+import { TextNodeThemeClasses } from './lexical-editor.type'
 import type { LexicalEditor } from './lexical-editor'
 import type {
   DOMExportOutput,
@@ -38,15 +39,23 @@ export type TextNodeThemeClasses = {
   superscript?: EditorThemeClassName
   underline?: EditorThemeClassName
   underlineStrikethrough?: EditorThemeClassName
-  [key: string]: EditorThemeClassName | undefined
+  __lexicalClassNameCache?: {
+    [key: string]: string[]
+  }
 }
+
+export type TextNodeThemeClassesKeys = keyof TextNodeThemeClasses
 
 export type EditorThemeClasses = {
   root?: EditorThemeClassName
   paragraph?: EditorThemeClassName
   text?: TextNodeThemeClasses
-  [key: string]: any
+  __lexicalClassNameCache?: {
+    [key: string]: string[]
+  }
 }
+
+export type EditorThemeClassesKeys = keyof EditorThemeClasses
 
 export type EditorConfig = {
   disableEvents?: boolean

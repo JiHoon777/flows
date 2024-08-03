@@ -402,6 +402,13 @@ export class ElementNode extends LexicalNode {
       version: 1,
     }
   }
+  splice(
+    start: number,
+    deleteCount: number,
+    nodesToInsert: Array<LexicalNode>,
+  ): this {
+    return this
+  }
 }
 
 export function $isElementNode(
