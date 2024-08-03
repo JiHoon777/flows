@@ -53,6 +53,10 @@ export type TextNodeThemeClassesKeys = keyof TextNodeThemeClasses
 export type EditorThemeClasses = {
   root?: EditorThemeClassName
   paragraph?: EditorThemeClassName
+  indent?: EditorThemeClassName
+  ltr?: EditorThemeClassName
+  rtl?: EditorThemeClassName
+
   text?: TextNodeThemeClasses
   __lexicalClassNameCache?: {
     [key: string]: string[]

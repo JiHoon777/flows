@@ -5,6 +5,10 @@ import type {
   CommandPayloadType,
   EditorThemeClasses,
   IntentionallyMarkedAsDirtyElement,
+  MutatedNodes,
+  MutationListeners,
+  NodeMutation,
+  RegisteredNodes,
   TextNodeThemeClasses,
 } from '@/lib/lexical/lexical-editor.type.ts'
 import type {
@@ -27,6 +31,8 @@ import {
   COMPOSITION_SUFFIX,
   DOM_TEXT_TYPE,
   HAS_DIRTY_NODES,
+  LTR_REGEX,
+  RTL_REGEX,
   TEXT_TYPE_TO_FORMAT,
 } from '@/lib/lexical/lexical-constants.ts'
 import { $getNodeByKey } from '@/lib/lexical/lexical-node.ts'
@@ -1227,6 +1233,93 @@ export function cloneDecorators(
   const pendingDecorators = Object.assign({}, currentDecorators)
   editor._pendingDecorators = pendingDecorators
   return pendingDecorators
+}
+
+/**
+ * 변이된 노드를 설정합니다.
+ *
+ * @desc 이 함수는 주어진 노드에 대한 변이를 기록하고, 변이 리스너가 존재하는 경우
+ * 해당 노드를 변이된 노드 맵에 추가합니다. 만약 노드가 이미 'destroyed' 상태였지만
+ * 'created' 상태로 다시 생성되면, 이는 노드가 이동된 것으로 간주하고 변이를 'updated'로 변경합니다.
+ *
+ * @param mutatedNodes - 변이된 노드의 맵입니다.
+ * @param registeredNodes - 등록된 노드의 맵입니다.
+ * @param mutationListeners - 변이 리스너의 집합입니다.
+ * @param node - 변이된 Lexical 노드입니다.
+ * @param mutation - 변이 유형입니다.
+ */
+export function setMutatedNode(
+  mutatedNodes: MutatedNodes,
+  registeredNodes: RegisteredNodes,
+  mutationListeners: MutationListeners,
+  node: LexicalNode,
+  mutation: NodeMutation,
+) {
+  if (mutationListeners.size === 0) {
+    return
+  }
+  const nodeType = node.__type
+  const nodeKey = node.__key
+  const registeredNode = registeredNodes.get(nodeType)
+  if (registeredNode === undefined) {
+    invariant(false, 'Type %s not in registeredNodes', nodeType)
+  }
+  const klass = registeredNode.klass
+  let mutatedNodesByType = mutatedNodes.get(klass)
+  if (mutatedNodesByType === undefined) {
+    mutatedNodesByType = new Map()
+    mutatedNodes.set(klass, mutatedNodesByType)
+  }
+  const prevMutation = mutatedNodesByType.get(nodeKey)
+  // If the node has already been "destroyed", yet we are
+  // re-making it, then this means a move likely happened.
+  // We should change the mutation to be that of "updated"
+  // instead.
+  const isMove = prevMutation === 'destroyed' && mutation === 'created'
+  if (prevMutation === undefined || isMove) {
+    mutatedNodesByType.set(nodeKey, isMove ? 'updated' : mutation)
+  }
+}
+/**
+ * 텍스트 콘텐츠가 끝에 두 개의 줄 바꿈이 필요한지 여부를 확인합니다.
+ *
+ * @desc 이 함수는 주어진 노드가 루트 노드가 아니고, 마지막 자식이 아니며,
+ * 인라인 노드가 아닌 경우 텍스트 콘텐츠의 끝에 두 개의 줄 바꿈이 필요한지를 확인합니다.
+ *
+ * @param node - 확인할 요소 노드입니다.
+ * @returns 텍스트 콘텐츠가 끝에 두 개의 줄 바꿈이 필요한 경우 true를 반환하고, 그렇지 않으면 false를 반환합니다.
+ */
+export function $textContentRequiresDoubleLinebreakAtEnd(
+  node: ElementNode,
+): boolean {
+  return !$isRootNode(node) && !node.isLastChild() && !node.isInline()
+}
+
+export function getElementByKeyOrThrow(
+  editor: LexicalEditor,
+  key: NodeKey,
+): HTMLElement {
+  const element = editor._keyToDOMMap.get(key)
+
+  if (element === undefined) {
+    invariant(
+      false,
+      'Reconciliation: could not find DOM element for node key %s',
+      key,
+    )
+  }
+
+  return element
+}
+
+export function getTextDirection(text: string): 'ltr' | 'rtl' | null {
+  if (RTL_REGEX.test(text)) {
+    return 'rtl'
+  }
+  if (LTR_REGEX.test(text)) {
+    return 'ltr'
+  }
+  return null
 }
 
 //
