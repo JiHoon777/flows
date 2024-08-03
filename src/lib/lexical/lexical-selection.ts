@@ -1,9 +1,11 @@
 import type { LexicalNode, NodeKey } from '@/lib/lexical/lexical-node.ts'
-import type { ElementNode } from '@/lib/lexical/nodes/lexical-element-node.ts'
-import type { TextNode } from '@/lib/lexical/nodes/lexical-text-node.ts'
-
 import { $getNodeByKey } from '@/lib/lexical/lexical-node.ts'
+import type { ElementNode } from '@/lib/lexical/nodes/lexical-element-node.ts'
+import { $isElementNode } from '@/lib/lexical/nodes/lexical-element-node.ts'
+import type { TextNode } from '@/lib/lexical/nodes/lexical-text-node.ts'
+import { $isTextNode } from '@/lib/lexical/nodes/lexical-text-node.ts'
 import {
+  getActiveEditor,
   getActiveEditorState,
   isCurrentlyReadOnlyMode,
 } from '@/lib/lexical/lexical-updates.ts'
@@ -11,9 +13,8 @@ import {
   $getCompositionKey,
   $setCompositionKey,
 } from '@/lib/lexical/lexical-utils.ts'
-import { $isElementNode } from '@/lib/lexical/nodes/lexical-element-node.ts'
-import { $isTextNode } from '@/lib/lexical/nodes/lexical-text-node.ts'
 import invariant from '@/utils/invariant.ts'
+import { LexicalEditor } from '@/lib/lexical/lexical-editor.ts'
 
 export type TextPointType = {
   _selection: BaseSelection
@@ -532,4 +533,18 @@ export function adjustPointOffsetForMergedSibling(
   } else if (point.offset > target.getIndexWithinParent()) {
     point.offset -= 1
   }
+}
+
+export function $getPreviousSelection(): null | BaseSelection {
+  const editor = getActiveEditor()
+  return editor._editorState._selection
+}
+
+export function $internalCreateRangeSelection(
+  lastSelection: null | BaseSelection,
+  domSelection: Selection | null,
+  editor: LexicalEditor,
+  event: UIEvent | Event | null,
+): null | RangeSelection {
+  return null
 }

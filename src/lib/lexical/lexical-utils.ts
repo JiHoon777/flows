@@ -1,32 +1,37 @@
 import type {
+  CommandPayloadType,
   EditorThemeClasses,
   IntentionallyMarkedAsDirtyElement,
+  LexicalCommand,
   TextNodeThemeClasses,
 } from './lexical-editor.type'
 import type { Spread } from './lexical-type'
 import type { TextFormatType } from './nodes/lexical-text-node.type'
 import type { EditorState } from '@/lib/lexical/lexical-editor-state.ts'
+import type { LexicalEditor } from '@/lib/lexical/lexical-editor.ts'
 import type {
   LexicalNode,
   NodeKey,
   NodeMap,
 } from '@/lib/lexical/lexical-node.ts'
+import { $getNodeByKey } from '@/lib/lexical/lexical-node.ts'
 import type {
   BaseSelection,
   PointType,
 } from '@/lib/lexical/lexical-selection.ts'
+import {
+  $getSelection,
+  $isRangeSelection,
+} from '@/lib/lexical/lexical-selection.ts'
 import type { ElementNode } from '@/lib/lexical/nodes/lexical-element-node.ts'
+import { $isElementNode } from '@/lib/lexical/nodes/lexical-element-node.ts'
 import type { RootNode } from '@/lib/lexical/nodes/lexical-root-node.ts'
+import { $isRootNode } from '@/lib/lexical/nodes/lexical-root-node.ts'
 
 import {
   HAS_DIRTY_NODES,
   TEXT_TYPE_TO_FORMAT,
 } from '@/lib/lexical/lexical-constants.ts'
-import { $getNodeByKey } from '@/lib/lexical/lexical-node.ts'
-import {
-  $getSelection,
-  $isRangeSelection,
-} from '@/lib/lexical/lexical-selection.ts'
 import {
   errorOnInfiniteTransforms,
   errorOnReadOnly,
@@ -34,14 +39,15 @@ import {
   getActiveEditorState,
   internalGetActiveEditorState,
   isCurrentlyReadOnlyMode,
+  triggerCommandListeners,
+  updateEditor,
 } from '@/lib/lexical/lexical-updates.ts'
 import { $isDecoratorNode } from '@/lib/lexical/nodes/lexical-decorator-node.ts'
-import { $isElementNode } from '@/lib/lexical/nodes/lexical-element-node.ts'
 import { $isParagraphNode } from '@/lib/lexical/nodes/lexical-paragraph-node.ts'
-import { $isRootNode } from '@/lib/lexical/nodes/lexical-root-node.ts'
 import { $isTextNode } from '@/lib/lexical/nodes/lexical-text-node.ts'
 import invariant from '@/utils/invariant.ts'
 import { normalizeClassNames } from '@/utils/normalize-class-name'
+import { CAN_USE_DOM } from '@/utils/can-use-dom.ts'
 
 export const emptyFunction = () => {
   return
@@ -606,4 +612,170 @@ export function internalMarkSiblingsAsDirty(node: LexicalNode) {
   if (nextNode !== null) {
     internalMarkNodeAsDirty(nextNode)
   }
+}
+
+/** @internal */
+export type TypeToNodeMap = Map<string, NodeMap>
+/**
+ * @internal
+ * Compute a cached Map of node type to nodes for a frozen EditorState
+ */
+const cachedNodeMaps = new WeakMap<EditorState, TypeToNodeMap>()
+const EMPTY_TYPE_TO_NODE_MAP: TypeToNodeMap = new Map()
+/**
+ * 고정된 EditorState에 대해 노드 타입에서 노드로의 캐시된 맵을 반환합니다.
+ *
+ * @param editorState - 캐시된 노드 맵을 가져올 EditorState입니다.
+ * @returns TypeToNodeMap - 노드 타입에서 노드로의 맵을 반환합니다.
+ * @throws editorState가 쓰기 가능한 상태일 때 오류를 발생시킵니다.
+ */
+export function getCachedTypeToNodeMap(
+  editorState: EditorState,
+): TypeToNodeMap {
+  // 새로운 Editor의 경우, 'root' 항목만 있는 writable this._editorState를 가질 수 있습니다.
+  if (!editorState._readOnly && editorState.isEmpty()) {
+    return EMPTY_TYPE_TO_NODE_MAP
+  }
+  invariant(
+    editorState._readOnly,
+    'getCachedTypeToNodeMap called with a writable EditorState',
+  )
+  let typeToNodeMap = cachedNodeMaps.get(editorState)
+  if (!typeToNodeMap) {
+    typeToNodeMap = new Map()
+    cachedNodeMaps.set(editorState, typeToNodeMap)
+    for (const [nodeKey, node] of editorState._nodeMap) {
+      const nodeType = node.__type
+      let nodeMap = typeToNodeMap.get(nodeType)
+      if (!nodeMap) {
+        nodeMap = new Map()
+        typeToNodeMap.set(nodeType, nodeMap)
+      }
+      nodeMap.set(nodeKey, node)
+    }
+  }
+  return typeToNodeMap
+}
+
+export function dispatchCommand<TCommand extends LexicalCommand<unknown>>(
+  editor: LexicalEditor,
+  command: TCommand,
+  payload: CommandPayloadType<TCommand>,
+): boolean {
+  return triggerCommandListeners(editor, command, payload)
+}
+
+export function getDOMSelection(targetWindow: null | Window): null | Selection {
+  return !CAN_USE_DOM ? null : (targetWindow || window).getSelection()
+}
+
+/**
+ * 주어진 DOM 노드에서 가장 가까운 LexicalEditor 인스턴스를 가져옵니다.
+ *
+ * @param node - 검색할 시작 노드입니다.
+ * @returns 가장 가까운 LexicalEditor 인스턴스를 반환합니다. 찾지 못한 경우 null을 반환합니다.
+ */
+export function getNearestEditorFromDOMNode(
+  node: Node | null,
+): LexicalEditor | null {
+  let currentNode = node
+  while (currentNode != null) {
+    // @ts-expect-error: internal field
+    const editor: LexicalEditor = currentNode.__lexicalEditor
+    if (editor != null) {
+      return editor
+    }
+    currentNode = getParentElement(currentNode)
+  }
+  return null
+}
+
+/**
+ * 주어진 노드의 부모 요소를 가져옵니다.
+ *
+ * @param node - 부모 요소를 가져올 노드입니다.
+ * @returns 부모 요소를 반환합니다. 부모 요소가 없거나 shadow DOM의 루트인 경우 null을 반환합니다.
+ */
+export function getParentElement(node: Node): HTMLElement | null {
+  const parentElement =
+    (node as HTMLSlotElement).assignedSlot || node.parentElement
+  return parentElement !== null && parentElement.nodeType === 11
+    ? ((parentElement as unknown as ShadowRoot).host as HTMLElement)
+    : parentElement
+}
+
+/**
+ * 전파될 에디터 목록을 가져옵니다.
+ *
+ * @param editor - 전파할 에디터입니다.
+ * @returns 전파될 에디터 목록을 반환합니다.
+ */
+export function getEditorsToPropagate(
+  editor: LexicalEditor,
+): Array<LexicalEditor> {
+  const editorsToPropagate = []
+  let currentEditor: LexicalEditor | null = editor
+  while (currentEditor !== null) {
+    editorsToPropagate.push(currentEditor)
+    currentEditor = currentEditor._parentEditor
+  }
+  return editorsToPropagate
+}
+
+/**
+ * 주어진 DOM 요소의 기본 뷰(윈도우 객체)를 가져옵니다.
+ *
+ * @param domElem - 기본 뷰를 가져올 DOM 요소입니다.
+ * @returns 기본 뷰(윈도우 객체)를 반환합니다. 기본 뷰가 없으면 null을 반환합니다.
+ */
+export function getDefaultView(domElem: HTMLElement): Window | null {
+  const ownerDoc = domElem.ownerDocument
+  return (ownerDoc && ownerDoc.defaultView) || null
+}
+
+/**
+ * 에디터의 윈도우 객체를 가져옵니다.
+ *
+ * @param editor - 윈도우 객체를 가져올 LexicalEditor 인스턴스입니다.
+ * @returns 에디터의 윈도우 객체를 반환합니다.
+ * @throws 윈도우 객체를 찾을 수 없는 경우 오류를 발생시킵니다.
+ */
+export function getWindow(editor: LexicalEditor): Window {
+  const windowObj = editor._window
+  if (windowObj === null) {
+    invariant(false, 'window object not found')
+  }
+  return windowObj
+}
+
+/**
+ * 에디터의 모든 노드를 더티 상태로 표시합니다.
+ *
+ * @param editor - 모든 노드를 더티 상태로 표시할 LexicalEditor 인스턴스입니다.
+ * @param type - 더티 상태로 표시할 노드의 타입입니다.
+ */
+export function markAllNodesAsDirty(editor: LexicalEditor, type: string): void {
+  // Mark all existing text nodes as dirty
+  updateEditor(
+    editor,
+    () => {
+      const editorState = getActiveEditorState()
+      if (editorState.isEmpty()) {
+        return
+      }
+      if (type === 'root') {
+        $getRoot().markDirty()
+        return
+      }
+      const nodeMap = editorState._nodeMap
+      for (const [, node] of nodeMap) {
+        node.markDirty()
+      }
+    },
+    editor._pendingEditorState === null
+      ? {
+          tag: 'history-merge',
+        }
+      : undefined,
+  )
 }

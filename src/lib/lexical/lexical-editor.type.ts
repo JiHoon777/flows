@@ -163,7 +163,7 @@ export type EditableListener = (editable: boolean) => void
 
 export type CommandListenerPriority = 0 | 1 | 2 | 3 | 4
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// @ts-ignore
 export type LexicalCommand<TPayload> = {
   type?: string
 }
