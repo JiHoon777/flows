@@ -1,10 +1,8 @@
-import type { AppError } from '@/api/error.ts'
 import type { DoFlowStore } from '@/store/flow/do-flow-store.ts'
 import type { DoNode } from '@/store/node/do-node.ts'
 import type { IFlow } from '@/types/flow.type.ts'
 import type { NodeTypes } from '@/types/types.ts'
 
-import { Effect, pipe } from 'effect'
 import { action, makeObservable, observable } from 'mobx'
 
 import { FlowDrawer } from '@/store/flow/flow-drawer.ts'
@@ -70,42 +68,34 @@ export class DoFlow {
   //
   // api
   //
-  createChildFlow(flow: IFlow): Effect.Effect<DoFlow, AppError> {
-    return pipe(
-      this.store.createFlow({ flow }),
-      Effect.flatMap((createdFlow) =>
-        pipe(
-          this.store.updateFlow({
-            changedFlow: {
-              childFlowIds: [
-                ...(this.snapshot.childFlowIds ?? []),
-                createdFlow.id,
-              ],
-            },
-            flowId: this.id,
-          }),
-          Effect.map(() => createdFlow),
-        ),
-      ),
-    )
+  /**
+   * @throws Error
+   */
+  async createChildFlow(flow: IFlow): Promise<DoFlow> {
+    const createdFlow = await this.store.createFlow({ flow })
+
+    await this.store.updateFlow({
+      changedFlow: {
+        childFlowIds: [...(this.snapshot.childFlowIds ?? []), createdFlow.id],
+      },
+      flowId: this.id,
+    })
+
+    return createdFlow
   }
-  createChildNode(node: NodeTypes): Effect.Effect<DoNode, AppError> {
-    return pipe(
-      this.store.rootStore.nodeStore.createNode(node),
-      Effect.flatMap((createdNode) =>
-        pipe(
-          this.store.updateFlow({
-            changedFlow: {
-              childNodeIds: [
-                ...(this.snapshot.childNodeIds ?? []),
-                createdNode.id,
-              ],
-            },
-            flowId: this.id,
-          }),
-          Effect.map(() => createdNode),
-        ),
-      ),
-    )
+  /**
+   * @throws Error
+   */
+  async createChildNode(node: NodeTypes): Promise<DoNode> {
+    const createdNode = await this.store.rootStore.nodeStore.createNode(node)
+
+    await this.store.updateFlow({
+      changedFlow: {
+        childNodeIds: [...(this.snapshot.childNodeIds ?? []), createdNode.id],
+      },
+      flowId: this.id,
+    })
+
+    return createdNode
   }
 }

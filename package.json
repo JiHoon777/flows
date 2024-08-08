@@ -37,9 +37,7 @@
     "classcat": "^5.0.5",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
-    "effect": "^3.5.4",
     "framer-motion": "^11.2.13",
-    "immer": "^10.1.1",
     "lexical": "^0.16.1",
     "lodash-es": "^4.17.21",
     "lucide-react": "^0.399.0",
@@ -56,8 +54,7 @@
     "sass": "^1.77.6",
     "tailwind-merge": "^2.4.0",
     "tailwind-scrollbar-hide": "^1.1.7",
-    "tailwindcss-animate": "^1.0.7",
-    "zustand": "^4.5.4"
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.6.0",

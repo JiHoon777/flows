@@ -7,7 +7,6 @@ import type {
   SetStateAction,
 } from 'react'
 
-import { Effect } from 'effect'
 import { motion } from 'framer-motion'
 import { debounce } from 'lodash-es'
 import { ChevronRight } from 'lucide-react'
@@ -52,14 +51,14 @@ export const ExplorerFlowRowItem = observer(
           return
         }
 
-        Effect.runPromise(
-          flow.store.updateFlow({
+        flow.store
+          .updateFlow({
             changedFlow: {
               title: e.target.value,
             },
             flowId: flow.id,
-          }),
-        ).catch(store.showError)
+          })
+          .catch((ex) => store.showError(ex))
       }, 500),
       [],
     )
@@ -77,9 +76,7 @@ export const ExplorerFlowRowItem = observer(
           isOpen={isOpen}
           onClose={exit}
           onFinish={() =>
-            Effect.runPromise(store.flowStore.removeFlow(flow.id)).catch(
-              store.showError,
-            )
+            store.flowStore.removeFlow(flow.id).catch(store.showError)
           }
         />
       ))

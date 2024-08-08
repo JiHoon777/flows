@@ -1,37 +1,80 @@
-import type { AppError } from '@/api/error.ts'
 import type { IFlow } from '@/types/flow.type.ts'
 import type { NodeTypes } from '@/types/types.ts'
-import type { Effect } from 'effect'
 
 interface IApiCommon {
   //
   // CRUD Flow
   //
-  createFlow(data: IFlow): Effect.Effect<void, AppError>
-  getFlow(flowId: string): Effect.Effect<IFlow, AppError>
-  updateFlow(
-    data: Partial<IFlow> & Pick<IFlow, 'flowId'>,
-  ): Effect.Effect<void, AppError, never>
-  deleteFlow(flowId: string): Effect.Effect<void, AppError>
-
-  getAllFlows(): Effect.Effect<IFlow[], AppError>
+  /**
+   * Flow 생성
+   * @throws {AppError}
+   * @returns {Promise<void>}
+   */
+  createFlow(data: IFlow): Promise<void>
+  /**
+   * @throws {AppError}
+   * @returns {Promise<IFlow>}
+   */
+  getFlow(flowId: string): Promise<IFlow>
+  /**
+   * @throws {AppError}
+   * @returns {Promise<void>}
+   */
+  updateFlow(data: Partial<IFlow> & Pick<IFlow, 'flowId'>): Promise<void>
+  /**
+   * @throws {AppError}
+   * @returns {Promise<void>}
+   */
+  deleteFlow(flowId: string): Promise<void>
+  /**
+   * @throws {AppError}
+   * @returns {Promise<IFlow[]>}
+   */
+  getAllFlows(): Promise<IFlow[]>
 
   //
   // CRUD Node
   //
-  createNode(data: NodeTypes): Effect.Effect<void, AppError>
-  getNode(nodeId: string): Effect.Effect<NodeTypes, AppError>
+  /**
+   * @throws {AppError}
+   * @returns {Promise<void>}
+   */
+  createNode(data: NodeTypes): Promise<void>
+  /**
+   * @throws {Error}
+   * @returns {Promise<NodeTypes>}
+   */
+  getNode(nodeId: string): Promise<NodeTypes>
+  /**
+   * @throws {Error}
+   * @returns {Promise<void>}
+   */
   updateNode(
     data: Partial<NodeTypes> & Pick<NodeTypes, 'nodeId'>,
-  ): Effect.Effect<void, AppError>
-  deleteNode(nodeId: string): Effect.Effect<void, AppError>
-
-  getAllNodes(): Effect.Effect<NodeTypes[], AppError>
+  ): Promise<void>
+  /**
+   * @throws {Error}
+   * @returns {Promise<void>}
+   */
+  deleteNode(nodeId: string): Promise<void>
+  /**
+   * @throws {Error}
+   * @returns {Promise<NodeTypes[]>}
+   */
+  getAllNodes(): Promise<NodeTypes[]>
 }
 
 export interface IApiFileSystem extends IApiCommon {
-  checkFlowDirectoryAndCreate(): Effect.Effect<void, AppError>
-  checkNodeDirectoryAndCreate(): Effect.Effect<void, AppError>
+  /**
+   * @throws {Error}
+   * @returns {Promise<void>}
+   */
+  checkFlowDirectoryAndCreate(): Promise<void>
+  /**
+   * @throws {Error}
+   * @returns {Promise<void>}
+   */
+  checkNodeDirectoryAndCreate(): Promise<void>
 }
 
 export type Apis = IApiFileSystem

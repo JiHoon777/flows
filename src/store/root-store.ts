@@ -1,12 +1,11 @@
 import type { Apis } from '@/api/api.interface.ts'
-import type { AppError } from '@/api/error.ts'
 import type { Platform } from '@tauri-apps/api/os'
 
 import { platform as TauriPlatform } from '@tauri-apps/api/os'
-import { Effect, pipe } from 'effect'
 import { action, makeObservable, observable, runInAction } from 'mobx'
 
 import { ApiFileSystem } from '@/api/api-file-system.ts'
+import { formatUnknownErrorMessage } from '@/api/error.ts'
 import { DoFlowStore } from '@/store/flow/do-flow-store.ts'
 import { DoNodeStore } from '@/store/node/do-node-store.ts'
 import { ExplorerView } from '@/store/views/explorer-view.ts'
@@ -48,11 +47,10 @@ export class RootStore {
     return this.platform === 'darwin'
   }
 
-  showError(ex: AppError) {
-    const errorMessage = ex.message ?? 'unknown message'
+  showError(ex: unknown) {
     const errorOrigin = isPrimitive(ex) ? ex : JSON.stringify(ex)
     console.error(
-      `errorMessage: ${errorMessage},\n\n errorOrigin: ${errorOrigin}`,
+      `errorMessage: ${formatUnknownErrorMessage(ex)},\n\n errorOrigin: ${errorOrigin}`,
     )
   }
 
@@ -69,47 +67,42 @@ export class RootStore {
   /**
    * App 진입시 모든 플로우와, 노드들을 초기화한다.
    */
-  initializeApp() {
-    const initializedEffect = pipe(
-      Effect.all([
+  async initializeApp(): Promise<void> {
+    try {
+      // Check and create directories
+      await Promise.all([
         this.api.checkFlowDirectoryAndCreate(),
         this.api.checkNodeDirectoryAndCreate(),
-      ]),
-      Effect.flatMap(() => Effect.promise(() => TauriPlatform())),
-      Effect.tap((platform) =>
-        Effect.sync(() => {
-          runInAction(() => {
-            this.platform = platform
-          })
-        }),
-      ),
-      Effect.flatMap(() =>
-        Effect.all([this.api.getAllFlows(), this.api.getAllNodes()]),
-      ),
-      Effect.tap(([flows, nodes]) =>
-        Effect.sync(() => {
-          flows.forEach((flow) => this.flowStore.merge(flow))
-          nodes.forEach((node) => this.nodeStore.merge(node))
-        }),
-      ),
-      Effect.tapError((e) =>
-        Effect.sync(() => {
-          this.showError(e)
-        }),
-      ),
-    )
+      ])
 
-    Effect.runPromise(initializedEffect)
-      .then(() => {
-        runInAction(() => {
-          this.appLoaded = true
-        })
+      // Initialize platform
+      const platform = await TauriPlatform()
+      runInAction(() => {
+        this.platform = platform
       })
-      .catch((ex) => {
-        runInAction(() => {
-          this.failAppLoaded = true
-        })
-        this.showError(ex)
+
+      // Get all flows and nodes
+      const [flows, nodes] = await Promise.all([
+        this.api.getAllFlows(),
+        this.api.getAllNodes(),
+      ])
+
+      // Merge flows and nodes into stores
+      runInAction(() => {
+        flows.forEach((flow) => this.flowStore.merge(flow))
+        nodes.forEach((node) => this.nodeStore.merge(node))
       })
+
+      // Set app as loaded
+      runInAction(() => {
+        this.appLoaded = true
+      })
+    } catch (error) {
+      // Handle errors
+      runInAction(() => {
+        this.failAppLoaded = true
+      })
+      this.showError(error)
+    }
   }
 }

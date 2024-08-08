@@ -1,7 +1,6 @@
 import type { DoNode } from '@/store/node/do-node.ts'
 import type { INoteNode } from '@/types/note-node.type.ts'
 
-import { Effect } from 'effect'
 import { observer } from 'mobx-react'
 import { useCallback } from 'react'
 
@@ -14,14 +13,14 @@ export const NoteNodeView = observer(({ node }: { node: DoNode }) => {
 
   const handleChangeContent = useCallback(
     (v: string) => {
-      Effect.runPromise(
-        node.store.updateNode({
+      node.store
+        .updateNode({
           changedNode: {
             content: v,
           },
           nodeId: node.id,
-        }),
-      ).catch((ex) => store.showError(ex))
+        })
+        .catch((ex) => store.showError(ex))
     },
     [node.id, node.store, store],
   )

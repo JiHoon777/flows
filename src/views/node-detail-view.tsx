@@ -1,7 +1,6 @@
 import type { DoNode } from '@/store/node/do-node.ts'
 import type { ChangeEvent } from 'react'
 
-import { Effect } from 'effect'
 import { observer } from 'mobx-react'
 import { useCallback } from 'react'
 import { useParams } from 'react-router-dom'
@@ -29,14 +28,14 @@ export const NodeDetailView = observer(({ node }: { node: DoNode }) => {
 
   const changeTitle = useCallback(
     (e: ChangeEvent<HTMLTextAreaElement>) => {
-      Effect.runPromise(
-        node.store.updateNode({
+      node.store
+        .updateNode({
           changedNode: {
             title: e.target.value,
           },
           nodeId: node.id,
-        }),
-      ).catch((ex) => store.showError(ex))
+        })
+        .catch((ex) => store.showError(ex))
     },
     [node.id, node.store, store],
   )

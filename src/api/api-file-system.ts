@@ -10,243 +10,214 @@ import {
   removeFile,
   writeTextFile,
 } from '@tauri-apps/api/fs'
-import { Effect, pipe } from 'effect'
-
-import { FileSystemError, handleFileSystemError } from '@/api/error.ts'
 
 const FLOW_DIR = `flows/flow`
 const NODE_DIR = `flows/node`
 
 export class ApiFileSystem implements IApiFileSystem {
-  //
-  // Check the directory when the app initializes for the first time,
-  // and create it if it doesn't exist.
-  //
-  checkFlowDirectoryAndCreate(): Effect.Effect<void, FileSystemError> {
-    return pipe(
-      Effect.tryPromise(() =>
-        readDir(FLOW_DIR, { dir: BaseDirectory.Document }),
-      ),
-      Effect.catchAll(() =>
-        Effect.tryPromise(() =>
-          createDir(FLOW_DIR, {
-            dir: BaseDirectory.Document,
-            recursive: true,
-          }),
-        ),
-      ),
-      Effect.catchAll(handleFileSystemError),
-    )
+  /**
+   * Check the flow directory when the app initializes for the first time,
+   * and create it if it doesn't exist.
+   * @throws {Error}
+   */
+  async checkFlowDirectoryAndCreate(): Promise<void> {
+    try {
+      await readDir(FLOW_DIR, { dir: BaseDirectory.Document })
+    } catch {
+      await createDir(FLOW_DIR, {
+        dir: BaseDirectory.Document,
+        recursive: true,
+      })
+    }
   }
-  checkNodeDirectoryAndCreate(): Effect.Effect<void, FileSystemError> {
-    return pipe(
-      Effect.tryPromise(() =>
-        readDir(NODE_DIR, { dir: BaseDirectory.Document }),
-      ),
-      Effect.catchAll(() =>
-        Effect.tryPromise(() =>
-          createDir(NODE_DIR, {
-            dir: BaseDirectory.Document,
-            recursive: true,
-          }),
-        ),
-      ),
-      Effect.catchAll(handleFileSystemError),
-    )
+  /**
+   * Check the node directory when the app initializes for the first time,
+   * and create it if it doesn't exist.
+   * @throws {Error}
+   */
+  async checkNodeDirectoryAndCreate(): Promise<void> {
+    try {
+      await readDir(NODE_DIR, { dir: BaseDirectory.Document })
+    } catch {
+      await createDir(NODE_DIR, {
+        dir: BaseDirectory.Document,
+        recursive: true,
+      })
+    }
   }
 
   //
   // CRUD Flow
   //
-  createFlow(data: IFlow): Effect.Effect<void, FileSystemError> {
+  /**
+   * Create a new flow.
+   * @param data - The flow data to create
+   * @throws {Error}
+   */
+  async createFlow(data: IFlow): Promise<void> {
     return this.updateFlow(data)
   }
-  getFlow(flowId: string): Effect.Effect<IFlow, FileSystemError> {
+  /**
+   * Get a flow by its ID.
+   * @param flowId - The ID of the flow to get
+   * @throws {Error}
+   */
+  async getFlow(flowId: string): Promise<IFlow> {
     const filePath = `${FLOW_DIR}/${flowId}.json`
 
-    return pipe(
-      this.readJsonFile<IFlow>(filePath),
-      Effect.catchAll(handleFileSystemError),
-    )
+    return this.readJsonFile<IFlow>(filePath)
   }
-  updateFlow(data: Partial<IFlow> & Pick<IFlow, 'flowId'>) {
+  /**
+   * Update an existing flow.
+   * @param data - The flow data to update
+   * @throws {Error}
+   */
+  async updateFlow(
+    data: Partial<IFlow> & Pick<IFlow, 'flowId'>,
+  ): Promise<void> {
     const filePath = `${FLOW_DIR}/${data.flowId}.json`
 
-    return pipe(
-      this.writeJsonFile(filePath, data),
-      Effect.catchAll(handleFileSystemError),
-    )
+    return this.writeJsonFile(filePath, data)
   }
-  deleteFlow(flowId: string): Effect.Effect<void, FileSystemError> {
+  /**
+   * Delete a flow by its ID.
+   * @param flowId - The ID of the flow to delete
+   * @throws {Error}
+   */
+  async deleteFlow(flowId: string): Promise<void> {
     const filePath = `${FLOW_DIR}/${flowId}.json`
 
-    return pipe(
-      this.getFlow(flowId),
-      /**
-       * 부모 플로우가 있을때 childFlowIds 에서 삭제할 flow 를 제거한다.
-       */
-      Effect.flatMap((flow) =>
-        flow.parentFlowId
-          ? pipe(
-              this.getFlow(flow.parentFlowId),
-              Effect.map((flow) => ({
-                ...flow,
-                childFlowIds:
-                  flow.childFlowIds?.filter((id) => id !== flowId) ?? [],
-              })),
-              Effect.flatMap((flow) => this.updateFlow(flow)),
-              Effect.as(flow),
-            )
-          : Effect.succeed(flow),
-      ),
-      /**
-       * 자식 플로우, 노드가 있으면 돌면서 parentFlowId 를 제거한다.
-       */
-      Effect.flatMap((flow) => {
-        return pipe(
-          Effect.forEach(flow.childFlowIds ?? [], (childFlowId) =>
-            pipe(
-              this.getFlow(childFlowId),
-              Effect.flatMap((childFlow) =>
-                this.updateFlow({
-                  ...childFlow,
-                  parentFlowId: undefined,
-                  targets: [],
-                }),
-              ),
-            ),
-          ),
-          Effect.flatMap(() =>
-            Effect.forEach(flow.childNodeIds ?? [], (childNodeId) =>
-              pipe(
-                this.getNode(childNodeId),
-                Effect.flatMap((childNode) =>
-                  this.updateNode({
-                    ...childNode,
-                    parentFlowId: undefined,
-                    targets: [],
-                  }),
-                ),
-              ),
-            ),
-          ),
-        )
-      }),
-      Effect.flatMap(() => this.deleteJsonFile(filePath)),
-      Effect.catchAll((e) =>
-        e instanceof FileSystemError
-          ? Effect.fail(e)
-          : handleFileSystemError(e),
-      ),
+    const flow = await this.getFlow(flowId)
+
+    if (flow.parentFlowId) {
+      const parentFlow = await this.getFlow(flow.parentFlowId)
+      parentFlow.childFlowIds =
+        parentFlow.childFlowIds?.filter((id) => id !== flowId) ?? []
+      await this.updateFlow(parentFlow)
+    }
+
+    for (const childFlowId of flow.childFlowIds ?? []) {
+      const childFlow = await this.getFlow(childFlowId)
+      await this.updateFlow({
+        ...childFlow,
+        parentFlowId: undefined,
+        targets: [],
+      })
+    }
+
+    for (const childNodeId of flow.childNodeIds ?? []) {
+      const childNode = await this.getNode(childNodeId)
+      await this.updateNode({
+        ...childNode,
+        parentFlowId: undefined,
+        targets: [],
+      })
+    }
+
+    return this.deleteJsonFile(filePath)
+  }
+  /**
+   * Get all flows.
+   * @throws {Error}
+   */
+  async getAllFlows(): Promise<IFlow[]> {
+    const files = await readDir(FLOW_DIR, { dir: BaseDirectory.Document })
+    const filteredFiles = files.filter((entry) => entry.name !== '.DS_Store')
+
+    return Promise.all(
+      filteredFiles.map((file) => this.readJsonFile<IFlow>(file.path)),
     )
   }
-
-  getAllFlows(): Effect.Effect<IFlow[], FileSystemError> {
-    return pipe(
-      Effect.tryPromise(() =>
-        readDir(FLOW_DIR, { dir: BaseDirectory.Document }),
-      ),
-      Effect.map((files) =>
-        files.filter((entry) => entry.name !== '.DS_Store'),
-      ),
-      Effect.flatMap((files) =>
-        Effect.all(files.map((file) => this.readJsonFile<IFlow>(file.path))),
-      ),
-      Effect.catchAll(handleFileSystemError),
-    )
-  }
-
   //
   // CRUD Node
   //
-  createNode(data: NodeTypes): Effect.Effect<void, FileSystemError> {
+  /**
+   * Create a new node.
+   * @param data - The node data to create
+   * @throws {Error}
+   */
+  async createNode(data: NodeTypes): Promise<void> {
     return this.updateNode(data)
   }
-  getNode(nodeId: string): Effect.Effect<NodeTypes, FileSystemError> {
+  /**
+   * Get a node by its ID.
+   * @param nodeId - The ID of the node to get
+   * @throws {Error}
+   */
+  async getNode(nodeId: string): Promise<NodeTypes> {
     const filePath = `${NODE_DIR}/${nodeId}.json`
-
-    return pipe(
-      this.readJsonFile<NodeTypes>(filePath),
-      Effect.catchAll(handleFileSystemError),
-    )
+    return this.readJsonFile<NodeTypes>(filePath)
   }
-  updateNode(
+  /**
+   * Update an existing node.
+   * @param data - The node data to update
+   * @throws {Error}
+   */
+  async updateNode(
     data: Partial<NodeTypes> & Pick<NodeTypes, 'nodeId'>,
-  ): Effect.Effect<void, FileSystemError> {
+  ): Promise<void> {
     const filePath = `${NODE_DIR}/${data.nodeId}.json`
-
-    return pipe(
-      this.writeJsonFile(filePath, data),
-      Effect.catchAll(handleFileSystemError),
-    )
+    return this.writeJsonFile(filePath, data)
   }
-  deleteNode(nodeId: string): Effect.Effect<void, FileSystemError> {
+  /**
+   * Delete a node by its ID.
+   * @param nodeId - The ID of the node to delete
+   * @throws {Error}
+   */
+  async deleteNode(nodeId: string): Promise<void> {
     const filePath = `${NODE_DIR}/${nodeId}.json`
-
-    return pipe(
-      this.getNode(nodeId),
-      Effect.flatMap((node) =>
-        node.parentFlowId
-          ? pipe(
-              this.getFlow(node.parentFlowId),
-              Effect.map((flow) => ({
-                ...flow,
-                childNodeIds:
-                  flow.childNodeIds?.filter((id) => id !== nodeId) ?? [],
-              })),
-              Effect.flatMap((flow) => this.updateFlow(flow)),
-              Effect.as(node),
-            )
-          : Effect.succeed(node),
-      ),
-      Effect.flatMap(() => this.deleteJsonFile(filePath)),
-      Effect.catchAll((e) =>
-        e instanceof FileSystemError
-          ? Effect.fail(e)
-          : handleFileSystemError(e),
-      ),
-    )
+    const node = await this.getNode(nodeId)
+    if (node.parentFlowId) {
+      const parentFlow = await this.getFlow(node.parentFlowId)
+      parentFlow.childNodeIds =
+        parentFlow.childNodeIds?.filter((id) => id !== nodeId) ?? []
+      await this.updateFlow(parentFlow)
+    }
+    return this.deleteJsonFile(filePath)
   }
-
-  getAllNodes(): Effect.Effect<NodeTypes[], FileSystemError> {
-    return pipe(
-      Effect.tryPromise(() =>
-        readDir(NODE_DIR, { dir: BaseDirectory.Document }),
-      ),
-      Effect.map((files) =>
-        files.filter((entry) => entry.name !== '.DS_Store'),
-      ),
-      Effect.flatMap((files) =>
-        Effect.all(
-          files.map((file) => this.readJsonFile<NodeTypes>(file.path)),
-        ),
-      ),
-      Effect.catchAll(handleFileSystemError),
+  /**
+   * Get all nodes.
+   * @throws {Error}
+   */
+  async getAllNodes(): Promise<NodeTypes[]> {
+    const files = await readDir(NODE_DIR, { dir: BaseDirectory.Document })
+    const filteredFiles = files.filter((entry) => entry.name !== '.DS_Store')
+    return await Promise.all(
+      filteredFiles.map((file) => this.readJsonFile<NodeTypes>(file.path)),
     )
   }
 
   //
   // Utils
   //
-  private readJsonFile<T>(filePath: string) {
-    return pipe(
-      Effect.tryPromise(() =>
-        readTextFile(filePath, { dir: BaseDirectory.Document }),
-      ),
-      Effect.map(JSON.parse),
-      Effect.map((data) => data as T),
-    )
+  /**
+   * Read a JSON file and parse its contents.
+   * @param filePath - The path to the JSON file
+   * @throws {Error}
+   */
+  private async readJsonFile<T>(filePath: string): Promise<T> {
+    const content = await readTextFile(filePath, {
+      dir: BaseDirectory.Document,
+    })
+    return JSON.parse(content) as T
   }
-  private writeJsonFile<T>(filePath: string, data: T) {
-    return Effect.tryPromise(() =>
-      writeTextFile(filePath, JSON.stringify(data), {
-        dir: BaseDirectory.Document,
-      }),
-    )
+  /**
+   * Write data to a JSON file.
+   * @param filePath - The path to the JSON file
+   * @param data - The data to write
+   * @throws {Error}
+   * */
+  private async writeJsonFile<T>(filePath: string, data: T): Promise<void> {
+    return writeTextFile(filePath, JSON.stringify(data), {
+      dir: BaseDirectory.Document,
+    })
   }
-  private deleteJsonFile(filePath: string) {
-    return Effect.tryPromise(() =>
-      removeFile(filePath, { dir: BaseDirectory.Document }),
-    )
+  /**
+   * Delete a JSON file.
+   * @param filePath - The path to the JSON file to delete
+   * @throws {Error}
+   * */
+  private async deleteJsonFile(filePath: string): Promise<void> {
+    return removeFile(filePath, { dir: BaseDirectory.Document })
   }
 }

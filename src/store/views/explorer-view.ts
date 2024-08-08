@@ -2,7 +2,6 @@ import type { DoFlow } from '@/store/flow/do-flow.ts'
 import type { DoNode } from '@/store/node/do-node.ts'
 import type { RootStore } from '@/store/root-store.ts'
 
-import { Effect } from 'effect'
 import { computed, makeObservable, observable, runInAction } from 'mobx'
 import { nanoid } from 'nanoid'
 
@@ -56,8 +55,8 @@ export class ExplorerView {
   // action
   //
   createFlowOnRoot() {
-    Effect.runPromise(
-      this.flowStore.createFlow({
+    this.flowStore
+      .createFlow({
         flow: {
           childNodeIds: [],
           created_at: new Date(),
@@ -65,8 +64,8 @@ export class ExplorerView {
           title: 'Untitled',
           updated_at: new Date(),
         },
-      }),
-    ).catch((ex) => this.rootStore.showError(ex))
+      })
+      .catch((ex) => this.rootStore.showError(ex))
   }
 
   setSortOption(changedOption: ExplorerSortOption) {

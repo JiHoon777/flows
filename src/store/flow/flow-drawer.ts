@@ -4,7 +4,6 @@ import type { IFlow } from '@/types/flow.type.ts'
 import type { NodeTypes } from '@/types/types.ts'
 import type { Edge, EdgeChange, Node, NodeChange, XYPosition } from 'reactflow'
 
-import { Effect } from 'effect'
 import { action, makeObservable, observable, runInAction } from 'mobx'
 import { nanoid } from 'nanoid'
 import { applyEdgeChanges, applyNodeChanges } from 'reactflow'
@@ -100,7 +99,7 @@ export class FlowDrawer {
   /**
    * 노드를 엣지로 연결합니다.
    */
-  connectNodes(sourceNode: Node, targetNode: Node) {
+  async connectNodes(sourceNode: Node, targetNode: Node): Promise<void> {
     const isSourceNodeFlow = sourceNode.type === 'flow'
 
     // 자기 자신으로 연결시, 중복 연결시 데이터가 계속 추가되는 이슈 수정
@@ -138,36 +137,29 @@ export class FlowDrawer {
       })
     }
 
-    if (isSourceNodeFlow) {
-      Effect.runPromise(
-        this.rootStore.flowStore.updateFlow({
-          changedFlow: {
-            targets,
-          },
-          flowId: sourceNode.id,
-        }),
-      ).catch((err) => {
-        this.rootStore.showError(err)
-        restoreOnError()
-      })
-    } else {
-      Effect.runPromise(
-        this.rootStore.nodeStore.updateNode({
-          changedNode: {
-            targets,
-          },
-          nodeId: sourceNode.id,
-        }),
-      ).catch((err) => {
-        this.rootStore.showError(err)
-        restoreOnError()
-      })
+    try {
+      isSourceNodeFlow
+        ? await this.rootStore.flowStore.updateFlow({
+            changedFlow: {
+              targets,
+            },
+            flowId: sourceNode.id,
+          })
+        : await this.rootStore.nodeStore.updateNode({
+            changedNode: {
+              targets,
+            },
+            nodeId: sourceNode.id,
+          })
+    } catch (ex) {
+      this.rootStore.showError(ex)
+      restoreOnError()
     }
   }
-  updateEdge(
+  async updateEdge(
     edgeId: string,
     updatingEdgeData: Partial<Omit<IReactFlowNodeTarget, 'id'>>,
-  ) {
+  ): Promise<void> {
     const updatingEdge = this.edges.find((edge) => edge.id === edgeId)
 
     if (!updatingEdge) {
@@ -203,46 +195,40 @@ export class FlowDrawer {
       return
     }
 
-    if (sourceNode.type === 'flow') {
-      Effect.runPromise(
-        this.flow.store.updateFlow({
-          changedFlow: {
-            targets: (
-              this.flow.store.getFlowById(sourceNode.id)?.snapshot.targets ?? []
-            ).map((target) =>
-              target.id === updatingEdge.target
-                ? { ...target, ...updatingEdgeData }
-                : target,
-            ),
-          },
-          flowId: updatingEdge.source,
-        }),
-      ).catch((ex) => {
-        restoreOnError()
-        this.rootStore.showError(ex)
-      })
-    } else {
-      Effect.runPromise(
-        this.rootStore.nodeStore.updateNode({
-          changedNode: {
-            targets: (
-              this.rootStore.nodeStore.getNodeById(sourceNode.id)?.snapshot
-                .targets ?? []
-            ).map((target) =>
-              target.id === updatingEdge.target
-                ? { ...target, ...updatingEdgeData }
-                : target,
-            ),
-          },
-          nodeId: updatingEdge.source,
-        }),
-      ).catch((ex) => {
-        restoreOnError()
-        this.rootStore.showError(ex)
-      })
+    try {
+      sourceNode.type === 'flow'
+        ? await this.flow.store.updateFlow({
+            changedFlow: {
+              targets: (
+                this.flow.store.getFlowById(sourceNode.id)?.snapshot.targets ??
+                []
+              ).map((target) =>
+                target.id === updatingEdge.target
+                  ? { ...target, ...updatingEdgeData }
+                  : target,
+              ),
+            },
+            flowId: updatingEdge.source,
+          })
+        : await this.rootStore.nodeStore.updateNode({
+            changedNode: {
+              targets: (
+                this.rootStore.nodeStore.getNodeById(sourceNode.id)?.snapshot
+                  .targets ?? []
+              ).map((target) =>
+                target.id === updatingEdge.target
+                  ? { ...target, ...updatingEdgeData }
+                  : target,
+              ),
+            },
+            nodeId: updatingEdge.source,
+          })
+    } catch (ex) {
+      restoreOnError()
+      this.rootStore.showError(ex)
     }
   }
-  deleteEdge(edgeId: string) {
+  async deleteEdge(edgeId: string): Promise<void> {
     const deletingEdge = this.edges.find((edge) => edge.id === edgeId)
 
     if (!deletingEdge) {
@@ -268,41 +254,35 @@ export class FlowDrawer {
       return
     }
 
-    if (sourceNode.type === 'flow') {
-      Effect.runPromise(
-        this.flow.store.updateFlow({
-          changedFlow: {
-            targets: (
-              this.flow.store.getFlowById(sourceNode.id)?.snapshot.targets ?? []
-            ).filter((target) => target.id !== deletingEdge.target),
-          },
-          flowId: sourceNode.id,
-        }),
-      ).catch((ex) => {
-        restoreOnError()
-        this.rootStore.showError(ex)
-      })
-    } else {
-      Effect.runPromise(
-        this.rootStore.nodeStore.updateNode({
-          changedNode: {
-            targets: (
-              this.rootStore.nodeStore.getNodeById(sourceNode.id)?.snapshot
-                .targets ?? []
-            ).filter((target) => target.id !== deletingEdge.target),
-          },
-          nodeId: sourceNode.id,
-        }),
-      ).catch((ex) => {
-        restoreOnError()
-        this.rootStore.showError(ex)
-      })
+    try {
+      sourceNode.type === 'flow'
+        ? await this.flow.store.updateFlow({
+            changedFlow: {
+              targets: (
+                this.flow.store.getFlowById(sourceNode.id)?.snapshot.targets ??
+                []
+              ).filter((target) => target.id !== deletingEdge.target),
+            },
+            flowId: sourceNode.id,
+          })
+        : await this.rootStore.nodeStore.updateNode({
+            changedNode: {
+              targets: (
+                this.rootStore.nodeStore.getNodeById(sourceNode.id)?.snapshot
+                  .targets ?? []
+              ).filter((target) => target.id !== deletingEdge.target),
+            },
+            nodeId: sourceNode.id,
+          })
+    } catch (ex) {
+      restoreOnError()
+      this.rootStore.showError(ex)
     }
   }
   /**
    * FlowNode 를 추가하고, Flow 를 저장한다.
    */
-  addFlowNode(position: XYPosition) {
+  async addFlowNode(position: XYPosition): Promise<void> {
     const reactFlowNode = FlowDrawer.createReactFlowNodeByNodeType({
       nodeType: 'flow',
       position,
@@ -317,23 +297,26 @@ export class FlowDrawer {
       this.nodes = [...this.nodes, reactFlowNode]
     })
 
-    Effect.runPromise(this.flow.createChildFlow(flow)).catch((err) => {
-      this.rootStore.showError(err)
+    try {
+      await this.flow.createChildFlow(flow)
+    } catch (ex) {
+      this.rootStore.showError(ex)
+
       runInAction(() => {
         this.nodes = this.nodes.filter((node) => node.id !== reactFlowNode.id)
       })
-    })
+    }
   }
   /**
    * Node 를 추가하고, 저장한다.
    */
-  addNode({
+  async addNode({
     nodeType,
     position,
   }: {
     nodeType: NodeType
     position: XYPosition
-  }) {
+  }): Promise<void> {
     const reactFlowNode = FlowDrawer.createReactFlowNodeByNodeType({
       nodeType,
       position,
@@ -349,20 +332,22 @@ export class FlowDrawer {
       this.nodes = [...this.nodes, reactFlowNode]
     })
 
-    Effect.runPromise(this.flow.createChildNode(node)).catch((err) => {
-      this.rootStore.showError(err)
+    try {
+      await this.flow.createChildNode(node)
+    } catch (ex) {
+      this.rootStore.showError(ex)
 
       runInAction(() => {
         this.nodes = this.nodes.filter((node) => node.id !== reactFlowNode.id)
       })
-    })
+    }
   }
   /**
    * 지정된 노드의 레이블을 업데이트합니다.
    *
    * 현재 상태에서 주어진 nodeId를 가진 노드를 찾아 해당 노드의 레이블을 제공된 값으로 업데이트합니다.
    */
-  updateNodeTitle({
+  async updateNodeTitle({
     id,
     type,
     title,
@@ -370,31 +355,29 @@ export class FlowDrawer {
     id: string
     type: NodeType | 'flow'
     title: string
-  }) {
-    if (type === 'flow') {
-      Effect.runPromise(
-        this.flow.store.updateFlow({
-          changedFlow: {
-            title,
-          },
-          flowId: id,
-        }),
-      ).catch(this.rootStore.showError)
-    } else {
-      Effect.runPromise(
-        this.rootStore.nodeStore.updateNode({
-          changedNode: {
-            title,
-          },
-          nodeId: id,
-        }),
-      ).catch(this.rootStore.showError)
+  }): Promise<void> {
+    try {
+      type === 'flow'
+        ? await this.flow.store.updateFlow({
+            changedFlow: {
+              title,
+            },
+            flowId: id,
+          })
+        : await this.rootStore.nodeStore.updateNode({
+            changedNode: {
+              title,
+            },
+            nodeId: id,
+          })
+    } catch (ex) {
+      this.rootStore.showError(ex)
     }
   }
   /**
    * Node 의 포지션을 변경한다.
    */
-  updateNodePosition({
+  async updateNodePosition({
     id,
     type,
     position,
@@ -402,25 +385,23 @@ export class FlowDrawer {
     id: string
     type: string
     position: XYPosition
-  }) {
-    if (type === 'flow') {
-      Effect.runPromise(
-        this.flow.store.updateFlow({
-          changedFlow: {
-            position,
-          },
-          flowId: id,
-        }),
-      ).catch(this.rootStore.showError)
-    } else {
-      Effect.runPromise(
-        this.rootStore.nodeStore.updateNode({
-          changedNode: {
-            position,
-          },
-          nodeId: id,
-        }),
-      ).catch(this.rootStore.showError)
+  }): Promise<void> {
+    try {
+      type === 'flow'
+        ? await this.flow.store.updateFlow({
+            changedFlow: {
+              position,
+            },
+            flowId: id,
+          })
+        : await this.rootStore.nodeStore.updateNode({
+            changedNode: {
+              position,
+            },
+            nodeId: id,
+          })
+    } catch (ex) {
+      this.rootStore.showError(ex)
     }
   }
   /**
@@ -429,7 +410,7 @@ export class FlowDrawer {
    * 1. this.nodes 제거
    * 2. 실제 저장된 node의 isTrashed : true 로 변경
    */
-  removeNode(id: string, type: NodeType | 'flow') {
+  async removeNode(id: string, type: NodeType | 'flow'): Promise<void> {
     const removedNode = this.nodes.find((node) => node.id === id)
 
     if (!removedNode) {
@@ -446,18 +427,13 @@ export class FlowDrawer {
       })
     }
 
-    if (type === 'flow') {
-      Effect.runPromise(this.flow.store.removeFlow(id)).catch((err) => {
-        this.rootStore.showError(err)
-        restoreOnError()
-      })
-    } else {
-      Effect.runPromise(this.rootStore.nodeStore.removeNode(id)).catch(
-        (err) => {
-          this.rootStore.showError(err)
-          restoreOnError()
-        },
-      )
+    try {
+      type === 'flow'
+        ? await this.flow.store.removeFlow(id)
+        : await this.rootStore.nodeStore.removeNode(id)
+    } catch (ex) {
+      this.rootStore.showError(ex)
+      restoreOnError()
     }
   }
 

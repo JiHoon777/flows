@@ -5,7 +5,6 @@ import type { ReactFlowNodeType } from '@/types/base.type.ts'
 import type { ChangeEvent, PropsWithChildren } from 'react'
 import type { NodeProps, ResizeDragEvent } from 'reactflow'
 
-import { Effect } from 'effect'
 import { observer } from 'mobx-react'
 import { useCallback, useRef } from 'react'
 import { Handle, NodeResizer, Position } from 'reactflow'
@@ -39,12 +38,12 @@ export const NodeWrap = observer(
         _: ResizeDragEvent,
         { width, height }: { width: number; height: number },
       ) => {
-        Effect.runPromise(
-          store.flowStore.updateFlow({
+        store.flowStore
+          .updateFlow({
             changedFlow: { style: { height, width } },
             flowId: id,
-          }),
-        ).catch(store.showError)
+          })
+          .catch(store.showError)
         // id, { style: { width, height } }
       },
       [id, store.flowStore, store.showError],
@@ -55,12 +54,12 @@ export const NodeWrap = observer(
         _: ResizeDragEvent,
         { width, height }: { width: number; height: number },
       ) => {
-        Effect.runPromise(
-          store.nodeStore.updateNode({
+        store.nodeStore
+          .updateNode({
             changedNode: { style: { height, width } },
             nodeId: id,
-          }),
-        ).catch(store.showError)
+          })
+          .catch(store.showError)
       },
       [id, store.nodeStore, store.showError],
     )

@@ -1,22 +1,4 @@
-import type { UnknownException } from 'effect/Cause'
-
-import { Effect } from 'effect'
-
-export class FileSystemError extends Error {
-  tag = 'file-system'
-  originalError: unknown
-
-  constructor(message: string, originalError?: unknown) {
-    super(message)
-    this.originalError = originalError
-  }
-}
-
-export class ClientError extends Error {
-  tag = 'client'
-}
-
-export const formatUnknownError = (error: unknown): string => {
+export const formatUnknownErrorMessage = (error: unknown): string => {
   if (error instanceof Error) {
     return error.message
   }
@@ -27,9 +9,3 @@ export const formatUnknownError = (error: unknown): string => {
 
   return String(error)
 }
-
-export const handleFileSystemError = (e: UnknownException) => {
-  return Effect.fail(new FileSystemError(formatUnknownError(e), e))
-}
-
-export type AppError = FileSystemError | ClientError

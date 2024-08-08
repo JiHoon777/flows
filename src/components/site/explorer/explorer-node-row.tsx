@@ -1,7 +1,6 @@
 import type { MenuModel, MenuRef } from '@/components/menu/menu.tsx'
 import type { DoNode } from '@/store/node/do-node.ts'
 
-import { Effect } from 'effect'
 import { motion } from 'framer-motion'
 import { observer } from 'mobx-react'
 import { useRef } from 'react'
@@ -25,7 +24,7 @@ export const ExplorerNodeRow = observer(({ node }: { node: DoNode }) => {
       <AlertModal
         isOpen={isOpen}
         onClose={exit}
-        onFinish={() => Effect.runPromise(store.nodeStore.removeNode(node.id))}
+        onFinish={() => store.nodeStore.removeNode(node.id)}
       />
     ))
   }

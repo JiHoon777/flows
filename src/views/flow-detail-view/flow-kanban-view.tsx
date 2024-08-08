@@ -1,7 +1,6 @@
 import type { IKanbanData } from '@/components/kanban/kanban.type.ts'
 import type { DoFlow } from '@/store/flow/do-flow.ts'
 
-import { Effect } from 'effect'
 import { observer } from 'mobx-react'
 import { nanoid } from 'nanoid'
 import { useCallback, useMemo } from 'react'
@@ -14,14 +13,14 @@ export const FlowKanbanView = observer(({ flow }: { flow: DoFlow }) => {
 
   const handleUpdate = useCallback(
     (kanbanData: IKanbanData) => {
-      Effect.runPromise(
-        flow.store.updateFlow({
+      flow.store
+        .updateFlow({
           changedFlow: {
             kanbanData,
           },
           flowId: flow.id,
-        }),
-      ).catch((ex) => store.showError(ex))
+        })
+        .catch((ex: unknown) => store.showError(ex))
     },
     [flow.id, flow.store, store],
   )

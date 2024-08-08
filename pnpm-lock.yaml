@@ -80,15 +80,9 @@ importers:
       date-fns:
         specifier: ^3.6.0
         version: 3.6.0
-      effect:
-        specifier: ^3.5.4
-        version: 3.5.4
       framer-motion:
         specifier: ^11.2.13
         version: 11.2.13(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      immer:
-        specifier: ^10.1.1
-        version: 10.1.1
       lexical:
         specifier: ^0.16.1
         version: 0.16.1
@@ -140,9 +134,6 @@ importers:
       tailwindcss-animate:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.4)
-      zustand:
-        specifier: ^4.5.4
-        version: 4.5.4(@types/react@18.3.3)(immer@10.1.1)(react@18.3.1)
     devDependencies:
       '@tauri-apps/cli':
         specifier: ^1.6.0
@@ -1636,9 +1627,6 @@ packages:
 
   eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
-
-  effect@3.5.4:
-    resolution: {integrity: sha512-TS9fhzqXh4AG070eP95/JY0STV9yi3FvMD/untC2blcQ/fXGT78AIzLc++mKdK8moaPce9OAIBwpHZPfhbE6rg==}
 
   electron-to-chromium@1.4.818:
     resolution: {integrity: sha512-eGvIk2V0dGImV9gWLq8fDfTTsCAeMDwZqEPMr+jMInxZdnp9Us8UpovYpRCf9NQ7VOFgrN2doNSgvISbsbNpxA==}
@@ -4478,8 +4466,6 @@ snapshots:
 
   eastasianwidth@0.2.0: {}
 
-  effect@3.5.4: {}
-
   electron-to-chromium@1.4.818: {}
 
   emoji-regex@8.0.0: {}
@@ -4978,7 +4964,8 @@ snapshots:
 
   ignore@5.3.1: {}
 
-  immer@10.1.1: {}
+  immer@10.1.1:
+    optional: true
 
   immutable@4.3.6: {}
 
