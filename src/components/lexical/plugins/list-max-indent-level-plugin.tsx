@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import type { ElementNode, RangeSelection } from 'lexical'
 
 import { $getListDepth, $isListItemNode, $isListNode } from '@lexical/list'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
@@ -7,10 +7,9 @@ import {
   $isElementNode,
   $isRangeSelection,
   COMMAND_PRIORITY_CRITICAL,
-  ElementNode,
   INDENT_CONTENT_COMMAND,
-  RangeSelection,
 } from 'lexical'
+import { useEffect } from 'react'
 
 /**
  * @desc 리스트의 깊이를 제한

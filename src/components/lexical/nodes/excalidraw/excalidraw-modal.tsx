@@ -1,12 +1,12 @@
-import { useLayoutEffect, useRef, useState } from 'react'
-
-import { Excalidraw } from '@excalidraw/excalidraw'
-import {
+import type {
   AppState,
   BinaryFiles,
   ExcalidrawImperativeAPI,
   ExcalidrawInitialDataState,
 } from '@excalidraw/excalidraw/types/types'
+
+import { Excalidraw } from '@excalidraw/excalidraw'
+import { useLayoutEffect, useRef, useState } from 'react'
 
 import { ExcalidrawDiscardModal } from '@/components/lexical/nodes/excalidraw/excalidraw-discard-modal.tsx'
 import { Portal } from '@/components/portal.tsx'
@@ -152,16 +152,16 @@ export const ExcalidrawModal = ({
     <Portal>
       <div
         className={
-          'z-50 fixed inset-0 flex justify-center items-center bg-black/80'
+          'fixed inset-0 z-50 flex items-center justify-center bg-black/80'
         }
       >
         <div
           ref={excalidrawModalRef}
           className={
-            'relative z-10 w-auto bg-background rounded-lg shadow-accent pt-4'
+            'relative z-10 w-auto rounded-lg bg-background pt-4 shadow-accent'
           }
         >
-          <div className={cn('relative w-[70vw] h-[70vh]')}>
+          <div className={cn('relative h-[70vh] w-[70vw]')}>
             <Excalidraw
               onChange={onChange}
               excalidrawAPI={excalidrawAPIRefCallback}
@@ -172,7 +172,7 @@ export const ExcalidrawModal = ({
               }}
             />
           </div>
-          <div className={'flex items-center justify-end p-4 gap-4'}>
+          <div className={'flex items-center justify-end gap-4 p-4'}>
             <Button variant={'destructive'} onClick={discard}>
               Discard
             </Button>

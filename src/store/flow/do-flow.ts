@@ -1,13 +1,14 @@
+import type { AppError } from '@/api/error.ts'
+import type { DoFlowStore } from '@/store/flow/do-flow-store.ts'
+import type { DoNode } from '@/store/node/do-node.ts'
+import type { IFlow } from '@/types/flow.type.ts'
+import type { NodeTypes } from '@/types/types.ts'
+
 import { Effect, pipe } from 'effect'
 import { action, makeObservable, observable } from 'mobx'
 
-import { AppError } from '@/api/error.ts'
-import { DoFlowStore } from '@/store/flow/do-flow-store.ts'
 import { FlowDrawer } from '@/store/flow/flow-drawer.ts'
-import { DoNode } from '@/store/node/do-node.ts'
 import { assignIf } from '@/store/utils/store.utils.ts'
-import { IFlow } from '@/types/flow.type.ts'
-import { NodeTypes } from '@/types/types.ts'
 import { customMerge } from '@/utils/custom-merge.ts'
 
 export class DoFlow {
@@ -27,12 +28,12 @@ export class DoFlow {
 
     this.merge(data)
     makeObservable(this, {
-      title: observable,
-      parentFlowId: observable,
       childFlowIds: observable,
       childNodeIds: observable,
-
       merge: action,
+      parentFlowId: observable,
+
+      title: observable,
     })
   }
 
@@ -75,13 +76,13 @@ export class DoFlow {
       Effect.flatMap((createdFlow) =>
         pipe(
           this.store.updateFlow({
-            flowId: this.id,
             changedFlow: {
               childFlowIds: [
                 ...(this.snapshot.childFlowIds ?? []),
                 createdFlow.id,
               ],
             },
+            flowId: this.id,
           }),
           Effect.map(() => createdFlow),
         ),
@@ -94,13 +95,13 @@ export class DoFlow {
       Effect.flatMap((createdNode) =>
         pipe(
           this.store.updateFlow({
-            flowId: this.id,
             changedFlow: {
               childNodeIds: [
                 ...(this.snapshot.childNodeIds ?? []),
                 createdNode.id,
               ],
             },
+            flowId: this.id,
           }),
           Effect.map(() => createdNode),
         ),

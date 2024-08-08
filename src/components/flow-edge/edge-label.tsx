@@ -1,4 +1,4 @@
-import { ChangeEvent } from 'react'
+import type { ChangeEvent } from 'react'
 
 import { observer } from 'mobx-react'
 import { EdgeLabelRenderer } from 'reactflow'
@@ -23,8 +23,8 @@ export const EdgeLabel = observer(
       <EdgeLabelRenderer>
         <div
           style={{
-            transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
             pointerEvents: 'all',
+            transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
           }}
           className="nodrag nopan absolute"
         >

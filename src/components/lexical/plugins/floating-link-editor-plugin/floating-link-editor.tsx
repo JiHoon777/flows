@@ -1,4 +1,5 @@
-import { Dispatch, useCallback, useEffect, useRef, useState } from 'react'
+import type { BaseSelection, LexicalEditor } from 'lexical'
+import type { Dispatch } from 'react'
 
 import {
   $createLinkNode,
@@ -10,13 +11,12 @@ import { $findMatchingParent, mergeRegister } from '@lexical/utils'
 import {
   $getSelection,
   $isRangeSelection,
-  BaseSelection,
   COMMAND_PRIORITY_HIGH,
   COMMAND_PRIORITY_LOW,
   KEY_ESCAPE_COMMAND,
-  LexicalEditor,
   SELECTION_CHANGE_COMMAND,
 } from 'lexical'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { lexicalUtils } from '@/components/lexical/utils/lexical.utils.ts'
 import { Button } from '@/components/ui/button.tsx'
@@ -214,11 +214,11 @@ export const FloatingLinkEditor = ({
     <div
       ref={editorRef}
       className={
-        'flex bg-[#fff] absolute top-0 left-0 z-10 drop-shadow-md rounded-lg p-4 w-full max-w-[320px]'
+        'absolute left-0 top-0 z-10 flex w-full max-w-[320px] rounded-lg bg-[#fff] p-4 drop-shadow-md'
       }
     >
       {isLink && isLinkEditMode && (
-        <div className={'w-full flex flex-col gap-1'}>
+        <div className={'flex w-full flex-col gap-1'}>
           <Input
             ref={inputRef}
             value={editedLinkUrl}
@@ -227,7 +227,7 @@ export const FloatingLinkEditor = ({
           />
           <div
             className={
-              'w-full flex justify-end gap-2 border-t border-accent pt-2'
+              'flex w-full justify-end gap-2 border-t border-accent pt-2'
             }
           >
             <Button
@@ -249,20 +249,20 @@ export const FloatingLinkEditor = ({
         </div>
       )}
       {isLink && !isLinkEditMode && (
-        <div className={'w-full flex flex-col gap-1'}>
+        <div className={'flex w-full flex-col gap-1'}>
           <a
             href={lexicalUtils.sanitizeUrl(linkUrl)}
             target="_blank"
             rel="noopener noreferrer"
             className={
-              'text-[rgb(33,111,219)] no-underline hover:underline cursor-pointer'
+              'cursor-pointer text-[rgb(33,111,219)] no-underline hover:underline'
             }
           >
             {linkUrl}
           </a>
           <div
             className={
-              'w-full flex justify-end gap-2 border-t border-accent pt-2'
+              'flex w-full justify-end gap-2 border-t border-accent pt-2'
             }
           >
             <Button

@@ -1,4 +1,6 @@
-import { ModalOverlay, ModalOverlayProps } from '@/components/modal-overlay.tsx'
+import type { ModalOverlayProps } from '@/components/modal-overlay.tsx'
+
+import { ModalOverlay } from '@/components/modal-overlay.tsx'
 import { Button } from '@/components/ui/button.tsx'
 
 export const AlertModal = ({

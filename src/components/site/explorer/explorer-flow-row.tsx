@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
-
 import { AnimatePresence, motion } from 'framer-motion'
 import { observer } from 'mobx-react'
+import { useEffect, useRef, useState } from 'react'
 
 import { ExplorerFlowRowItem } from '@/components/site/explorer/explorer-flow-row-item.tsx'
 import { ExplorerNodeRow } from '@/components/site/explorer/explorer-node-row.tsx'

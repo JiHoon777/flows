@@ -1,3 +1,7 @@
+import type { IApiFileSystem } from '@/api/api.interface.ts'
+import type { IFlow } from '@/types/flow.type.ts'
+import type { NodeTypes } from '@/types/types.ts'
+
 import {
   BaseDirectory,
   createDir,
@@ -8,10 +12,7 @@ import {
 } from '@tauri-apps/api/fs'
 import { Effect, pipe } from 'effect'
 
-import { IApiFileSystem } from '@/api/api.interface.ts'
 import { FileSystemError, handleFileSystemError } from '@/api/error.ts'
-import { IFlow } from '@/types/flow.type.ts'
-import { NodeTypes } from '@/types/types.ts'
 
 const FLOW_DIR = `flows/flow`
 const NODE_DIR = `flows/node`
@@ -29,8 +30,8 @@ export class ApiFileSystem implements IApiFileSystem {
       Effect.catchAll(() =>
         Effect.tryPromise(() =>
           createDir(FLOW_DIR, {
-            recursive: true,
             dir: BaseDirectory.Document,
+            recursive: true,
           }),
         ),
       ),
@@ -45,8 +46,8 @@ export class ApiFileSystem implements IApiFileSystem {
       Effect.catchAll(() =>
         Effect.tryPromise(() =>
           createDir(NODE_DIR, {
-            recursive: true,
             dir: BaseDirectory.Document,
+            recursive: true,
           }),
         ),
       ),

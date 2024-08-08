@@ -1,14 +1,15 @@
-import { useRef } from 'react'
+import type { MenuModel, MenuRef } from '@/components/menu/menu.tsx'
+import type { DoNode } from '@/store/node/do-node.ts'
 
 import { Effect } from 'effect'
 import { motion } from 'framer-motion'
 import { observer } from 'mobx-react'
+import { useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { AlertModal } from '@/components/alert-modal.tsx'
-import { Menu, MenuModel, MenuRef } from '@/components/menu/menu.tsx'
+import { Menu } from '@/components/menu/menu.tsx'
 import { useOverlay } from '@/contexts/overlay/use-overlay.tsx'
-import { DoNode } from '@/store/node/do-node.ts'
 import { useStore } from '@/store/useStore.ts'
 import { cn } from '@/utils/cn.ts'
 
@@ -31,8 +32,8 @@ export const ExplorerNodeRow = observer(({ node }: { node: DoNode }) => {
 
   const contextMenuModel: MenuModel = [
     {
-      label: 'Delete ...',
       command: openDelete,
+      label: 'Delete ...',
     },
   ]
 

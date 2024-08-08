@@ -1,4 +1,5 @@
-import { ComponentPickerOption } from '@/components/lexical/plugins/component-picker-menu-plugin/component-picker-option.ts'
+import type { ComponentPickerOption } from '@/components/lexical/plugins/component-picker-menu-plugin/component-picker-option.ts'
+
 import { cn } from '@/utils/cn.ts'
 
 export const ComponentPickerMenuItem = ({
@@ -19,7 +20,7 @@ export const ComponentPickerMenuItem = ({
       key={option.key}
       tabIndex={-1}
       className={cn(
-        'cursor-pointer w-full flex gap-2 px-2 py-0.5 items-center hover:bg-primary-foreground',
+        'flex w-full cursor-pointer items-center gap-2 px-2 py-0.5 hover:bg-primary-foreground',
         isSelected && 'bg-primary-foreground',
       )}
       ref={option.setRefElement}

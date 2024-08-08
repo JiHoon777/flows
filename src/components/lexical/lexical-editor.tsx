@@ -1,11 +1,8 @@
-import { useEffect, useState } from 'react'
+import type { InitialEditorStateType } from '@lexical/react/LexicalComposer'
 
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin'
 import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin'
-import {
-  InitialEditorStateType,
-  LexicalComposer,
-} from '@lexical/react/LexicalComposer'
+import { LexicalComposer } from '@lexical/react/LexicalComposer'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
@@ -19,6 +16,7 @@ import {
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin'
 import { observer } from 'mobx-react'
+import { useEffect, useState } from 'react'
 
 import { lexicalEditorTheme } from '@/components/lexical/lexical-editor-theme.ts'
 import { LexicalNodes } from '@/components/lexical/nodes'
@@ -49,9 +47,9 @@ type Props = {
 export const LexicalEditor = observer((props: Props) => {
   const initialConfig = {
     namespace: 'NodeEditor,',
-    theme: lexicalEditorTheme,
-    onError,
     nodes: [...LexicalNodes],
+    onError,
+    theme: lexicalEditorTheme,
   }
 
   return (

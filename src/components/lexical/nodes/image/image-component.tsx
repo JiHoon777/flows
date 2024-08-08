@@ -1,4 +1,9 @@
-import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
+import type {
+  BaseSelection,
+  LexicalCommand,
+  LexicalEditor,
+  NodeKey,
+} from 'lexical'
 
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { useLexicalNodeSelection } from '@lexical/react/useLexicalNodeSelection'
@@ -8,18 +13,15 @@ import {
   $getSelection,
   $isNodeSelection,
   $isRangeSelection,
-  BaseSelection,
   CLICK_COMMAND,
   COMMAND_PRIORITY_LOW,
   createCommand,
   DRAGSTART_COMMAND,
   KEY_BACKSPACE_COMMAND,
   KEY_DELETE_COMMAND,
-  LexicalCommand,
-  LexicalEditor,
-  NodeKey,
   SELECTION_CHANGE_COMMAND,
 } from 'lexical'
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
 
 import { ImageResizer } from '@/components/lexical/nodes/excalidraw/image-resizer.tsx'
 import { $isImageNode } from '@/components/lexical/nodes/image/index.tsx'
@@ -215,7 +217,7 @@ export const ImageComponent = ({
           draggable={draggable}
           className={cn(
             isFocused &&
-              'select-none outline-none border border-gray-200 border-dashed',
+              'select-none border border-dashed border-gray-200 outline-none',
           )}
         >
           {isLoadError ? (

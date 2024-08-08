@@ -1,5 +1,6 @@
+import type { OptionsOrDependencyArray } from 'react-hotkeys-hook/dist/types'
+
 import { useHotkeys } from 'react-hotkeys-hook'
-import { OptionsOrDependencyArray } from 'react-hotkeys-hook/dist/types'
 
 import { useStore } from '@/store/useStore.ts'
 import { createHotkeyMap } from '@/utils/createHotkeyMap.ts'
@@ -7,8 +8,8 @@ import { createHotkeyMap } from '@/utils/createHotkeyMap.ts'
 type GlobalHotKeyType = 'GlobalFontSizeUp' | 'GlobalFontSizeDown'
 
 const GlobalHotkeyMap = createHotkeyMap<GlobalHotKeyType>({
-  GlobalFontSizeUp: ['meta+=', 'ctrl+='],
   GlobalFontSizeDown: ['meta+minus', 'ctrl+minus'],
+  GlobalFontSizeUp: ['meta+=', 'ctrl+='],
 })
 
 const CommonOptions: OptionsOrDependencyArray = {

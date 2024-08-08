@@ -1,12 +1,12 @@
-import { useCallback, useMemo } from 'react'
+import type { IKanbanData } from '@/components/kanban/kanban.type.ts'
+import type { DoFlow } from '@/store/flow/do-flow.ts'
 
 import { Effect } from 'effect'
 import { observer } from 'mobx-react'
 import { nanoid } from 'nanoid'
+import { useCallback, useMemo } from 'react'
 
 import { KanbanBoard } from '@/components/kanban/kanban.tsx'
-import { IKanbanData } from '@/components/kanban/kanban.type.ts'
-import { DoFlow } from '@/store/flow/do-flow.ts'
 import { useStore } from '@/store/useStore.ts'
 
 export const FlowKanbanView = observer(({ flow }: { flow: DoFlow }) => {
@@ -16,10 +16,10 @@ export const FlowKanbanView = observer(({ flow }: { flow: DoFlow }) => {
     (kanbanData: IKanbanData) => {
       Effect.runPromise(
         flow.store.updateFlow({
-          flowId: flow.id,
           changedFlow: {
             kanbanData,
           },
+          flowId: flow.id,
         }),
       ).catch((ex) => store.showError(ex))
     },
@@ -29,9 +29,6 @@ export const FlowKanbanView = observer(({ flow }: { flow: DoFlow }) => {
   const kanbanData: IKanbanData = useMemo(() => {
     return (
       flow.snapshot.kanbanData ?? {
-        columns: [
-          { id: nanoid(), title: 'Inbox', cardIds: flow.childNodeIds ?? [] },
-        ],
         cards:
           flow.childNodeIds?.reduce(
             (prev, cur) => {
@@ -50,6 +47,9 @@ export const FlowKanbanView = observer(({ flow }: { flow: DoFlow }) => {
             },
             {} as IKanbanData['cards'],
           ) ?? {},
+        columns: [
+          { cardIds: flow.childNodeIds ?? [], id: nanoid(), title: 'Inbox' },
+        ],
       }
     )
   }, [flow, store.nodeStore])

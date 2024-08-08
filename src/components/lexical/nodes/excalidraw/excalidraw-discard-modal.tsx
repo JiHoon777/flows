@@ -13,7 +13,7 @@ export const ExcalidrawDiscardModal = ({
   return (
     <ModalOverlay isOpen={isOpen} onClose={onClose}>
       Are you sure you want to discard the changes?
-      <div className={'w-full flex justify-end gap-4'}>
+      <div className={'flex w-full justify-end gap-4'}>
         <Button variant={'destructive'} onClick={discard}>
           Discard
         </Button>

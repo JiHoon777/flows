@@ -1,7 +1,4 @@
-import { JSX, lazy, Suspense } from 'react'
-
-import {
-  DecoratorNode,
+import type {
   DOMConversionMap,
   DOMConversionOutput,
   DOMExportOutput,
@@ -12,6 +9,10 @@ import {
   SerializedLexicalNode,
   Spread,
 } from 'lexical'
+import type { JSX } from 'react'
+
+import { DecoratorNode } from 'lexical'
+import { lazy, Suspense } from 'react'
 
 type Dimension = number | 'inherit'
 

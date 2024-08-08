@@ -1,4 +1,6 @@
-import React, { ChangeEvent } from 'react'
+import type { ChangeEvent } from 'react'
+
+import React from 'react'
 
 import { FlTextareaAutoSize } from '@/components/fl-textarea-auto-size.tsx'
 import { cn } from '@/utils/cn'

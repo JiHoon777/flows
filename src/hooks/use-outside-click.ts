@@ -1,4 +1,6 @@
-import { RefObject, useEffect } from 'react'
+import type { RefObject } from 'react'
+
+import { useEffect } from 'react'
 
 /**
  * @param ref - 감지할 요소의 Ref 객체

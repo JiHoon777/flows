@@ -1,4 +1,5 @@
-import { Dispatch, useCallback, useEffect, useState } from 'react'
+import type { LexicalEditor } from 'lexical'
+import type { Dispatch } from 'react'
 
 import { $isCodeHighlightNode } from '@lexical/code'
 import { $isLinkNode } from '@lexical/link'
@@ -8,8 +9,8 @@ import {
   $isParagraphNode,
   $isRangeSelection,
   $isTextNode,
-  LexicalEditor,
 } from 'lexical'
+import { useCallback, useEffect, useState } from 'react'
 
 import { TextFormatFloatingToolbar } from '@/components/lexical/plugins/floating-text-format-toolbar-plugin/text-format-floating-toolbar.tsx'
 import { lexicalUtils } from '@/components/lexical/utils/lexical.utils.ts'

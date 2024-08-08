@@ -1,20 +1,13 @@
+import type { DoFlow } from '@/store/flow/do-flow.ts'
+import type { IReactFlowNodeTarget, NodeType } from '@/types/base.type.ts'
+import type { IFlow } from '@/types/flow.type.ts'
+import type { NodeTypes } from '@/types/types.ts'
+import type { Edge, EdgeChange, Node, NodeChange, XYPosition } from 'reactflow'
+
 import { Effect } from 'effect'
 import { action, makeObservable, observable, runInAction } from 'mobx'
 import { nanoid } from 'nanoid'
-import {
-  applyEdgeChanges,
-  applyNodeChanges,
-  Edge,
-  EdgeChange,
-  Node,
-  NodeChange,
-  XYPosition,
-} from 'reactflow'
-
-import { DoFlow } from '@/store/flow/do-flow.ts'
-import { IReactFlowNodeTarget, NodeType } from '@/types/base.type.ts'
-import { IFlow } from '@/types/flow.type.ts'
-import { NodeTypes } from '@/types/types.ts'
+import { applyEdgeChanges, applyNodeChanges } from 'reactflow'
 
 export class FlowDrawer {
   flow: DoFlow
@@ -27,12 +20,12 @@ export class FlowDrawer {
     this.flow = flow
 
     makeObservable(this, {
+      edges: observable,
       loaded: observable,
       nodes: observable,
-      edges: observable,
 
-      onNodesChange: action,
       onEdgesChange: action,
+      onNodesChange: action,
     })
   }
 
@@ -88,10 +81,10 @@ export class FlowDrawer {
    **/
   addChildNode(parentNode: Node, position: XYPosition) {
     const creatingNode = {
-      id: nanoid(),
-      type: 'text',
       data: { title: 'new Node' },
+      id: nanoid(),
       position,
+      type: 'text',
     }
 
     const creatingEdge = FlowDrawer.createEdge({
@@ -148,10 +141,10 @@ export class FlowDrawer {
     if (isSourceNodeFlow) {
       Effect.runPromise(
         this.rootStore.flowStore.updateFlow({
-          flowId: sourceNode.id,
           changedFlow: {
             targets,
           },
+          flowId: sourceNode.id,
         }),
       ).catch((err) => {
         this.rootStore.showError(err)
@@ -160,10 +153,10 @@ export class FlowDrawer {
     } else {
       Effect.runPromise(
         this.rootStore.nodeStore.updateNode({
-          nodeId: sourceNode.id,
           changedNode: {
             targets,
           },
+          nodeId: sourceNode.id,
         }),
       ).catch((err) => {
         this.rootStore.showError(err)
@@ -213,7 +206,6 @@ export class FlowDrawer {
     if (sourceNode.type === 'flow') {
       Effect.runPromise(
         this.flow.store.updateFlow({
-          flowId: updatingEdge.source,
           changedFlow: {
             targets: (
               this.flow.store.getFlowById(sourceNode.id)?.snapshot.targets ?? []
@@ -223,6 +215,7 @@ export class FlowDrawer {
                 : target,
             ),
           },
+          flowId: updatingEdge.source,
         }),
       ).catch((ex) => {
         restoreOnError()
@@ -231,7 +224,6 @@ export class FlowDrawer {
     } else {
       Effect.runPromise(
         this.rootStore.nodeStore.updateNode({
-          nodeId: updatingEdge.source,
           changedNode: {
             targets: (
               this.rootStore.nodeStore.getNodeById(sourceNode.id)?.snapshot
@@ -242,6 +234,7 @@ export class FlowDrawer {
                 : target,
             ),
           },
+          nodeId: updatingEdge.source,
         }),
       ).catch((ex) => {
         restoreOnError()
@@ -278,12 +271,12 @@ export class FlowDrawer {
     if (sourceNode.type === 'flow') {
       Effect.runPromise(
         this.flow.store.updateFlow({
-          flowId: sourceNode.id,
           changedFlow: {
             targets: (
               this.flow.store.getFlowById(sourceNode.id)?.snapshot.targets ?? []
             ).filter((target) => target.id !== deletingEdge.target),
           },
+          flowId: sourceNode.id,
         }),
       ).catch((ex) => {
         restoreOnError()
@@ -292,13 +285,13 @@ export class FlowDrawer {
     } else {
       Effect.runPromise(
         this.rootStore.nodeStore.updateNode({
-          nodeId: sourceNode.id,
           changedNode: {
             targets: (
               this.rootStore.nodeStore.getNodeById(sourceNode.id)?.snapshot
                 .targets ?? []
             ).filter((target) => target.id !== deletingEdge.target),
           },
+          nodeId: sourceNode.id,
         }),
       ).catch((ex) => {
         restoreOnError()
@@ -347,9 +340,9 @@ export class FlowDrawer {
     })
     const node = FlowDrawer.createNodeByReactFlowNode({
       nodeId: reactFlowNode.id,
-      type: nodeType,
       parentFlowId: this.flow.id,
       position,
+      type: nodeType,
     })
 
     runInAction(() => {
@@ -381,19 +374,19 @@ export class FlowDrawer {
     if (type === 'flow') {
       Effect.runPromise(
         this.flow.store.updateFlow({
-          flowId: id,
           changedFlow: {
             title,
           },
+          flowId: id,
         }),
       ).catch(this.rootStore.showError)
     } else {
       Effect.runPromise(
         this.rootStore.nodeStore.updateNode({
-          nodeId: id,
           changedNode: {
             title,
           },
+          nodeId: id,
         }),
       ).catch(this.rootStore.showError)
     }
@@ -413,19 +406,19 @@ export class FlowDrawer {
     if (type === 'flow') {
       Effect.runPromise(
         this.flow.store.updateFlow({
-          flowId: id,
           changedFlow: {
             position,
           },
+          flowId: id,
         }),
       ).catch(this.rootStore.showError)
     } else {
       Effect.runPromise(
         this.rootStore.nodeStore.updateNode({
-          nodeId: id,
           changedNode: {
             position,
           },
+          nodeId: id,
         }),
       ).catch(this.rootStore.showError)
     }
@@ -533,32 +526,32 @@ export class FlowDrawer {
     edges: Edge[]
   } {
     const node: Node = {
+      data: undefined,
       id: 'flowId' in origin ? origin.flowId : origin.nodeId,
-      type: 'flowId' in origin ? 'flow' : origin.type,
       position: origin.position ?? { x: 0, y: 0 },
       style: {
-        width: origin.style?.width ?? DEFAULT_NODE_MIN_WIDTH,
         height: origin.style?.height ?? DEFAULT_NODE_MIN_HEIGHT,
+        width: origin.style?.width ?? DEFAULT_NODE_MIN_WIDTH,
       },
-      data: undefined,
+      type: 'flowId' in origin ? 'flow' : origin.type,
     }
     const edges: Edge[] = []
 
     if (origin.targets) {
       origin.targets.forEach((target) => {
         edges.push({
-          id: nanoid(),
-          source: 'flowId' in origin ? origin.flowId : origin.nodeId,
-          target: target.id,
           data: {
             label: target.label ?? undefined,
           },
+          id: nanoid(),
+          source: 'flowId' in origin ? origin.flowId : origin.nodeId,
+          target: target.id,
         })
       })
     }
     return {
-      node,
       edges,
+      node,
     }
   }
 
@@ -604,14 +597,14 @@ export class FlowDrawer {
     position: XYPosition
   }): Node {
     return {
-      id: nanoid(),
-      type: nodeType,
       data: { title: 'Untitled' },
+      id: nanoid(),
       position,
       style: {
-        width: DEFAULT_NODE_MIN_WIDTH,
         height: DEFAULT_NODE_MIN_HEIGHT,
+        width: DEFAULT_NODE_MIN_WIDTH,
       },
+      type: nodeType,
     }
   }
 
@@ -628,18 +621,18 @@ export class FlowDrawer {
     position: XYPosition
   }): IFlow {
     return {
-      flowId,
-      created_at: new Date(),
-      updated_at: new Date(),
-      title: 'Untitled',
-      position,
-      parentFlowId,
-      childNodeIds: [],
       childFlowIds: [],
+      childNodeIds: [],
+      created_at: new Date(),
+      flowId,
+      parentFlowId,
+      position,
       style: {
-        width: DEFAULT_NODE_MIN_WIDTH,
         height: DEFAULT_NODE_MIN_HEIGHT,
+        width: DEFAULT_NODE_MIN_WIDTH,
       },
+      title: 'Untitled',
+      updated_at: new Date(),
     }
   }
 
@@ -658,17 +651,17 @@ export class FlowDrawer {
     position: XYPosition
   }): NodeTypes {
     return {
+      created_at: new Date(),
       nodeId,
+      parentFlowId,
+      position,
+      style: {
+        height: DEFAULT_NODE_MIN_HEIGHT,
+        width: DEFAULT_NODE_MIN_WIDTH,
+      },
       title: 'Untitled',
       type,
-      created_at: new Date(),
       updated_at: new Date(),
-      position,
-      parentFlowId,
-      style: {
-        width: DEFAULT_NODE_MIN_WIDTH,
-        height: DEFAULT_NODE_MIN_HEIGHT,
-      },
     }
   }
 

@@ -1,7 +1,9 @@
-import { ReactNode } from 'react'
+import type { ButtonProps } from '@/components/ui/button.tsx'
+import type { TooltipWrapProps } from '@/components/ui/tooltip.tsx'
+import type { ReactNode } from 'react'
 
-import { Button, ButtonProps } from '@/components/ui/button.tsx'
-import { TooltipWrap, TooltipWrapProps } from '@/components/ui/tooltip.tsx'
+import { Button } from '@/components/ui/button.tsx'
+import { TooltipWrap } from '@/components/ui/tooltip.tsx'
 
 export const ButtonWithTooltip = ({
   tooltipContent,

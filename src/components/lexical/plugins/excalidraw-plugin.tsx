@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import type { LexicalCommand } from 'lexical'
 
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { $wrapNodeInElement } from '@lexical/utils'
@@ -8,8 +8,8 @@ import {
   $isRootOrShadowRoot,
   COMMAND_PRIORITY_EDITOR,
   createCommand,
-  LexicalCommand,
 } from 'lexical'
+import { useEffect } from 'react'
 
 import {
   $createExcalidrawNode,

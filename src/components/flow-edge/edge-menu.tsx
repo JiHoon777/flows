@@ -18,8 +18,8 @@ export const EdgeMenu = observer(
       <EdgeLabelRenderer>
         <div
           style={{
-            transform: `translate(-50%, -50%) translate(${labelX}px,${labelY - 30}px)`,
             pointerEvents: 'all',
+            transform: `translate(-50%, -50%) translate(${labelX}px,${labelY - 30}px)`,
           }}
           className="nodrag nopan absolute flex gap-1 rounded-lg bg-background px-1.5 py-1.5 shadow-lg"
         >

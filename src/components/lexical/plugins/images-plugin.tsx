@@ -1,4 +1,6 @@
-import { JSX, useEffect } from 'react'
+import type { ImagePayload } from '@/components/lexical/nodes/image'
+import type { LexicalCommand, LexicalEditor } from 'lexical'
+import type { JSX } from 'react'
 
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { $wrapNodeInElement, CAN_USE_DOM, mergeRegister } from '@lexical/utils'
@@ -17,15 +19,13 @@ import {
   DRAGOVER_COMMAND,
   DRAGSTART_COMMAND,
   DROP_COMMAND,
-  LexicalCommand,
-  LexicalEditor,
 } from 'lexical'
+import { useEffect } from 'react'
 
 import {
   $createImageNode,
   $isImageNode,
   ImageNode,
-  ImagePayload,
 } from '@/components/lexical/nodes/image'
 
 export type InsertImagePayload = Readonly<ImagePayload>

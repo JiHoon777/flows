@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import type { ExcalidrawInitialElements } from '@/components/lexical/nodes/excalidraw/excalidraw-modal.tsx'
+import type { AppState, BinaryFiles } from '@excalidraw/excalidraw/types/types'
+import type { NodeKey } from 'lexical'
 
-import { AppState, BinaryFiles } from '@excalidraw/excalidraw/types/types'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { useLexicalNodeSelection } from '@lexical/react/useLexicalNodeSelection'
 import { mergeRegister } from '@lexical/utils'
@@ -12,15 +13,12 @@ import {
   COMMAND_PRIORITY_LOW,
   KEY_BACKSPACE_COMMAND,
   KEY_DELETE_COMMAND,
-  NodeKey,
 } from 'lexical'
 import { PencilIcon } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { ExcalidrawImage } from '@/components/lexical/nodes/excalidraw/excalidraw-image.tsx'
-import {
-  ExcalidrawInitialElements,
-  ExcalidrawModal,
-} from '@/components/lexical/nodes/excalidraw/excalidraw-modal.tsx'
+import { ExcalidrawModal } from '@/components/lexical/nodes/excalidraw/excalidraw-modal.tsx'
 import { ImageResizer } from '@/components/lexical/nodes/excalidraw/image-resizer.tsx'
 import { $isExcalidrawNode } from '@/components/lexical/nodes/excalidraw/index.tsx'
 import { Button } from '@/components/ui/button.tsx'
@@ -224,9 +222,9 @@ const ExcalidrawComponent = ({
         <button
           ref={buttonRef}
           className={cn(
-            'relative p-0 bg-transparent',
+            'relative bg-transparent p-0',
             isSelected &&
-              'select-none outline-none border border-gray-200 border-dashed',
+              'select-none border border-dashed border-gray-200 outline-none',
             !isSelected && 'border-0',
           )}
         >
@@ -244,10 +242,10 @@ const ExcalidrawComponent = ({
               size={'icon'}
               onMouseDown={(e) => e.preventDefault()}
               onClick={openModal}
-              className={'absolute top-4 right-4'}
+              className={'absolute right-4 top-4'}
             >
               <div className={'p-4'}>
-                <PencilIcon className={'!w-6 !h-6 shrink-0'} />
+                <PencilIcon className={'!h-6 !w-6 shrink-0'} />
               </div>
             </Button>
           )}

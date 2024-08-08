@@ -1,6 +1,7 @@
-import { FlowDrawer } from '@/store/flow/flow-drawer.ts'
+import type { FlowDrawer } from '@/store/flow/flow-drawer.ts'
+import type { NodeType } from '@/types/base.type.ts'
+
 import { useStore } from '@/store/useStore.ts'
-import { NodeType } from '@/types/base.type.ts'
 
 export const useGetNodeDrawer = (
   nodeId: string,

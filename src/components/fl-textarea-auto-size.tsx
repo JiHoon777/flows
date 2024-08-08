@@ -1,6 +1,6 @@
-import TextareaAutoSize, {
-  TextareaAutosizeProps,
-} from 'react-textarea-autosize'
+import type { TextareaAutosizeProps } from 'react-textarea-autosize'
+
+import TextareaAutoSize from 'react-textarea-autosize'
 
 import { cn } from '@/utils/cn.ts'
 

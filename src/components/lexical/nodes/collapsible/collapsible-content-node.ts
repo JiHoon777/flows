@@ -1,20 +1,21 @@
-import { IS_CHROME } from '@lexical/utils'
-import {
+import type {
   DOMConversionMap,
   DOMConversionOutput,
   DOMExportOutput,
   EditorConfig,
-  ElementNode,
   LexicalEditor,
   LexicalNode,
   SerializedElementNode,
 } from 'lexical'
 
-import { $isCollapsibleContainerNode } from '@/components/lexical/nodes/collapsible/collapsible-container.node.ts'
+import { IS_CHROME } from '@lexical/utils'
+import { ElementNode } from 'lexical'
+
 import {
   domOnBeforeMatch,
   setDomHiddenUntilFound,
 } from '@/components/lexical/nodes/collapsible/collapsible.utils.ts'
+import { $isCollapsibleContainerNode } from '@/components/lexical/nodes/collapsible/collapsible-container.node.ts'
 import invariant from '@/components/lexical/utils/invariant.ts'
 
 type SerializedCollapsibleContentNode = SerializedElementNode

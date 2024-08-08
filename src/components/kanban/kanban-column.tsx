@@ -1,6 +1,6 @@
-import { ReactNode } from 'react'
+import type { IKanbanCard, IKanbanColumn } from './kanban.type'
+import type { ReactNode } from 'react'
 
-import { IKanbanCard, IKanbanColumn } from './kanban.type'
 import {
   SortableContext,
   useSortable,
@@ -25,11 +25,11 @@ export function KanbanColumn({ column, cards, renderCard }: ColumnProps) {
     transition,
     isDragging,
   } = useSortable({
-    id: column.id,
     data: {
-      type: 'Column',
       column,
+      type: 'Column',
     },
+    id: column.id,
   })
 
   const style = {

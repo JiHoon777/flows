@@ -1,8 +1,4 @@
-import { lazy, Suspense } from 'react'
-
-import {
-  $applyNodeReplacement,
-  DecoratorNode,
+import type {
   DOMConversionMap,
   DOMConversionOutput,
   DOMExportOutput,
@@ -12,6 +8,9 @@ import {
   SerializedLexicalNode,
   Spread,
 } from 'lexical'
+
+import { $applyNodeReplacement, DecoratorNode } from 'lexical'
+import { lazy, Suspense } from 'react'
 
 const ImageComponent = lazy(() =>
   import('./image-component').then((module) => ({

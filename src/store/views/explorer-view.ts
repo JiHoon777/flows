@@ -1,10 +1,10 @@
+import type { DoFlow } from '@/store/flow/do-flow.ts'
+import type { DoNode } from '@/store/node/do-node.ts'
+import type { RootStore } from '@/store/root-store.ts'
+
 import { Effect } from 'effect'
 import { computed, makeObservable, observable, runInAction } from 'mobx'
 import { nanoid } from 'nanoid'
-
-import { DoFlow } from '@/store/flow/do-flow.ts'
-import { DoNode } from '@/store/node/do-node.ts'
-import { RootStore } from '@/store/root-store.ts'
 
 export enum ExplorerSortOption {
   CreatedTimeAsc = 'CreatedTimeAsc',
@@ -24,10 +24,10 @@ export class ExplorerView {
     this.rootStore = rootStore
 
     makeObservable(this, {
-      sortOption: observable,
+      explorerList: computed,
       isExpandAll: observable,
 
-      explorerList: computed,
+      sortOption: observable,
     })
   }
 
@@ -59,11 +59,11 @@ export class ExplorerView {
     Effect.runPromise(
       this.flowStore.createFlow({
         flow: {
-          flowId: nanoid(),
-          created_at: new Date(),
-          updated_at: new Date(),
           childNodeIds: [],
+          created_at: new Date(),
+          flowId: nanoid(),
           title: 'Untitled',
+          updated_at: new Date(),
         },
       }),
     ).catch((ex) => this.rootStore.showError(ex))

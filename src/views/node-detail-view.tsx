@@ -1,12 +1,13 @@
-import { ChangeEvent, useCallback } from 'react'
+import type { DoNode } from '@/store/node/do-node.ts'
+import type { ChangeEvent } from 'react'
 
 import { Effect } from 'effect'
 import { observer } from 'mobx-react'
+import { useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { FlTextareaAutoSize } from '@/components/fl-textarea-auto-size.tsx'
 import { useDebounce } from '@/hooks/use-debounce.ts'
-import { DoNode } from '@/store/node/do-node.ts'
 import { useStore } from '@/store/useStore.ts'
 import { NoteNodeView } from '@/views/node-detail-view/note-node-view.tsx'
 
@@ -30,10 +31,10 @@ export const NodeDetailView = observer(({ node }: { node: DoNode }) => {
     (e: ChangeEvent<HTMLTextAreaElement>) => {
       Effect.runPromise(
         node.store.updateNode({
-          nodeId: node.id,
           changedNode: {
             title: e.target.value,
           },
+          nodeId: node.id,
         }),
       ).catch((ex) => store.showError(ex))
     },

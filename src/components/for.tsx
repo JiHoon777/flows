@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
 type MapFunction<T, MT> = (item: T) => MT
 

@@ -1,16 +1,15 @@
-import { IS_CHROME } from '@lexical/utils'
-import {
-  $createParagraphNode,
-  $isElementNode,
+import type {
   DOMConversionMap,
   DOMConversionOutput,
   EditorConfig,
-  ElementNode,
   LexicalEditor,
   LexicalNode,
   RangeSelection,
   SerializedElementNode,
 } from 'lexical'
+
+import { IS_CHROME } from '@lexical/utils'
+import { $createParagraphNode, $isElementNode, ElementNode } from 'lexical'
 
 import { $isCollapsibleContainerNode } from '@/components/lexical/nodes/collapsible/collapsible-container.node.ts'
 import { $isCollapsibleContentNode } from '@/components/lexical/nodes/collapsible/collapsible-content-node.ts'

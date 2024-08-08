@@ -1,5 +1,6 @@
+import type { RangeSelection } from 'lexical'
+
 import { $isAtNodeEnd } from '@lexical/selection'
-import { RangeSelection } from 'lexical'
 
 const VERTICAL_GAP = 10
 const HORIZONTAL_OFFSET = 5
@@ -16,6 +17,23 @@ const urlRegExp = new RegExp(
 )
 
 export const lexicalUtils = {
+  getDOMRangeRect: (nativeSelection: Selection, rootElement: HTMLElement) => {
+    const domRange = nativeSelection.getRangeAt(0)
+
+    let rect
+
+    if (nativeSelection.anchorNode === rootElement) {
+      let inner = rootElement
+      while (inner.firstElementChild != null) {
+        inner = inner.firstElementChild as HTMLElement
+      }
+      rect = inner.getBoundingClientRect()
+    } else {
+      rect = domRange.getBoundingClientRect()
+    }
+
+    return rect
+  },
   getSelectedNode: (selection: RangeSelection) => {
     const anchor = selection.anchor
     const focus = selection.focus
@@ -39,6 +57,18 @@ export const lexicalUtils = {
        */
       return $isAtNodeEnd(anchor) ? anchorNode : focusNode
     }
+  },
+  sanitizeUrl: (url: string) => {
+    try {
+      const parsedUrl = new URL(url)
+      // eslint-disable-next-line no-script-url
+      if (!SUPPORTED_URL_PROTOCOLS.has(parsedUrl.protocol)) {
+        return 'about:blank'
+      }
+    } catch {
+      return url
+    }
+    return url
   },
   setFloatingElemPosition: (
     targetRect: DOMRect | null,
@@ -85,23 +115,6 @@ export const lexicalUtils = {
     floatingElem.style.opacity = '1'
     floatingElem.style.transform = `translate(${left}px, ${top}px)`
   },
-  getDOMRangeRect: (nativeSelection: Selection, rootElement: HTMLElement) => {
-    const domRange = nativeSelection.getRangeAt(0)
-
-    let rect
-
-    if (nativeSelection.anchorNode === rootElement) {
-      let inner = rootElement
-      while (inner.firstElementChild != null) {
-        inner = inner.firstElementChild as HTMLElement
-      }
-      rect = inner.getBoundingClientRect()
-    } else {
-      rect = domRange.getBoundingClientRect()
-    }
-
-    return rect
-  },
   setFloatingElemPositionForLinkEditor: (
     targetRect: DOMRect | null,
     floatingElem: HTMLElement,
@@ -138,18 +151,6 @@ export const lexicalUtils = {
 
     floatingElem.style.opacity = '1'
     floatingElem.style.transform = `translate(${left}px, ${top}px)`
-  },
-  sanitizeUrl: (url: string) => {
-    try {
-      const parsedUrl = new URL(url)
-      // eslint-disable-next-line no-script-url
-      if (!SUPPORTED_URL_PROTOCOLS.has(parsedUrl.protocol)) {
-        return 'about:blank'
-      }
-    } catch {
-      return url
-    }
-    return url
   },
   validateUrl: (url: string) => {
     // TODO Fix UI for link insertion; it should never default to an invalid URL such as https://.

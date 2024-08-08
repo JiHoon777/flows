@@ -1,4 +1,5 @@
-import { Dispatch, useEffect, useState } from 'react'
+import type { LexicalEditor } from 'lexical'
+import type { Dispatch } from 'react'
 
 import { $isAutoLinkNode, $isLinkNode } from '@lexical/link'
 import { $findMatchingParent, mergeRegister } from '@lexical/utils'
@@ -9,9 +10,9 @@ import {
   CLICK_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
   COMMAND_PRIORITY_LOW,
-  LexicalEditor,
   SELECTION_CHANGE_COMMAND,
 } from 'lexical'
+import { useEffect, useState } from 'react'
 
 import { FloatingLinkEditor } from '@/components/lexical/plugins/floating-link-editor-plugin/floating-link-editor.tsx'
 import { lexicalUtils } from '@/components/lexical/utils/lexical.utils.ts'

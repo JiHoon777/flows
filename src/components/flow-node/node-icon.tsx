@@ -1,6 +1,6 @@
-import { Map, NotebookPen, Type } from 'lucide-react'
+import type { NodeType } from '@/types/base.type.ts'
 
-import { NodeType } from '@/types/base.type.ts'
+import { Map, NotebookPen, Type } from 'lucide-react'
 
 export const NodeIcon = ({ type }: { type: NodeType | 'flow' }) => {
   return (

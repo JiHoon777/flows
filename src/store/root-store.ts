@@ -1,10 +1,12 @@
-import { Platform, platform as TauriPlatform } from '@tauri-apps/api/os'
+import type { Apis } from '@/api/api.interface.ts'
+import type { AppError } from '@/api/error.ts'
+import type { Platform } from '@tauri-apps/api/os'
+
+import { platform as TauriPlatform } from '@tauri-apps/api/os'
 import { Effect, pipe } from 'effect'
 import { action, makeObservable, observable, runInAction } from 'mobx'
 
 import { ApiFileSystem } from '@/api/api-file-system.ts'
-import { Apis } from '@/api/api.interface.ts'
-import { AppError } from '@/api/error.ts'
 import { DoFlowStore } from '@/store/flow/do-flow-store.ts'
 import { DoNodeStore } from '@/store/node/do-node-store.ts'
 import { ExplorerView } from '@/store/views/explorer-view.ts'

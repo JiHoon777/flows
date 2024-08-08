@@ -1,12 +1,12 @@
-import { useCallback } from 'react'
+import type { DoNode } from '@/store/node/do-node.ts'
+import type { INoteNode } from '@/types/note-node.type.ts'
 
 import { Effect } from 'effect'
 import { observer } from 'mobx-react'
+import { useCallback } from 'react'
 
 import { LexicalEditor } from '@/components/lexical/lexical-editor.tsx'
-import { DoNode } from '@/store/node/do-node.ts'
 import { useStore } from '@/store/useStore.ts'
-import { INoteNode } from '@/types/note-node.type.ts'
 
 export const NoteNodeView = observer(({ node }: { node: DoNode }) => {
   const store = useStore()
@@ -16,10 +16,10 @@ export const NoteNodeView = observer(({ node }: { node: DoNode }) => {
     (v: string) => {
       Effect.runPromise(
         node.store.updateNode({
-          nodeId: node.id,
           changedNode: {
             content: v,
           },
+          nodeId: node.id,
         }),
       ).catch((ex) => store.showError(ex))
     },

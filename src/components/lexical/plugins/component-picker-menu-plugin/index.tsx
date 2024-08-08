@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import type { LexicalEditor, TextNode } from 'lexical'
 
 import { $createCodeNode } from '@lexical/code'
 import {
@@ -15,13 +15,7 @@ import {
 import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text'
 import { $setBlocksType } from '@lexical/selection'
 import { DividerHorizontalIcon } from '@radix-ui/react-icons'
-import {
-  $createParagraphNode,
-  $getSelection,
-  $isRangeSelection,
-  LexicalEditor,
-  TextNode,
-} from 'lexical'
+import { $createParagraphNode, $getSelection, $isRangeSelection } from 'lexical'
 import {
   CaseSensitive,
   ChevronRight,
@@ -36,6 +30,7 @@ import {
   Quote,
   Ruler,
 } from 'lucide-react'
+import { useCallback, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 
 import { INSERT_COLLAPSIBLE_COMMAND } from '@/components/lexical/plugins/collapsible-plugin.tsx'

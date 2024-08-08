@@ -1,5 +1,6 @@
+import type { NodeProps } from 'reactflow'
+
 import { observer } from 'mobx-react'
-import { NodeProps } from 'reactflow'
 
 import { NodeWrap } from '@/components/flow-node/node-wrap'
 

@@ -1,4 +1,4 @@
-import { JSX } from 'react'
+import type { JSX } from 'react'
 
 import { ImageOff } from 'lucide-react'
 
@@ -23,7 +23,7 @@ const useSuspenseImage = (src: string) => {
 export const BrokenImage = () => {
   return (
     <div draggable={false}>
-      <ImageOff className={'w-[200px] h-[200px] opacity-10'} />
+      <ImageOff className={'h-[200px] w-[200px] opacity-10'} />
     </div>
   )
 }

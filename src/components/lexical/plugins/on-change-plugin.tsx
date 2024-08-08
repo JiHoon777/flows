@@ -1,9 +1,9 @@
-import { useEffect } from 'react'
+import type { InitialEditorStateType } from '@lexical/react/LexicalComposer'
+import type { EditorState } from 'lexical'
 
-import { InitialEditorStateType } from '@lexical/react/LexicalComposer'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { EditorState } from 'lexical'
 import { debounce } from 'lodash-es'
+import { useEffect } from 'react'
 
 // When the editor changes, you can get notified via the
 // OnChangePlugin!

@@ -1,6 +1,7 @@
-import { DependencyList, useMemo } from 'react'
+import type { MenuModel } from '@/components/menu/menu.tsx'
+import type { DependencyList } from 'react'
 
-import { MenuModel } from '@/components/menu/menu.tsx'
+import { useMemo } from 'react'
 
 export const useCreateMenuModel = (
   menuModel: () => MenuModel,

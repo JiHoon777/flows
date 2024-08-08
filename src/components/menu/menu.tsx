@@ -1,3 +1,7 @@
+import type { MenuItems } from '@/components/menu/menu-item.tsx'
+import type { VariantProps } from 'class-variance-authority'
+
+import { cva } from 'class-variance-authority'
 import * as React from 'react'
 import {
   forwardRef,
@@ -7,9 +11,7 @@ import {
   useState,
 } from 'react'
 
-import { cva, VariantProps } from 'class-variance-authority'
-
-import { MenuItem, MenuItems } from '@/components/menu/menu-item.tsx'
+import { MenuItem } from '@/components/menu/menu-item.tsx'
 import { Portal } from '@/components/portal.tsx'
 import { useOutsideClick } from '@/hooks/use-outside-click.ts'
 import { cn } from '@/utils/cn.ts'
@@ -21,8 +23,8 @@ const menuVariants = cva(
   {
     variants: {
       variant: {
-        dropdown: '',
         contextMenu: '',
+        dropdown: '',
       },
     },
   },
@@ -49,6 +51,9 @@ const Menu = forwardRef<MenuRef, MenuProps>(({ model, variant }, ref) => {
   useOutsideClick(menuRef, () => setIsVisible(false), isVisible)
 
   useImperativeHandle(ref, () => ({
+    close: () => {
+      setIsVisible(false)
+    },
     show: (event: React.MouseEvent | TouchEvent) => {
       event.preventDefault()
       event.stopPropagation()
@@ -60,9 +65,6 @@ const Menu = forwardRef<MenuRef, MenuProps>(({ model, variant }, ref) => {
       setPosition({ x, y })
       setIsVisible(true)
       setActiveIndex(-1)
-    },
-    close: () => {
-      setIsVisible(false)
     },
   }))
 
@@ -129,7 +131,7 @@ const Menu = forwardRef<MenuRef, MenuProps>(({ model, variant }, ref) => {
       <div
         ref={menuRef}
         className={cn(menuVariants({ variant }))}
-        style={{ top: position.y, left: position.x }}
+        style={{ left: position.x, top: position.y }}
       >
         {model.map((item, index) => (
           <MenuItem
@@ -148,4 +150,4 @@ const Menu = forwardRef<MenuRef, MenuProps>(({ model, variant }, ref) => {
 })
 
 export { Menu }
-export type { MenuProps, MenuModel, MenuRef }
+export type { MenuModel, MenuProps, MenuRef }

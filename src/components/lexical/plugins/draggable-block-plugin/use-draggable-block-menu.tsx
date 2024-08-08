@@ -1,4 +1,5 @@
-import { DragEvent as ReactDragEvent, useEffect, useRef, useState } from 'react'
+import type { LexicalEditor } from 'lexical'
+import type { DragEvent as ReactDragEvent } from 'react'
 
 import { eventFiles } from '@lexical/rich-text'
 import { calculateZoomLevel, mergeRegister } from '@lexical/utils'
@@ -9,9 +10,9 @@ import {
   COMMAND_PRIORITY_LOW,
   DRAGOVER_COMMAND,
   DROP_COMMAND,
-  LexicalEditor,
 } from 'lexical'
 import { GripVertical } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 
 import {
   getBlockElement,

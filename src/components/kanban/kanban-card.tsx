@@ -1,6 +1,6 @@
-import { ReactNode } from 'react'
+import type { IKanbanCard } from './kanban.type'
+import type { ReactNode } from 'react'
 
-import { IKanbanCard } from './kanban.type'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
@@ -13,17 +13,17 @@ interface TaskProps {
 export function KanbanCard({ card, isDragging, renderCard }: TaskProps) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({
-      id: card.id,
       data: {
-        type: 'Card',
         card,
+        type: 'Card',
       },
+      id: card.id,
     })
 
   const style = {
+    opacity: isDragging ? 0.5 : 1,
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1,
   }
 
   return (

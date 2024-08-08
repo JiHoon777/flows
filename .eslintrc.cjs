@@ -71,7 +71,7 @@ module.exports = {
     ],
 
     'sort-keys-fix/sort-keys-fix': ERROR,
-    
+
     'jsx-a11y/anchor-is-valid': 'warn',
     'react/react-in-jsx-scope': 'off',
     'react/display-name': 'off',

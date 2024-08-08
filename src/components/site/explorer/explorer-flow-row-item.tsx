@@ -1,11 +1,10 @@
-import {
+import type { MenuModel, MenuRef } from '@/components/menu/menu.tsx'
+import type { DoFlow } from '@/store/flow/do-flow.ts'
+import type {
   ChangeEvent,
   Dispatch,
   KeyboardEvent,
   SetStateAction,
-  useCallback,
-  useRef,
-  useState,
 } from 'react'
 
 import { Effect } from 'effect'
@@ -13,14 +12,14 @@ import { motion } from 'framer-motion'
 import { debounce } from 'lodash-es'
 import { ChevronRight } from 'lucide-react'
 import { observer } from 'mobx-react'
+import { useCallback, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { AlertModal } from '@/components/alert-modal.tsx'
-import { Menu, MenuModel, MenuRef } from '@/components/menu/menu.tsx'
+import { Menu } from '@/components/menu/menu.tsx'
 import { Input } from '@/components/ui/input.tsx'
 import { useOverlay } from '@/contexts/overlay/use-overlay.tsx'
 import { useOutsideClick } from '@/hooks/use-outside-click.ts'
-import { DoFlow } from '@/store/flow/do-flow.ts'
 import { useStore } from '@/store/useStore.ts'
 import { cn } from '@/utils/cn.ts'
 
@@ -55,10 +54,10 @@ export const ExplorerFlowRowItem = observer(
 
         Effect.runPromise(
           flow.store.updateFlow({
-            flowId: flow.id,
             changedFlow: {
               title: e.target.value,
             },
+            flowId: flow.id,
           }),
         ).catch(store.showError)
       }, 500),
@@ -88,17 +87,17 @@ export const ExplorerFlowRowItem = observer(
 
     const contextmenuModel: MenuModel = [
       {
-        label: 'Rename ...',
         command: () => {
           setTimeout(() => {
             setIsNameEditing(true)
             inputRef.current?.focus()
           }, 300)
         },
+        label: 'Rename ...',
       },
       {
-        label: 'Delete ...',
         command: openDelete,
+        label: 'Delete ...',
       },
     ]
 

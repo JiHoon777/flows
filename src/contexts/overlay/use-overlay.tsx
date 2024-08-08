@@ -1,8 +1,10 @@
+import type { OverlayControlRef } from './overlay-controller'
+import type { CreateOverlayElement } from './types'
+
 import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 
-import { OverlayController, OverlayControlRef } from './overlay-controller'
+import { OverlayController } from './overlay-controller'
 import { OverlayContext } from './overlay-provider'
-import { CreateOverlayElement } from './types'
 
 let elementId = 1
 
@@ -41,6 +43,16 @@ export function useOverlay({ exitOnUnmount = true }: Options = {}) {
 
   return useMemo(
     () => ({
+      close: () => {
+        overlayRef.current?.close()
+      },
+      exit: () => {
+        overlayRef.current?.close()
+
+        timeoutRef.current = setTimeout(() => {
+          unmount(id)
+        }, 500)
+      },
       open: (overlayElement: CreateOverlayElement) => {
         mount(
           id,
@@ -58,16 +70,6 @@ export function useOverlay({ exitOnUnmount = true }: Options = {}) {
             }}
           />,
         )
-      },
-      close: () => {
-        overlayRef.current?.close()
-      },
-      exit: () => {
-        overlayRef.current?.close()
-
-        timeoutRef.current = setTimeout(() => {
-          unmount(id)
-        }, 500)
       },
     }),
     [id, mount, unmount],

@@ -1,13 +1,11 @@
-import { ReactNode, useCallback, useState } from 'react'
+import type { IKanbanCard, IKanbanColumn, IKanbanData } from './kanban.type'
+import type { DragEndEvent, DragOverEvent, DragStartEvent } from '@dnd-kit/core'
+import type { ReactNode } from 'react'
 
-import { IKanbanCard, IKanbanColumn, IKanbanData } from './kanban.type'
 import {
   closestCorners,
   DndContext,
-  DragEndEvent,
-  DragOverEvent,
   DragOverlay,
-  DragStartEvent,
   KeyboardSensor,
   PointerSensor,
   useSensor,
@@ -20,6 +18,7 @@ import {
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable'
 import { nanoid } from 'nanoid'
+import { useCallback, useState } from 'react'
 
 import { KanbanCard } from '@/components/kanban/kanban-card.tsx'
 import { KanbanColumn } from '@/components/kanban/kanban-column.tsx'
@@ -129,7 +128,7 @@ export const KanbanBoard = ({
       ...prev,
       columns: [
         ...prev.columns,
-        { id: nanoid(), title: 'New Column', cardIds: [] },
+        { cardIds: [], id: nanoid(), title: 'New Column' },
       ],
     }))
   }, [])

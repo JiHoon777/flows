@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import type { MenuRef } from '@/components/menu/menu.tsx'
 
 import {
   ArrowUpNarrowWide,
@@ -9,9 +9,10 @@ import {
   Sun,
 } from 'lucide-react'
 import { observer } from 'mobx-react'
+import { useRef } from 'react'
 
 import { ButtonWithTooltip } from '@/components/button-with-tooltip.tsx'
-import { Menu, MenuRef } from '@/components/menu/menu.tsx'
+import { Menu } from '@/components/menu/menu.tsx'
 import { useCreateMenuModel } from '@/components/menu/use-create-menu-model.ts'
 import { Button } from '@/components/ui/button.tsx'
 import { TooltipWrap } from '@/components/ui/tooltip.tsx'
@@ -36,8 +37,8 @@ export const ExplorerToolbar = observer(() => {
     () =>
       Object.values(ExplorerSortOption).map((item) => ({
         checked: explorerView.sortOption === item,
-        label: item,
         command: () => explorerView.setSortOption(item),
+        label: item,
       })),
     [explorerView.sortOption],
   )

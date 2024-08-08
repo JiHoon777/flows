@@ -1,13 +1,13 @@
+import type { CreateOverlayElement } from '@/contexts/overlay/types.ts'
+import type { Ref } from 'react'
+
 import {
   forwardRef,
-  Ref,
   useCallback,
   useEffect,
   useImperativeHandle,
   useState,
 } from 'react'
-
-import { CreateOverlayElement } from '@/contexts/overlay/types.ts'
 
 interface Props {
   overlayElement: CreateOverlayElement

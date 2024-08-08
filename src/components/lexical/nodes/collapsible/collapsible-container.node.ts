@@ -1,17 +1,17 @@
-import { IS_CHROME } from '@lexical/utils'
-import {
+import type {
   DOMConversionMap,
   DOMConversionOutput,
   DOMExportOutput,
   EditorConfig,
-  ElementNode,
-  isHTMLElement,
   LexicalEditor,
   LexicalNode,
   NodeKey,
   SerializedElementNode,
   Spread,
 } from 'lexical'
+
+import { IS_CHROME } from '@lexical/utils'
+import { ElementNode, isHTMLElement } from 'lexical'
 
 import { setDomHiddenUntilFound } from '@/components/lexical/nodes/collapsible/collapsible.utils.ts'
 import invariant from '@/components/lexical/utils/invariant.ts'

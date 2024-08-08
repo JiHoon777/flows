@@ -1,4 +1,5 @@
-import { Dispatch, useCallback, useEffect, useRef } from 'react'
+import type { LexicalEditor } from 'lexical'
+import type { Dispatch } from 'react'
 
 import { TOGGLE_LINK_COMMAND } from '@lexical/link'
 import { mergeRegister } from '@lexical/utils'
@@ -7,7 +8,6 @@ import {
   $getSelection,
   COMMAND_PRIORITY_LOW,
   FORMAT_TEXT_COMMAND,
-  LexicalEditor,
   SELECTION_CHANGE_COMMAND,
 } from 'lexical'
 import {
@@ -19,6 +19,7 @@ import {
   SuperscriptIcon,
   UnderlineIcon,
 } from 'lucide-react'
+import { useCallback, useEffect, useRef } from 'react'
 
 import { lexicalUtils } from '@/components/lexical/utils/lexical.utils.ts'
 import { Button } from '@/components/ui/button.tsx'
@@ -142,7 +143,7 @@ export const TextFormatFloatingToolbar = ({
     <div
       ref={popupCharStylesEditorRef}
       className={
-        'flex bg-[#fff] absolute top-0 left-0 z-10 drop-shadow-md h-6 rounded-lg'
+        'absolute left-0 top-0 z-10 flex h-6 rounded-lg bg-[#fff] drop-shadow-md'
       }
     >
       {editor.isEditable() && (

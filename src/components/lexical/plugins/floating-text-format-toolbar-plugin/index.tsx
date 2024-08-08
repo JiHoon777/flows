@@ -1,4 +1,4 @@
-import { Dispatch } from 'react'
+import type { Dispatch } from 'react'
 
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 

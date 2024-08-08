@@ -1,26 +1,28 @@
-import { JSX, PropsWithChildren, useRef } from 'react'
+import type { VariantProps } from 'class-variance-authority'
+import type { JSX, PropsWithChildren } from 'react'
 
-import { cva, VariantProps } from 'class-variance-authority'
+import { cva } from 'class-variance-authority'
 import { AnimatePresence, motion as m } from 'framer-motion'
+import { useRef } from 'react'
 
 import { Portal } from '@/components/portal.tsx'
 import { useOutsideClick } from '@/hooks/use-outside-click.ts'
 import { cn } from '@/utils/cn.ts'
 
 const modalVariants = cva('w-full rounded-xl bg-background shadow-lg', {
+  defaultVariants: {
+    size: 'md',
+  },
   variants: {
     size: {
-      sm: 'max-w-sm',
-      md: 'max-w-md',
-      lg: 'max-w-lg',
-      xl: 'max-w-xl',
       '2xl': 'max-w-2xl',
       '3xl': 'max-w-3xl',
       '7xl': 'max-w-7xl',
+      lg: 'max-w-lg',
+      md: 'max-w-md',
+      sm: 'max-w-sm',
+      xl: 'max-w-xl',
     },
-  },
-  defaultVariants: {
-    size: 'md',
   },
 })
 

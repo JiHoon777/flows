@@ -1,4 +1,4 @@
-import { EditorThemeClasses } from 'lexical'
+import type { EditorThemeClasses } from 'lexical'
 
 import { cn } from '@/utils/cn.ts'
 
@@ -73,6 +73,7 @@ export const lexicalEditorTheme: EditorThemeClasses = {
       listitem:
         'EditorTheme__nestedListItem list-none before:hidden after:hidden',
     },
+    ol: 'p-0 m-0 list-outside list-decimal',
     olDepth: [
       'p-0 m-0 list-outside',
       'p-0 m-0 list-outside !list-[upper-alpha]',
@@ -81,7 +82,6 @@ export const lexicalEditorTheme: EditorThemeClasses = {
       'p-0 m-0 list-outside !list-[lower-roman]',
     ],
     ul: 'p-0 m-0 list-outside list-disc',
-    ol: 'p-0 m-0 list-outside list-decimal',
   },
   ltr: 'text-left',
   mark: 'PlaygroundEditorTheme__mark',

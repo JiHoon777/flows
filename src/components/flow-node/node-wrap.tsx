@@ -1,26 +1,23 @@
-import { ChangeEvent, PropsWithChildren, useCallback, useRef } from 'react'
+import type { MenuModel, MenuRef } from '@/components/menu/menu.tsx'
+import type { DoFlow } from '@/store/flow/do-flow.ts'
+import type { DoNode } from '@/store/node/do-node.ts'
+import type { ReactFlowNodeType } from '@/types/base.type.ts'
+import type { ChangeEvent, PropsWithChildren } from 'react'
+import type { NodeProps, ResizeDragEvent } from 'reactflow'
 
 import { Effect } from 'effect'
 import { observer } from 'mobx-react'
-import {
-  Handle,
-  NodeProps,
-  NodeResizer,
-  Position,
-  ResizeDragEvent,
-} from 'reactflow'
+import { useCallback, useRef } from 'react'
+import { Handle, NodeResizer, Position } from 'reactflow'
 
 import { AlertModal } from '@/components/alert-modal.tsx'
 import { NodeContent } from '@/components/flow-node/node-content.tsx'
 import { NodeIcon } from '@/components/flow-node/node-icon.tsx'
 import { useGetNodeDrawer } from '@/components/flow-node/useGetNodeDrawer.ts'
-import { Menu, MenuModel, MenuRef } from '@/components/menu/menu.tsx'
+import { Menu } from '@/components/menu/menu.tsx'
 import { useOverlay } from '@/contexts/overlay/use-overlay.tsx'
 import { useDebounce } from '@/hooks/use-debounce.ts'
-import { DoFlow } from '@/store/flow/do-flow.ts'
-import { DoNode } from '@/store/node/do-node.ts'
 import { useStore } from '@/store/useStore.ts'
-import { ReactFlowNodeType } from '@/types/base.type.ts'
 import { cn } from '@/utils/cn'
 
 type Props = PropsWithChildren & NodeProps & { type: ReactFlowNodeType }
@@ -44,8 +41,8 @@ export const NodeWrap = observer(
       ) => {
         Effect.runPromise(
           store.flowStore.updateFlow({
+            changedFlow: { style: { height, width } },
             flowId: id,
-            changedFlow: { style: { width, height } },
           }),
         ).catch(store.showError)
         // id, { style: { width, height } }
@@ -60,8 +57,8 @@ export const NodeWrap = observer(
       ) => {
         Effect.runPromise(
           store.nodeStore.updateNode({
+            changedNode: { style: { height, width } },
             nodeId: id,
-            changedNode: { style: { width, height } },
           }),
         ).catch(store.showError)
       },
@@ -72,8 +69,8 @@ export const NodeWrap = observer(
       (e: ChangeEvent<HTMLTextAreaElement>) => {
         drawer?.updateNodeTitle({
           id,
-          type,
           title: e.target.value,
+          type,
         })
       },
       [drawer, id, type],
@@ -91,7 +88,7 @@ export const NodeWrap = observer(
     }, [drawer, id, open, type])
 
     const contextMenuModel: MenuModel = [
-      { label: 'Remove ...', command: handleRemove },
+      { command: handleRemove, label: 'Remove ...' },
     ]
 
     return (

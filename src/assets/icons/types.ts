@@ -1,4 +1,5 @@
-import React, { PropsWithChildren, SVGProps } from 'react'
+import type { PropsWithChildren, SVGProps } from 'react'
+import type React from 'react'
 
 export interface CustomSVGProps
   extends Omit<SVGProps<SVGSVGElement>, 'onClick'>,

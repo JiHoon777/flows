@@ -1,9 +1,10 @@
+import type { Klass, LexicalNode } from 'lexical'
+
 import { CodeHighlightNode, CodeNode } from '@lexical/code'
 import { AutoLinkNode, LinkNode } from '@lexical/link'
 import { ListItemNode, ListNode } from '@lexical/list'
 import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode'
 import { HeadingNode, QuoteNode } from '@lexical/rich-text'
-import { Klass, LexicalNode } from 'lexical'
 
 import { CollapsibleContainerNode } from '@/components/lexical/nodes/collapsible/collapsible-container.node.ts'
 import { CollapsibleContentNode } from '@/components/lexical/nodes/collapsible/collapsible-content-node.ts'

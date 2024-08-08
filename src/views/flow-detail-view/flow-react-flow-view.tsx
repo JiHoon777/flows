@@ -1,18 +1,7 @@
-import {
-  MouseEvent as ReactMouseEvent,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
-
-import { Map, NotebookPen, Type } from 'lucide-react'
-import { observer } from 'mobx-react'
-import { useNavigate } from 'react-router-dom'
-import {
-  Background,
-  ConnectionLineType,
-  Controls,
+import type { MenuModel, MenuRef } from '@/components/menu/menu.tsx'
+import type { DoFlow } from '@/store/flow/do-flow.ts'
+import type { MouseEvent as ReactMouseEvent } from 'react'
+import type {
   DefaultEdgeOptions,
   EdgeChange,
   EdgeTypes,
@@ -22,6 +11,16 @@ import {
   NodeTypes,
   OnConnectEnd,
   OnConnectStart,
+} from 'reactflow'
+
+import { Map, NotebookPen, Type } from 'lucide-react'
+import { observer } from 'mobx-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import {
+  Background,
+  ConnectionLineType,
+  Controls,
   ReactFlow,
   useOnSelectionChange,
   useReactFlow,
@@ -33,8 +32,7 @@ import { FlowNode } from '@/components/flow-node/flow-node.tsx'
 import { NoteNode } from '@/components/flow-node/note-node.tsx'
 import { TextNode } from '@/components/flow-node/text-node.tsx'
 import { BookLoading } from '@/components/loading/book-loading.tsx'
-import { Menu, MenuModel, MenuRef } from '@/components/menu/menu.tsx'
-import { DoFlow } from '@/store/flow/do-flow.ts'
+import { Menu } from '@/components/menu/menu.tsx'
 import { useStore } from '@/store/useStore.ts'
 
 const nodeOrigin: NodeOrigin = [0.5, 0.5]
@@ -44,8 +42,8 @@ const defaultEdgeOptions: DefaultEdgeOptions = {
 
 const nodeTypes: NodeTypes = {
   flow: FlowNode,
-  text: TextNode,
   note: NoteNode,
+  text: TextNode,
 }
 
 const edgeTypes: EdgeTypes = {
@@ -124,8 +122,8 @@ export const FlowReactFlowView = observer(({ flow }: { flow: DoFlow }) => {
       if (node.type) {
         drawer?.updateNodePosition({
           id: node.id,
-          type: node.type,
           position: node.position,
+          type: node.type,
         })
       }
     },
@@ -168,28 +166,28 @@ export const FlowReactFlowView = observer(({ flow }: { flow: DoFlow }) => {
 
   const contextMenuModel: MenuModel = [
     {
-      leftIcon: <NotebookPen className={'h-4 w-4'} />,
-      label: 'Create Note',
       command: ({ contextMenuPosition: { x, y } }) =>
         drawer?.addNode({
           nodeType: 'note',
           position: screenToFlowPosition({ x, y }),
         }),
+      label: 'Create Note',
+      leftIcon: <NotebookPen className={'h-4 w-4'} />,
     },
     {
-      leftIcon: <Map className={'h-4 w-4'} />,
-      label: 'Create Flow',
       command: ({ contextMenuPosition: { x, y } }) =>
         drawer?.addFlowNode(screenToFlowPosition({ x, y })),
+      label: 'Create Flow',
+      leftIcon: <Map className={'h-4 w-4'} />,
     },
     {
-      leftIcon: <Type className={'h-4 w-4'} />,
-      label: 'Create Text',
       command: ({ contextMenuPosition: { x, y } }) =>
         drawer?.addNode({
           nodeType: 'text',
           position: screenToFlowPosition({ x, y }),
         }),
+      label: 'Create Text',
+      leftIcon: <Type className={'h-4 w-4'} />,
     },
   ]
 

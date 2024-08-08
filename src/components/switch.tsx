@@ -1,4 +1,6 @@
-import { Children, isValidElement, ReactElement, ReactNode } from 'react'
+import type { ReactElement, ReactNode } from 'react'
+
+import { Children, isValidElement } from 'react'
 
 type SwitchProps = {
   children:

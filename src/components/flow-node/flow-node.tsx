@@ -1,5 +1,6 @@
+import type { NodeProps } from 'reactflow'
+
 import { observer } from 'mobx-react'
-import { NodeProps } from 'reactflow'
 
 import { NodeWrap } from '@/components/flow-node/node-wrap'
 import { For } from '@/components/for.tsx'
@@ -8,10 +9,10 @@ import { useStore } from '@/store/useStore.ts'
 import { cn } from '@/utils/cn.ts'
 
 const cns = {
-  container: cn('flex w-full flex-col gap-2'),
-  desc: cn('w-full px-2 text-left text-xs font-extralight'),
-  content: cn('flex h-full w-full flex-wrap gap-4'),
   card: cn('w-[10rem]'),
+  container: cn('flex w-full flex-col gap-2'),
+  content: cn('flex h-full w-full flex-wrap gap-4'),
+  desc: cn('w-full px-2 text-left text-xs font-extralight'),
 }
 
 export const FlowNode = observer((props: NodeProps) => {

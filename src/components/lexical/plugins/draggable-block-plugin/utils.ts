@@ -1,5 +1,7 @@
+import type { LexicalEditor } from 'lexical'
+
 import { calculateZoomLevel } from '@lexical/utils'
-import { $getRoot, LexicalEditor } from 'lexical'
+import { $getRoot } from 'lexical'
 
 import { Point } from '@/components/lexical/utils/point.ts'
 import { Rect } from '@/components/lexical/utils/rect.ts'

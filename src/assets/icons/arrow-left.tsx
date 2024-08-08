@@ -1,5 +1,6 @@
+import type { CustomSVGProps } from '@/assets/icons/types.ts'
+
 import { SVGWrap } from '@/assets/icons/svg-wrap.tsx'
-import { CustomSVGProps } from '@/assets/icons/types.ts'
 
 export function ArrowLeft(props: CustomSVGProps) {
   return (

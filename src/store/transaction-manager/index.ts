@@ -1,6 +1,6 @@
-import { makeObservable, observable } from 'mobx'
+import type { RootStore } from '@/store/root-store.ts'
 
-import { RootStore } from '@/store/root-store.ts'
+import { makeObservable, observable } from 'mobx'
 
 export class TransactionManager {
   rootStore: RootStore

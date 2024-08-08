@@ -1,6 +1,5 @@
-import { lazy, Suspense } from 'react'
-
 import { observer } from 'mobx-react'
+import { lazy, Suspense } from 'react'
 import { Route, Routes } from 'react-router-dom'
 
 import { RegisterGlobalHotkeys } from '@/components/hotkey/RegisterGlobalHotkeys.tsx'

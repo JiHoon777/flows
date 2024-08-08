@@ -1,5 +1,6 @@
+import type { UnknownException } from 'effect/Cause'
+
 import { Effect } from 'effect'
-import { UnknownException } from 'effect/Cause'
 
 export class FileSystemError extends Error {
   tag = 'file-system'

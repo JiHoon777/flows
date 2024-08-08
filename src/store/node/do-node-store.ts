@@ -1,11 +1,12 @@
+import type { AppError } from '@/api/error.ts'
+import type { RootStore } from '@/store/root-store.ts'
+import type { NodeTypes } from '@/types/types.ts'
+
 import { Effect, pipe } from 'effect'
 import { cloneDeep } from 'lodash-es'
 import { action, makeObservable, observable, runInAction } from 'mobx'
 
-import { AppError } from '@/api/error.ts'
 import { DoNode } from '@/store/node/do-node.ts'
-import { RootStore } from '@/store/root-store.ts'
-import { NodeTypes } from '@/types/types.ts'
 
 export class DoNodeStore {
   rootStore: RootStore
@@ -15,9 +16,9 @@ export class DoNodeStore {
   constructor(rootStore: RootStore) {
     this.rootStore = rootStore
     makeObservable(this, {
-      nodesMap: observable,
-
       merge: action,
+
+      nodesMap: observable,
     })
   }
 
