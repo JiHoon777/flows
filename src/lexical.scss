@@ -1,4 +1,59 @@
 .editor-shell {
+  .h1 {
+    @apply text-4xl text-foreground font-bold my-6
+  }
+  .h2 {
+    @apply text-3xl text-foreground font-bold my-5
+  }
+  .h3 {
+    @apply text-2xl text-foreground font-bold my-4
+  }
+  .h4 {
+    @apply text-xl text-foreground font-bold my-3
+  }
+  .h5 {
+    @apply text-lg text-foreground font-bold my-2
+  }
+  .h6 {
+    @apply text-base text-foreground font-bold my-1
+  }
+  .ltr {
+    @apply text-left
+  }
+  .rtl {
+    @apply text-right
+  }
+  .indent {
+    --lexical-indent-base-value: 20px;
+  }
+  .paragraph {
+    @apply m-0 relative
+  }
+  .quote {
+    color: rgb(101, 103, 107);
+    @apply m-0 ml-5 mb-2.5 text-[15px] border-border border-l-[4px] pl-4
+  }
+  .bold {
+    @apply font-bold
+  }
+  .code {
+    background-color: rgb(240,242,245);
+    font-size: 0.94rem;
+    @apply py-px px-1 text-red-500 rounded
+  }
+  .strikethrough {
+    @apply line-through decoration-wavy
+  }
+  .subscript {
+    @apply text-sm align-sub
+  }
+  .superscript {
+    @apply text-sm align-super
+  }
+  .underlineStrikethrough {
+    @apply [text-decoration:underline_line-through] decoration-wavy
+  }
+
   //
   // List
   //

@@ -2,7 +2,6 @@ import { observer } from 'mobx-react'
 
 import { ExplorerFlowRow } from '@/components/site/explorer/explorer-flow-row.tsx'
 import { ExplorerNodeRow } from '@/components/site/explorer/explorer-node-row.tsx'
-import { ExplorerToolbar } from '@/components/site/explorer/explorer-toolbar.tsx'
 import { DoFlow } from '@/store/flow/do-flow.ts'
 import { useStore } from '@/store/useStore.ts'
 
@@ -11,10 +10,9 @@ export const Explorer = observer(() => {
 
   const explorerList = store.explorerView.explorerList
   return (
-    <div className={'flex w-full flex-col gap-2'}>
+    <div className={'flex w-full flex-col gap-2 pt-4'}>
       {/* System Header Area */}
-      <div className={'ml-20 h-7'}></div>
-      <ExplorerToolbar />
+      {/*<ExplorerToolbar />*/}
       <section className={'flex w-full flex-col gap-1.5'}>
         {explorerList.map((flow) =>
           flow instanceof DoFlow ? (

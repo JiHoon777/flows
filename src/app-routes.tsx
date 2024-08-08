@@ -6,7 +6,7 @@ import { RegisterGlobalHotkeys } from '@/components/hotkey/RegisterGlobalHotkeys
 import { BookLoading } from '@/components/loading/book-loading.tsx'
 
 const SiteLayout = lazy(() =>
-  import('@/components/site/site-layout.tsx').then((module) => ({
+  import('@/components/site/siteLayout.tsx').then((module) => ({
     default: module.SiteLayout,
   })),
 )
