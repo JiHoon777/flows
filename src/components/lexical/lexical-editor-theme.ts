@@ -66,12 +66,12 @@ export const lexicalEditorTheme: EditorThemeClasses = {
   link: 'text-[rgb(33,111,219)] no-underline hover:underline cursor-pointer',
   list: {
     checklist: '',
-    listitem: 'my-0 mx-8',
+    listitem: 'list-item',
     listitemChecked: 'EditorTheme__listItemChecked',
     listitemUnchecked: 'EditorTheme__listItemUnChecked',
     nested: {
       listitem:
-        'EditorTheme__nestedListItem list-none before:hidden after:hidden',
+        'EditorTheme__nestedListItem !ml-4 list-none before:hidden after:hidden',
     },
     ol: 'p-0 m-0 list-outside list-decimal',
     olDepth: [
