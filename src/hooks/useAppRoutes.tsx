@@ -1,6 +1,6 @@
 import type { ComponentType } from 'react'
 
-import { lazy as _lazy } from 'react'
+import { lazy as _lazy, Suspense } from 'react'
 import { useRoutes } from 'react-router-dom'
 
 import { SiteLayout } from '@/components/site/siteLayout.tsx'
@@ -39,7 +39,7 @@ const appLazyLoad = {
 }
 
 export const useAppRoutes = () => {
-  return useRoutes([
+  const routes = useRoutes([
     {
       children: [
         { element: null, index: true },
@@ -52,8 +52,12 @@ export const useAppRoutes = () => {
         { element: <appLazyLoad.FlowDetailView />, path: 'flows/:flowId' },
         { element: <appLazyLoad.NodeDetailView />, path: 'nodes/:nodeId' },
       ],
-      element: <SiteLayout />,
       path: '/',
     },
   ])
+  return (
+    <SiteLayout>
+      <Suspense fallback={null}>{routes}</Suspense>
+    </SiteLayout>
+  )
 }
