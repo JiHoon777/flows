@@ -18,7 +18,7 @@ function lazy<T extends LazyComponentModule, K extends keyof T>(
   )
 }
 
-export const appLazyLoad = {
+const appLazyLoad = {
   BookmarkView: lazy(
     () => import('@/views/bookmarksView.tsx'),
     'BookmarksView',
@@ -37,6 +37,7 @@ export const appLazyLoad = {
     'NodeDetailViewParamsWrap',
   ),
 }
+
 export const useAppRoutes = () => {
   return useRoutes([
     {
