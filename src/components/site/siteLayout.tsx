@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { debounce } from 'lodash-es'
-import { useCallback, useRef, useState } from 'react'
+import { memo, useCallback, useRef, useState } from 'react'
 import { Outlet } from 'react-router-dom'
 
 import { Providers } from '@/components/providers.tsx'
@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/resizable.tsx'
 import { cn } from '@/utils/cn.ts'
 
-export const SiteLayout = () => {
+export const SiteLayout = memo(() => {
   const [panelSize, setPanelSize] = useState(15)
   const [isResizing, setIsResizing] = useState(false)
 
@@ -86,4 +86,4 @@ export const SiteLayout = () => {
       </div>
     </Providers>
   )
-}
+})

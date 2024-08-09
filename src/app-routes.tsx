@@ -5,7 +5,7 @@ import { lazy as _lazy, Suspense } from 'react'
 import { Route, Routes } from 'react-router-dom'
 
 import { RegisterGlobalHotkeys } from '@/components/hotkey/RegisterGlobalHotkeys.tsx'
-import { BookLoading } from '@/components/loading/book-loading.tsx'
+import { SiteLayout } from '@/components/site/siteLayout.tsx'
 
 type LazyComponentModule = { [key: string]: ComponentType<any> }
 
@@ -20,10 +20,6 @@ function lazy<T extends LazyComponentModule, K extends keyof T>(
   )
 }
 
-const SiteLayout = lazy(
-  () => import('@/components/site/siteLayout'),
-  'SiteLayout',
-)
 const FlowDetailView = lazy(
   () => import('@/views/flow-detail-view'),
   'FlowDetailViewParamsWrap',
@@ -39,22 +35,26 @@ const DocumentsView = lazy(
   'DocumentsView',
 )
 const CalendarView = lazy(() => import('@/views/calendarView'), 'CalendarView')
-const BookmarkView = lazy(() => import('@/views/bookmarkView'), 'BookmarkView')
+const BookmarkView = lazy(
+  () => import('@/views/bookmarksView.tsx'),
+  'BookmarksView',
+)
 const InboxView = lazy(() => import('@/views/inboxView'), 'InboxView')
 
 export const AppRoutes = observer(() => {
+  const Layout = <SiteLayout />
   return (
     <>
       <RegisterGlobalHotkeys />
-      <Suspense fallback={<BookLoading />}>
+      <Suspense fallback={Layout}>
         <Routes>
-          <Route path={'/'} element={<SiteLayout />}>
+          <Route path={'/'} element={Layout}>
             <Route index element={null} />
             <Route path={'home'} element={<HomeView />} />
             <Route path={'flows'} element={<FlowsView />} />
             <Route path={'documents'} element={<DocumentsView />} />
             <Route path={'calendar'} element={<CalendarView />} />
-            <Route path={'bookmark'} element={<BookmarkView />} />
+            <Route path={'bookmarks'} element={<BookmarkView />} />
             <Route path={'inbox'} element={<InboxView />} />
             <Route path={'flows/:flowId'} element={<FlowDetailView />} />
             <Route path={'nodes/:nodeId'} element={<NodeDetailView />} />
