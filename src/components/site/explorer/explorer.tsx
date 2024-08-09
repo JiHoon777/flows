@@ -33,7 +33,7 @@ export const Explorer = observer(() => {
         >
           <div className={'flex w-full items-center gap-2 text-foreground'}>
             <House className={'h-4 w-4'} />
-            <span>집</span>
+            <span>홈</span>
           </div>
         </ButtonWithTooltip>
         <ButtonWithTooltip
@@ -83,12 +83,12 @@ export const Explorer = observer(() => {
         <ButtonWithTooltip
           variant={'ghost'}
           side={'bottom'}
-          tooltipContent={'정렬되지 않은 문서 전체 보기로 가기'}
+          tooltipContent={'인박스로 가기'}
           onClick={() => navigate('/inbox')}
         >
           <div className={'flex w-full items-center gap-2 text-foreground'}>
             <Inbox className={'h-4 w-4 shrink-0'} />
-            <span>정렬되지 않은 문서 전체 보기</span>
+            <span>Inbox</span>
           </div>
         </ButtonWithTooltip>
       </section>
