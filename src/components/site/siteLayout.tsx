@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { debounce } from 'lodash-es'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { Outlet } from 'react-router-dom'
 
 import { Providers } from '@/components/providers.tsx'
@@ -14,13 +14,8 @@ import {
 import { cn } from '@/utils/cn.ts'
 
 export const SiteLayout = () => {
-  const [showExplorer, setShowExplorer] = useState(true)
   const [panelSize, setPanelSize] = useState(15)
   const [isResizing, setIsResizing] = useState(false)
-
-  useEffect(() => {
-    setPanelSize(showExplorer ? 15 : 0)
-  }, [showExplorer])
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSetIsResizing = useCallback(
@@ -36,6 +31,18 @@ export const SiteLayout = () => {
     },
     [debouncedSetIsResizing],
   )
+
+  const tempPanelSize = useRef(0)
+  const showExplorer = panelSize > 0
+  const toggleShowExplorer = useCallback(() => {
+    if (showExplorer) {
+      tempPanelSize.current = panelSize
+      setPanelSize(0)
+    } else {
+      setPanelSize(tempPanelSize.current)
+    }
+  }, [panelSize, showExplorer])
+
   return (
     <Providers>
       <div
@@ -45,7 +52,7 @@ export const SiteLayout = () => {
       >
         <SiteHeader
           showExplorer={showExplorer}
-          setShowExplorer={setShowExplorer}
+          toggleShowExplorer={toggleShowExplorer}
         />
 
         <ResizablePanelGroup

@@ -1,5 +1,3 @@
-import type { Dispatch, SetStateAction } from 'react'
-
 import { Columns2, MoonStar, Sun } from 'lucide-react'
 
 import { ButtonWithTooltip } from '@/components/button-with-tooltip.tsx'
@@ -7,24 +5,24 @@ import { useTheme } from '@/contexts/theme-provider.tsx'
 
 export const SiteHeader = ({
   showExplorer,
-  setShowExplorer,
+  toggleShowExplorer,
 }: {
   showExplorer: boolean
-  setShowExplorer: Dispatch<SetStateAction<boolean>>
+  toggleShowExplorer: () => void
 }) => {
   const { theme, setTheme } = useTheme()
 
   return (
     <div
       data-tauri-drag-region="true"
-      className={'flex h-8 w-full items-center pl-16 shadow'}
+      className={'flex h-[46px] w-full items-center pl-[80px] shadow'}
     >
       <ButtonWithTooltip
         variant={'ghost'}
         size={'icon'}
         side={'bottom'}
         tooltipContent={showExplorer ? '익스플로러 접기' : '익스플로러 펼치기'}
-        onClick={() => setShowExplorer((p) => !p)}
+        onClick={toggleShowExplorer}
       >
         <Columns2 className={'h-4 w-4 text-gray-500'} />
       </ButtonWithTooltip>
