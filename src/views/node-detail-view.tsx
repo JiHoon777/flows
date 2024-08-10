@@ -45,7 +45,7 @@ export const NodeDetailView = observer(({ node }: { node: DoNode }) => {
     <main className={'h-screen w-full overflow-y-auto scrollbar-hide'}>
       <div
         className={
-          'mx-auto mb-6 mt-10 flex w-full max-w-[1024px] flex-col gap-3'
+          'mx-auto mb-6 mt-10 flex w-full max-w-screen-lg flex-col gap-3'
         }
       >
         {/* Meta Data; Title, Tag, ...*/}
