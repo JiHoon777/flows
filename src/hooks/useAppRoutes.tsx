@@ -61,3 +61,5 @@ export const useAppRoutes = () => {
     </SiteLayout>
   )
 }
+
+// Todo: AdminRoutes, IntroductionAndDownloadRoutes
