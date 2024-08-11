@@ -25,7 +25,7 @@ export const MonthCalendar = () => {
   }
 
   return (
-    <div className="flex w-full flex-col gap-4 p-4">
+    <div className="flex w-full shrink-0 flex-col gap-4 p-4">
       <MonthCalendarHeader
         currentDate={currentDate}
         onPrevMonth={goToPreviousMonth}

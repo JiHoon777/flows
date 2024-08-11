@@ -4,8 +4,9 @@ import { format, isValid } from 'date-fns'
 import { observer } from 'mobx-react'
 import { useSearchParams } from 'react-router-dom'
 
-import { useStore } from '@/store/useStore.ts'
 import { MonthCalendar } from '@/components/calendar/monthCalendar/monthCalendar.tsx'
+import { useStore } from '@/store/useStore.ts'
+import { InfiniteScrollCalendar } from '@/components/calendar/infiniteScrollCalendar'
 
 const FORMAT_TO_DISPLAY = 'MMM d, yyyy (EEEE)'
 const FORMAT_TO_SAVE = 'yyyy-MM-dd'
@@ -24,14 +25,19 @@ export const CalendarView = observer(() => {
 
   const currentNode: DoNode | null = store.nodeStore.getNodeById('')
   return (
-    <main className={'h-screen w-full'}>
+    <main className={'h-full w-full overflow-y-hidden'}>
       <div className={'flex h-full w-full'}>
-        <section className={'h-full w-full max-w-xs border-r border-border'}>
+        <section
+          className={
+            'flex h-full w-full max-w-xs flex-col border-r border-border'
+          }
+        >
           <MonthCalendar />
+          <InfiniteScrollCalendar />
         </section>
         <section
           className={
-            'mx-auto flex h-full w-full max-w-screen-lg gap-3 overflow-y-auto overflow-x-hidden pt-10'
+            'mx-auto flex w-full max-w-screen-lg gap-3 overflow-x-hidden overflow-y-hidden pt-10'
           }
         >
           <h1 className={'text-4xl font-bold'}>{currentDateToDisplay}</h1>

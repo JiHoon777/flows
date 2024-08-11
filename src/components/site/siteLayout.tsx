@@ -58,7 +58,7 @@ export const SiteLayout = memo(({ children }: PropsWithChildren) => {
 
         <ResizablePanelGroup
           direction={'horizontal'}
-          className={'h-screen w-full'}
+          className={'h-full w-full'}
         >
           <AnimatePresence initial={false}>
             <motion.div
