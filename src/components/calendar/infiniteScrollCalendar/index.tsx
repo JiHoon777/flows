@@ -1,11 +1,18 @@
+import type { Dispatch } from 'react'
+
 import { addDays, format, subDays } from 'date-fns'
 import { useEffect, useRef, useState, useTransition } from 'react'
 
 import { InfiniteScrollCalendarItem } from '@/components/calendar/infiniteScrollCalendar/infiniteScrollCalendarItem.tsx'
 
-export const InfiniteScrollCalendar = () => {
+export const InfiniteScrollCalendar = ({
+  selectedDate,
+  setSelectedDate,
+}: {
+  selectedDate: string
+  setSelectedDate: Dispatch<string>
+}) => {
   const [dates, setDates] = useState<Date[]>([])
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [, startTransition] = useTransition()
 
@@ -17,10 +24,10 @@ export const InfiniteScrollCalendar = () => {
     scrollToSelectedDate()
   }, [selectedDate])
 
-  const generateInitialDates = (date?: Date): void => {
+  const generateInitialDates = (date?: string): void => {
     const initialDates: Date[] = []
     for (let i = -10; i <= 10; i++) {
-      initialDates.push(addDays(date ?? new Date(), i))
+      initialDates.push(addDays(date ? new Date(date) : new Date(), i))
     }
     setDates(initialDates)
   }
@@ -43,15 +50,11 @@ export const InfiniteScrollCalendar = () => {
   }
 
   const scrollToSelectedDate = (): void => {
-    if (!selectedDate) {
-      return
-    }
-
     const container = containerRef.current
     if (!container) return
 
     const includedSelectedDateElement = container.querySelector(
-      `[data-infinite-scroll-calendar-item-date="${format(selectedDate, 'yyyy. M. d.')}"]`,
+      `[data-infinite-scroll-calendar-item-date="${format(new Date(selectedDate), 'yyyy. M. d.')}"]`,
     )
     if (includedSelectedDateElement) {
       includedSelectedDateElement.scrollIntoView({
@@ -104,7 +107,7 @@ export const InfiniteScrollCalendar = () => {
                 format(selectedDate, 'yyyy-MM-dd')
               : false
           }
-          onSelect={() => setSelectedDate(date)}
+          onSelect={() => setSelectedDate(format(date, 'yyyy-MM-dd'))}
         />
       ))}
     </div>

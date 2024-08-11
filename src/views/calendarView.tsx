@@ -1,12 +1,13 @@
 import type { DoNode } from '@/store/node/do-node.ts'
 
-import { format, isValid } from 'date-fns'
+import { format } from 'date-fns'
 import { observer } from 'mobx-react'
+import { useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
 
-import { MonthCalendar } from '@/components/calendar/monthCalendar/monthCalendar.tsx'
-import { useStore } from '@/store/useStore.ts'
 import { InfiniteScrollCalendar } from '@/components/calendar/infiniteScrollCalendar'
+import { MonthCalendar } from '@/components/calendar/monthCalendar'
+import { useStore } from '@/store/useStore.ts'
 
 const FORMAT_TO_DISPLAY = 'MMM d, yyyy (EEEE)'
 const FORMAT_TO_SAVE = 'yyyy-MM-dd'
@@ -14,14 +15,24 @@ const CURRENT_DATE_PARAM_NAME = 'currentDate'
 
 export const CalendarView = observer(() => {
   const store = useStore()
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams({
+    [CURRENT_DATE_PARAM_NAME]: format(new Date(), FORMAT_TO_SAVE),
+  })
 
   const currentDateFromParam = searchParams.get(CURRENT_DATE_PARAM_NAME)
-  const today = new Date()
-  const currentDate = format(currentDateFromParam ?? today, FORMAT_TO_SAVE)
-  const validCurrentDate = isValid(currentDate) ? currentDate : today
+  const currentDate = format(currentDateFromParam ?? new Date(), FORMAT_TO_SAVE)
+  const currentDateToDisplay = format(currentDate, FORMAT_TO_DISPLAY)
 
-  const currentDateToDisplay = format(validCurrentDate, FORMAT_TO_DISPLAY)
+  const handleCurrentDate = useCallback(
+    (changedDate: string) => {
+      setSearchParams((prevParams) => {
+        const newParams = new URLSearchParams(prevParams)
+        newParams.set(CURRENT_DATE_PARAM_NAME, changedDate)
+        return newParams
+      })
+    },
+    [setSearchParams],
+  )
 
   const currentNode: DoNode | null = store.nodeStore.getNodeById('')
   return (
@@ -32,8 +43,14 @@ export const CalendarView = observer(() => {
             'flex h-full w-full max-w-xs flex-col border-r border-border'
           }
         >
-          <MonthCalendar />
-          <InfiniteScrollCalendar />
+          <MonthCalendar
+            selectedDate={currentDate}
+            setSelectedDate={handleCurrentDate}
+          />
+          <InfiniteScrollCalendar
+            selectedDate={currentDate}
+            setSelectedDate={handleCurrentDate}
+          />
         </section>
         <section
           className={

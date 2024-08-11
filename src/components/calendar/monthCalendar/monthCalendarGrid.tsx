@@ -15,7 +15,7 @@ export const MonthCalendarGrid = ({
   onDateClick,
 }: {
   currentDate: Date
-  selectedDate: Date
+  selectedDate: string
   onDateClick: (date: Date) => void
 }) => {
   const monthStart = startOfMonth(currentDate)
@@ -34,7 +34,7 @@ export const MonthCalendarGrid = ({
           key={date.toISOString()}
           date={date}
           currentMonth={currentDate}
-          isSelected={isSameDay(date, selectedDate)}
+          isSelected={isSameDay(date, new Date(selectedDate))}
           onClick={onDateClick}
         />
       ))}

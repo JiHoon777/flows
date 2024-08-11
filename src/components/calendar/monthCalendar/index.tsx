@@ -1,24 +1,29 @@
-import { addMonths, isSameMonth, startOfMonth } from 'date-fns'
-import { useState } from 'react'
+import { addMonths, format, isSameMonth, startOfMonth } from 'date-fns'
+import { type Dispatch, useState } from 'react'
 
 import { MonthCalendarGrid } from '@/components/calendar/monthCalendar/monthCalendarGrid.tsx'
 import { MonthCalendarHeader } from '@/components/calendar/monthCalendar/monthCalendarHeader.tsx'
 import { MonthCalendarWeekdays } from '@/components/calendar/monthCalendar/monthCalendarWeekdays.tsx'
 
-export const MonthCalendar = () => {
+export const MonthCalendar = ({
+  selectedDate,
+  setSelectedDate,
+}: {
+  selectedDate: string
+  setSelectedDate: Dispatch<string>
+}) => {
   const [currentDate, setCurrentDate] = useState<Date>(new Date())
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date())
 
   const goToPreviousMonth = () => setCurrentDate((date) => addMonths(date, -1))
   const goToNextMonth = () => setCurrentDate((date) => addMonths(date, 1))
   const goToToday = () => {
     const today = new Date()
     setCurrentDate(today)
-    setSelectedDate(today)
+    setSelectedDate(format(today, 'yyyy-MM-dd'))
   }
 
   const handleDateClick = (date: Date) => {
-    setSelectedDate(date)
+    setSelectedDate(format(date, 'yyyy-MM-dd'))
     if (!isSameMonth(date, currentDate)) {
       setCurrentDate(startOfMonth(date))
     }
