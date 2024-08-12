@@ -1,6 +1,5 @@
 import type { DoNode } from '@/store/node/do-node.ts'
 
-import { format } from 'date-fns'
 import { observer } from 'mobx-react'
 import { useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
@@ -8,20 +7,22 @@ import { useSearchParams } from 'react-router-dom'
 import { InfiniteScrollCalendar } from '@/components/calendar/infiniteScrollCalendar'
 import { MonthCalendar } from '@/components/calendar/monthCalendar'
 import { useStore } from '@/store/useStore.ts'
+import {
+  formatDateToYYYYMMDD,
+  formatDateWithFullDayName,
+} from '@/utils/date-utils.ts'
 
-const FORMAT_TO_DISPLAY = 'MMM d, yyyy (EEEE)'
-const FORMAT_TO_SAVE = 'yyyy-MM-dd'
 const CURRENT_DATE_PARAM_NAME = 'currentDate'
 
 export const CalendarView = observer(() => {
   const store = useStore()
   const [searchParams, setSearchParams] = useSearchParams({
-    [CURRENT_DATE_PARAM_NAME]: format(new Date(), FORMAT_TO_SAVE),
+    [CURRENT_DATE_PARAM_NAME]: formatDateToYYYYMMDD(new Date()),
   })
 
   const currentDateFromParam = searchParams.get(CURRENT_DATE_PARAM_NAME)
-  const currentDate = format(currentDateFromParam ?? new Date(), FORMAT_TO_SAVE)
-  const currentDateToDisplay = format(currentDate, FORMAT_TO_DISPLAY)
+  const currentDate = formatDateToYYYYMMDD(currentDateFromParam ?? new Date())
+  const currentDateToDisplay = formatDateWithFullDayName(currentDate)
 
   const handleCurrentDate = useCallback(
     (changedDate: string) => {

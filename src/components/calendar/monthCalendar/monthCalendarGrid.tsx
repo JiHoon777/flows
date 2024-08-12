@@ -8,7 +8,6 @@ import {
 
 import { MonthCalendarDay } from '@/components/calendar/monthCalendar/monthCalendarDay.tsx'
 
-// 달력 그리드 컴포넌트
 export const MonthCalendarGrid = ({
   currentDate,
   selectedDate,

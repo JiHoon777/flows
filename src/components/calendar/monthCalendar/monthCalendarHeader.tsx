@@ -4,7 +4,6 @@ import { ChevronLeft, ChevronRight, CircleDot } from 'lucide-react'
 import { ButtonWithTooltip } from '@/components/button-with-tooltip.tsx'
 import { Button } from '@/components/ui/button.tsx'
 
-// 헤더 컴포넌트
 export const MonthCalendarHeader = ({
   currentDate,
   onPrevMonth,
