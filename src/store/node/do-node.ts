@@ -7,6 +7,7 @@ import { action, makeObservable, observable } from 'mobx'
 import { assignIf } from '@/store/utils/store.utils.ts'
 import { customMerge } from '@/utils/custom-merge.ts'
 
+// Todo: DoNode: DoTextNode, DoNoteNode 로 분리
 export class DoNode {
   store: DoNodeStore
 

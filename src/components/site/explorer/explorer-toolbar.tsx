@@ -18,7 +18,7 @@ import { Button } from '@/components/ui/button.tsx'
 import { TooltipWrap } from '@/components/ui/tooltip.tsx'
 import { useTheme } from '@/contexts/theme-provider.tsx'
 import { useStore } from '@/store/useStore.ts'
-import { ExplorerSortOption } from '@/store/views/explorer-view.ts'
+import { ExplorerSortOption } from '@/store/views/explorerViewModel.ts'
 import { cn } from '@/utils/cn.ts'
 
 const cns = {

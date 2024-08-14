@@ -26,7 +26,7 @@ export interface IReactFlowNodeBase {
   }
 }
 
-export type NodeType = 'text' | 'note' | 'table' | 'kanban'
+export type NodeType = 'text' | 'note'
 export type ReactFlowNodeType = NodeType | 'flow'
 
 export interface INodeBase extends IEditableItemBase, IReactFlowNodeBase {

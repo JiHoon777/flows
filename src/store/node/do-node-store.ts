@@ -5,6 +5,8 @@ import { cloneDeep } from 'lodash-es'
 import { action, makeObservable, observable, runInAction } from 'mobx'
 
 import { DoNode } from '@/store/node/do-node.ts'
+import { INoteNode } from '@/types/note-node.type.ts'
+import { ITextNode } from '@/types/text-node.type.ts'
 
 export class DoNodeStore {
   rootStore: RootStore
@@ -47,7 +49,16 @@ export class DoNodeStore {
   /**
    * @throws Error
    */
-  async createNode(node: NodeTypes): Promise<DoNode> {
+  async createNode(
+    _node:
+      | Omit<INoteNode, 'created_at' | 'updated_at'>
+      | Omit<ITextNode, 'created_at' | 'updated_at'>,
+  ): Promise<DoNode> {
+    const node: NodeTypes = {
+      ..._node,
+      created_at: new Date(),
+      updated_at: new Date(),
+    }
     const createdNode = this.merge(node)
 
     try {

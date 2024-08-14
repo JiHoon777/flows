@@ -14,7 +14,7 @@ export enum ExplorerSortOption {
   TitleZtoA = 'TitleZtoA',
 }
 
-export class ExplorerView {
+export class ExplorerViewModel {
   rootStore: RootStore
 
   sortOption: ExplorerSortOption = ExplorerSortOption.CreatedTimeAsc
@@ -38,13 +38,16 @@ export class ExplorerView {
   }
 
   get explorerList() {
-    return ExplorerView.sortFlowsOrNodesBySortOption(
+    return ExplorerViewModel.sortFlowsOrNodesBySortOption(
       [
         ...Object.values(this.flowStore.flowsMap).filter(
           (flow) => !flow.parentFlowId,
         ),
         ...Object.values(this.rootStore.nodeStore.nodesMap).filter(
-          (node) => !node.parentFlowId && node.type !== 'text',
+          (node) =>
+            !node.parentFlowId &&
+            node.snapshot.type === 'note' &&
+            !node.snapshot.dailyDate,
         ),
       ],
       this.sortOption,

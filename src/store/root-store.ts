@@ -8,7 +8,8 @@ import { ApiFileSystem } from '@/api/api-file-system.ts'
 import { formatUnknownErrorMessage } from '@/api/error.ts'
 import { DoFlowStore } from '@/store/flow/do-flow-store.ts'
 import { DoNodeStore } from '@/store/node/do-node-store.ts'
-import { ExplorerView } from '@/store/views/explorer-view.ts'
+import { CalendarViewModel } from '@/store/views/calendarViewModel.ts'
+import { ExplorerViewModel } from '@/store/views/explorerViewModel.ts'
 
 const isPrimitive = (value: any) =>
   value === null || (typeof value !== 'object' && typeof value !== 'function')
@@ -25,15 +26,17 @@ export class RootStore {
 
   platform: Platform | null = null
 
-  explorerView: ExplorerView
+  explorerView: ExplorerViewModel
+  calendarView: CalendarViewModel
 
   constructor() {
     this.api = new ApiFileSystem()
     this.flowStore = new DoFlowStore(this)
     this.nodeStore = new DoNodeStore(this)
 
-    // views
-    this.explorerView = new ExplorerView(this)
+    // view models
+    this.explorerView = new ExplorerViewModel(this)
+    this.calendarView = new CalendarViewModel(this)
 
     makeObservable(this, {
       appLoaded: observable,

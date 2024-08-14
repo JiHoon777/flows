@@ -1,7 +1,8 @@
 import type { InitialEditorStateType } from '@lexical/react/LexicalComposer'
-import type { EditorState } from 'lexical'
+import { $createParagraphNode, EditorState } from 'lexical'
 
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import { $getRoot } from 'lexical'
 import { debounce } from 'lodash-es'
 import { useEffect } from 'react'
 
@@ -33,15 +34,23 @@ export const OnChangePlugin = ({
   }, [editor, onChange])
 
   useEffect(() => {
-    if (!initialEditorState) {
-      return
-    }
-
     queueMicrotask(() => {
-      const editorState = editor.parseEditorState(initialEditorState as string)
-      editor.setEditorState(editorState)
+      if (initialEditorState) {
+        const editorState = editor.parseEditorState(
+          initialEditorState as string,
+        )
+        editor.setEditorState(editorState)
+      } else {
+        // initialEditorState가 없을 때 빈 단락으로 초기화
+        editor.update(() => {
+          const root = $getRoot()
+          if (root.isEmpty()) {
+            const paragraph = $createParagraphNode()
+            root.append(paragraph)
+          }
+        })
+      }
     })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editor, initialEditorState])
 
   return null

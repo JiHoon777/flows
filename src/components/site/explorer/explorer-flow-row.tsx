@@ -6,7 +6,7 @@ import { ExplorerFlowRowItem } from '@/components/site/explorer/explorer-flow-ro
 import { ExplorerNodeRow } from '@/components/site/explorer/explorer-node-row.tsx'
 import { DoFlow } from '@/store/flow/do-flow.ts'
 import { useStore } from '@/store/useStore.ts'
-import { ExplorerView } from '@/store/views/explorer-view.ts'
+import { ExplorerViewModel } from '@/store/views/explorerViewModel.ts'
 
 export const ExplorerFlowRow = observer(({ flow }: { flow: DoFlow }) => {
   const store = useStore()
@@ -29,15 +29,16 @@ export const ExplorerFlowRow = observer(({ flow }: { flow: DoFlow }) => {
     setIsOpen(false)
   }, [explorerView.isExpandAll])
 
-  const childFlows = ExplorerView.convertChildFlowIdsToDoFlows(flow.id, (id) =>
-    store.flowStore.getFlowById(id),
+  const childFlows = ExplorerViewModel.convertChildFlowIdsToDoFlows(
+    flow.id,
+    (id) => store.flowStore.getFlowById(id),
   )
-  const childNodes = ExplorerView.convertChildNodeIdsToDoNodes(
+  const childNodes = ExplorerViewModel.convertChildNodeIdsToDoNodes(
     flow.id,
     (id) => store.flowStore.getFlowById(id),
     (id) => store.nodeStore.getNodeById(id),
   )
-  const sortedFlowAndNodes = ExplorerView.sortFlowsOrNodesBySortOption(
+  const sortedFlowAndNodes = ExplorerViewModel.sortFlowsOrNodesBySortOption(
     [...childFlows, ...childNodes],
     store.explorerView.sortOption,
   )
